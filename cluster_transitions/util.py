@@ -20,9 +20,10 @@ def plot_view(clustering, centers, j):
 def plot_view_all(clustering, centers):
     for j in clustering.keys():
         X, y, colors = clustering[j]
+        n_c = 0
         centers_c = centers[j]
         for i in np.unique(y):
-            plt.scatter(X[y == i, 0], X[y == i, 1], color=colors[i], marker = 'o', s=20, label="Cluster "+str(i))
+            plt.scatter(X[y == i, 0], X[y == i, 1], color=colors[i], marker = 'o', s=20, label="Cluster "+str(n_c))
             plt.scatter(centers_c[i][0], centers_c[i][1], color='black', marker = 'h', s=20)
             plt.title("T_" + str(j))
             plt.xlabel("x")
@@ -30,6 +31,7 @@ def plot_view_all(clustering, centers):
             plt.xlim(0, 40)
             plt.ylim(0, 50)
             plt.legend()
+            n_c = n_c + 1
         plt.show()
 
 def att_colors(y):
