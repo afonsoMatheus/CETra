@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: utf-8
+
 from random import uniform, sample, randint, shuffle
 from sklearn.datasets import make_blobs
 import math
@@ -22,23 +25,21 @@ def int_local(X, y, clu, num_f, rang):
 
 #density changes
 #--difusion
-def int_den_dif(X, y, centers, clu, num_f, d):
+def int_den_dif(X, y, centers, clu, num_f):
     
     clu_index = cluster_index(X, y, clu)
         
-    for i in clu_index:
-        X[i] = dist_points_den(X[i], centers[clu[0]], d, num_f, 0)  
+    X = dist_points_den(X, centers[clu[0]], clu_index, num_f, 0) 
         
     return X, y
     
 #--compaction
-def int_den_comp(X, y, centers, clu, num_f, d):
+def int_den_comp(X, y, centers, clu, num_f):
     
     clu_index = cluster_index(X, y, clu)
     
-    for i in clu_index:
-        X[i] = dist_points_den(X[i], centers[clu[0]], d, num_f, 1)
-        
+    X = dist_points_den(X, centers[clu[0]], clu_index, num_f, 1) 
+    
     return X, y
 
 #size changes
@@ -51,10 +52,10 @@ def int_size_grow(X, y, centers, clu, num_f, q):
     clu_index = cluster_index(X, y, clu)
     
     for i in clu_index:
-        if(euc_distance(X[i], centers[clu]) > max_d):
-            max_d = euc_distance(X[i], centers[clu])
+        if(euc_distance(X[i], centers[clu[0]]) > max_d):
+            max_d = euc_distance(X[i], centers[clu[0]])
             
-    new_samples_X, new_samples_y = gen_samples(max_d, clu, centers[clu], num_f, q)
+    new_samples_X, new_samples_y = gen_samples(max_d, clu[0], centers[clu[0]], num_f, q)
     
     X = np.concatenate((X, new_samples_X), axis = 0)
     y = np.concatenate((y, new_samples_y), axis = 0)
@@ -163,23 +164,34 @@ def cluster_index(X, y, clusters):
     return clu_index
     
 
-def dist_points_den(x, center, d, num_f, t):
+def dist_points_den(X, center, clu_index, num_f, t):
     
-    if(t == 0):    
-        for i in range(num_f):
-            if(x[i] < center[i]):
-                x[i] = x[i] - d
-            else:
-                x[i] = x[i] + d
+    max_d = []
+    for i in range(num_f):
+        max_d.append(0)
+
+    for i in clu_index:
+        for j in range(num_f):
+            if(abs(X[i][j] - center[j]) > max_d[j]):
+                max_d[j] = abs(X[i][j] - center[j])
+                
+    if(t == 0):      
+        for i in clu_index:
+            for j in range(num_f):
+                if(X[i][j] < center[j]):
+                    X[i][j] = X[i][j] - max_d[j]/2
+                else:
+                    X[i][j] = X[i][j] + max_d[j]/2
     
     if(t == 1):
-         for i in range(num_f):
-            if(x[i] < center[i]):
-                x[i] = x[i] + d
-            else:
-                x[i] = x[i] - d
+         for i in clu_index:
+            for j in range(num_f):
+                if(X[i][j] < center[j]):
+                    X[i][j] = X[i][j] + max_d[j]/2
+                else:
+                    X[i][j] = X[i][j] - max_d[j]/2
 
-    return x
+    return X
 
 
 def gen_samples(max_d, clu, center, num_f, q):
