@@ -56,7 +56,7 @@ class Evocluster:
             n_c = 0
             centers_c = self.centers[j]
             for i in np.unique(y):
-                plt.scatter(X[y == i, 0], X[y == i, 1], color=colors[i], marker = 'o', s=20, label="Cluster "+str(n_c))
+                plt.scatter(X[y == i, 0], X[y == i, 1], color=colors[i], marker = 'o', s=20, label="Cluster "+str(i))
                 plt.scatter(centers_c[i][0], centers_c[i][1], color='black', marker = 'h', s=20)
                 plt.title("T_" + str(j))
                 plt.xlabel("x")
@@ -85,7 +85,22 @@ class Evocluster:
                     
                 csv_file.close()
                 
-            t = t + 1      
+            t = t + 1
+            
+    #Args None, None
+    #Ret dict; return the clusterings with only the X and y values
+    def get_samples(self):
+        
+        clusterings = {}
+        
+        for i in self.evo_clustering.keys():
+            X, y, c = self.evo_clustering[i]
+            clusterings[i] = X, y
+            
+        return clusterings
+        
+        
+        
             
 #Args tr X y colors centers num_f, list list list dict dict int
 #Ret list list dict dict; returns the new data for the next clustering 
@@ -130,7 +145,7 @@ def ch_transition(tr, X, y, colors, centers, num_f):
         new_c = find_centroids(X, y, num_f)
 
     if("ext_div" in tr):
-        X, y, colors = trans.ext_div(X, y, colors, [0], [[30,25,20],[20,40,25],[30,10,20]], [0.3,0.3,0.4], num_f)
+        X, y, colors = trans.ext_div(X, y, colors, [0], [[10,30,20],[20,10,25]], [0.5,0.5], num_f)
         new_c = find_centroids(X, y, num_f)
 
     return X, y, colors, new_c

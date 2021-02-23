@@ -2,8 +2,8 @@ import numpy as np
 
 def execute(clust_i, clust_j, age_j):
     
-    X_1, y_1, c1 = clust_i
-    X_2, y_2, c2 = clust_j
+    X_1, y_1= clust_i
+    X_2, y_2= clust_j
     
     clu_index_1 = {}
     for clu in np.unique(y_1):
@@ -15,49 +15,50 @@ def execute(clust_i, clust_j, age_j):
         
     overlap_m =  overlap_matrix(clu_index_1, clu_index_2, age_j)
     
-    print(overlap_m)
+    #print(overlap_m)
+    
+    C_1 = list(clu_index_1)
+    C_2 = list(clu_index_2)
         
     deaths, split_list, absor_sur = [], [], []
-    for i in clu_index_1.keys():
+    for i in range(len(C_1)):
         split_cand, split_union = [], []
         surv_cand = -1
         
-        for j in clu_index_2.keys():
+        for j in range(len(C_2)):
             
             mcell = overlap_m[i][j]
             
             if(mcell > 0.5):
                 if(mcell > surv_cand):
-                    surv_cand = j
+                    surv_cand = C_2[j]
             elif(mcell > 0.25):
-                split_cand.append(j)
-                split_union.append(clu_index_2[j])
+                split_cand.append(C_2[j])
+                split_union = split_union + clu_index_2[C_2[j]]
                         
         if(surv_cand == -1 and split_cand == []):
-            deaths.append(i)
+            deaths.append(C_1[i])
         elif(split_cand != []):
-            if (overlap(clu_index_1[i], split_union) > 0.5):
-                for j in split_cand:
-                    split_list.append([i,j])
+            if (overlap(clu_index_1[C_1[i]], split_union, age_j) > 0.5):
+                for j in range(len(split_cand)):
+                    split_list.append([C_1[i],split_cand[j]])
             else:
-                deaths.append(i)
+                deaths.append(C_1[i])
         else:
             
-            absor_sur.append([i, surv_cand])
+            absor_sur.append([C_1[i], surv_cand])
             
     absor_list, surv_list = [], []
                 
-    for j in clu_index_2.keys():
-        absor_cand = get_candidates(absor_sur, j)
-        
-        print(absor_cand)
-        
+    for j in range(len(C_2)):
+        absor_cand = get_candidates(absor_sur, C_2[j])
+                
         if(len(absor_cand) > 1): 
             for i in absor_cand:
-                absor_list.append([i,j])
+                absor_list.append([C_1[i],C_2[j]])
         
-        elif(absor_cand[0] == j):
-            surv_list.append([absor_cand[0],j])
+        elif(absor_cand == C_2[j]):
+            surv_list.append([absor_cand[0],C_2[j]])
     
     print("----------------")
     print("Absorvidos: " + str(absor_list))
@@ -87,12 +88,12 @@ def overlap_matrix(clu_index_1, clu_index_2, age_y):
         #size[i] = []
         #size[i].append(len(clu_index_1[i]))
         
-        for j in clu_index_1.keys():
+        for j in clu_index_2.keys():
             
-            if(j not in clu_index_2.keys()):
-                overlaps[i].append(0) 
-            else:
-                overlaps[i].append(overlap(clu_index_1[i], clu_index_2[j], age_y))
+            #if(j not in clu_index_2.keys()):
+                #overlaps[i].append(0) 
+            #else:
+            overlaps[i].append(overlap(clu_index_1[i], clu_index_2[j], age_y))
             #size[i].append(len(clu_index_2[j]))'
             
     return overlaps
@@ -142,11 +143,11 @@ def weight_age(clustering):
     for i in clustering.keys():
         age_w[i] = []
     
-    X, y, c = clustering[0]
+    X, y = clustering[0]
     age_w[0] = [1 for x in range(len(X))]
     
     for i in range(1, len(clustering.keys())):
-        X, y, c = clustering[i]
+        X, y = clustering[i]
         age_w[i] = age(X, i, age_w[i-1])
         
     return age_w
