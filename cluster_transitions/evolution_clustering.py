@@ -55,7 +55,12 @@ class Evocluster:
             X, y, colors = self.evo_clustering[j]
             n_c = 0
             centers_c = self.centers[j]
-            for i in np.unique(y):
+            
+            clus = np.unique(y)
+            index = np.argwhere(clus==-1)
+            clus = np.delete(clus, index, 0)
+                        
+            for i in clus:
                 plt.scatter(X[y == i, 0], X[y == i, 1], color=colors[i], marker = 'o', s=20, label="Cluster "+str(i))
                 plt.scatter(centers_c[i][0], centers_c[i][1], color='black', marker = 'h', s=20)
                 plt.title("T_" + str(j))
@@ -133,7 +138,7 @@ def ch_transition(tr, X, y, colors, centers, num_f):
     #external transitions
 
     if("ext_death" in tr):
-        X, y, colors = trans.ext_death(X, y, [3], colors)
+        X, y, colors = trans.ext_death(X, y, [1], colors)
         new_c = find_centroids(X, y, num_f)
 
     if("ext_birth" in tr):
@@ -141,7 +146,7 @@ def ch_transition(tr, X, y, colors, centers, num_f):
         new_c = find_centroids(X, y, num_f)
 
     if("ext_union" in tr):
-        X, y, colors = trans.ext_union(X, y, colors, [0,2], [10,40,25], num_f)
+        X, y, colors = trans.ext_union(X, y, colors, [2,3], [10,40,25], num_f)
         new_c = find_centroids(X, y, num_f)
 
     if("ext_div" in tr):

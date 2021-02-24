@@ -79,7 +79,7 @@ def int_size_reduc(X, y, clu, k):
 #birth
 def ext_birth(X, y, colors, num_f, q):
     
-    X_new, y_new = make_blobs(n_samples=[q], centers=[(25,10,20)], n_features=num_f ,random_state=1)
+    X_new, y_new = make_blobs(n_samples=[q], centers=[(35,10,20)], n_features=num_f ,random_state=1)
             
     for i in range(len(y_new)):
         y_new[i] = max(y) + 1
@@ -96,11 +96,12 @@ def ext_death(X, y, clu, colors):
 
     clu_index = cluster_index(X, y, clu)
     
-    X = np.delete(X, clu_index, axis = 0)
-    y = np.delete(y, clu_index, axis = 0)
+    for i in clu_index:
+        #X[i] = 0
+        y[i] = -1
     
     del colors[clu[0]]
-    
+        
     return X, y, colors
     
 #union
@@ -141,7 +142,6 @@ def ext_div(X, y, colors, clu, n_centers, ratio, num_f):
     for i in range(1,len(ratio)):
         ys[i] = ys[i-1]+1
         colors[ys[i]] = '#%06X' % randint(0, 0xFFFFFF)
-    print(ys)
         
     for i in new_clusters.keys():
         for j in new_clusters[i]:
