@@ -85,7 +85,7 @@ class Evocluster:
                 writer = csv.writer(csv_file)
                                                 
                 for j in range(X.shape[0]):
-                    row = np.concatenate((X[j], y[j]), axis = None)
+                    row = np.concatenate((y[j], X[j]), axis = None)
                     writer.writerow(row)
                     
                 csv_file.close()
@@ -116,7 +116,7 @@ def ch_transition(tr, X, y, colors, centers, num_f):
     #internal transitions
 
     if("int_den_dif" in tr):
-        X, y = trans.int_den_dif(X, y, centers, [1], num_f)
+        X, y = trans.int_den_dif(X, y, centers, [2], num_f)
         new_c = find_centroids(X, y, num_f)
 
     if("int_den_comp" in tr):
@@ -124,15 +124,15 @@ def ch_transition(tr, X, y, colors, centers, num_f):
         new_c = find_centroids(X, y, num_f)
 
     if("int_size_grow" in tr):
-        X, y = trans.int_size_grow(X, y, centers, [1], num_f, 30)
+        X, y = trans.int_size_grow(X, y, centers, [2], num_f, 30)
         new_c = find_centroids(X, y, num_f)
 
     if("int_size_reduc" in tr):
-        X, y = trans.int_size_reduc(X, y, [1], 80)
+        X, y = trans.int_size_reduc(X, y, [4], 7)
         new_c = find_centroids(X, y, num_f)
 
     if("int_local" in tr):   
-        X, y = trans.int_local(X, y, [2], num_f, (-8,8))
+        X, y = trans.int_local(X, y, [4], num_f, (-5,-5))
         new_c = find_centroids(X, y, num_f)
 
     #external transitions
