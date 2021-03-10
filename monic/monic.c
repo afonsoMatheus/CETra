@@ -30,7 +30,7 @@ int max(int *v, int count);
 float **overlapMatrix(int **clu_index_1, int **clu_index_2, int *unique_c1, int *unique_c2, int usize_i, int usize_j, int* cont_ci, int* cont_cj, float *age_j);
 float overlap(int *c1, int count_i, int *c2, int count_j, float *age_j);
 
-int *concatenate(int *v1, int s1, int *v2, int s2);
+void concatenate(int *v1, int *s1, int *v2, int s2);
 char *getCandidates(struct Tuple *absor_sur, int size, char j, int *s);
 
 
@@ -93,26 +93,21 @@ struct Clustering *readCsv(char* path){
 
 void main(int argc, char const *argv[]){
 
+	//inputs of the two clusterings
+
 	struct Clustering *C_1 = readCsv("evo_cluster_0.csv");
 	struct Clustering *C_2 = readCsv("evo_cluster_1.csv");
 
-	//inputs of the two clusterings
-
-	float X_1[][4] = {{20.0,30.0,15.0},{5.0,5.0,5.0},{40.0,50.0,40.0}};
-	int y_1[] = {0,0,1};
-	int size_1 = C_1->s;
-
-	float X_2[][4] = {{20.0,30.0,15.0},{5.0,5.0,5.0},{40.0,50.0,40.0}, {60.0,60.0,60.0}};
-	int y_2[] = {0,0,1,0};
-	int size_2 = C_2->s;
-
 	//getting clusters informations of each clustering
 
+	int size_1 = C_1->s;
+	int size_2 = C_2->s;
+
 	int usize_1; 
-	int *unique_c1 = unique(y_1, size_1, &usize_1);
+	int *unique_c1 = unique(C_1->y, size_1, &usize_1);
 
 	int usize_2;
-	int *unique_c2 = unique(y_2, size_2, &usize_2);
+	int *unique_c2 = unique(C_2->y, size_2, &usize_2);
 
 	//assigning the weights of each sample for each clustering
 
@@ -124,13 +119,13 @@ void main(int argc, char const *argv[]){
 	int *cont_1 = (int *) malloc(MAX * sizeof(int*));
 	int **clu_index_1 = (int **) malloc(usize_1 * sizeof(int*));
 	for (int i = 0; i < usize_1; ++i){
-		clu_index_1[i] = clusterIndex(y_1, size_1, unique_c1[i], &cont_1[i]);
+		clu_index_1[i] = clusterIndex(C_1->y, size_1, unique_c1[i], &cont_1[i]);
 	}; 
 
 	int *cont_2 = (int *) malloc(MAX * sizeof(int*));
 	int **clu_index_2 = (int **) malloc(usize_2 * sizeof(int*));
 	for (int i = 0; i < usize_2; ++i){
-		clu_index_2[i] = clusterIndex(y_2, size_2, unique_c2[i], &cont_2[i]);
+		clu_index_2[i] = clusterIndex(C_2->y, size_2, unique_c2[i], &cont_2[i]);
 	};
 
 	//building overlapping matrix
@@ -145,24 +140,28 @@ void main(int argc, char const *argv[]){
 
 	int d, s, a, t = 0;
 
+
+
 	for (int i = 0; i < usize_1; ++i){
 
-		int *split_cand = NULL;
-		int *split_union = (int *) malloc (MAX * sizeof(int));
+		int *split_cand;
+		split_cand[0] = -1;
+
+		int *split_union = (int *) malloc (sizeof(int));
 
 		int sc, su = 0;
 		int surv_cand = -1;
 
 		for (int j = 0; j < usize_2; ++j){
 			
-			float mcell = overlap_m[unique_c1[i]][j];
+			float mcell = overlap_m[i][j];
 
 			if (mcell > 0.5){
 				if (mcell > surv_cand){
-					surv_cand = unique_c2[j];
+					surv_cand = j;
 				}else if(mcell == surv_cand){
 
-					if (overlap_i[unique_c2[j]][i] > overlap_i[unique_c2[surv_cand]][i]){
+					if (overlap_i[j][i] > overlap_i[surv_cand][i]){
 						surv_cand = unique_c2[j];
 					};
 
@@ -170,21 +169,28 @@ void main(int argc, char const *argv[]){
 
 			}else if(mcell > 0.25){
 
-				split_cand[sc] = unique_c2[j];
+				split_cand[sc] = j;
 				sc++;
+				
+				concatenate(split_union, &su, clu_index_2[j], cont_2[j]);
 
-				split_union = concatenate(split_union, su, clu_index_2[unique_c2[j]], cont_2[j]);
-				su = su + cont_2[j];
+				printf("aqui %d\n", su);
+
+				for (int k = 0; k < su; ++k){
+					printf("%d\n", split_union[k]);
+				}
 
 			};
 
 		};
 
-		if (surv_cand == -1 && split_cand == NULL){
+		/*
+
+		if (surv_cand == -1 && split_cand[0] == -1){
 			deaths[d] = (char) unique_c1[i];
 			d++;
 			
-		}else if(split_cand != NULL){
+		}else if(split_cand[0] != -1){
 
 			if (overlap(clu_index_1[i], cont_1[i], split_union, su, age_w[1]) > 0.5){
 				
@@ -210,8 +216,12 @@ void main(int argc, char const *argv[]){
 			a++;
 
 		};
+
+		*/
 		
 	};
+
+	/*
 
 	struct Tuple *absors_list = (struct Tuple *) malloc ((usize_1 + usize_2) * sizeof(struct Tuple));
 	char *survs = (char *) malloc ((usize_1 + usize_2) * sizeof(char));
@@ -244,6 +254,10 @@ void main(int argc, char const *argv[]){
 
 	};
 
+	printf("%c\n", survs[0]);
+
+	*/
+
 };
 
 char *getCandidates(struct Tuple *absor_sur, int size, char j, int *s){
@@ -264,23 +278,35 @@ char *getCandidates(struct Tuple *absor_sur, int size, char j, int *s){
 
 };
 
-int *concatenate(int *v1, int s1, int *v2, int s2){
+void concatenate(int *v1, int *s1, int *v2, int s2){
 
-	int *v3 = (int*) malloc((s1+s2) * sizeof(int));
+	if(*s1 == 0){
 
-	int k = 0;
-	for (int i = 0; i < s1; ++i){
-		v3[k] = v1[i];
-		k++;
-	};
+		v1 = (int*) realloc(v1, MAX * sizeof(int));
 
-	for (int i = 0; i < s2; ++i){
-		v3[k] = v2[i];
-		k++;
+		//v1 = (int*) realloc(v1, s2 * sizeof(int));
+
+		for (int i = 0; i < s2; ++i){
+			v1[i] = v2[i];
+		};
+
+		*s1 = s2;
 		
+	}else{
+
+		//v1 = (int*) realloc(v1, (*s1 + s2) * sizeof(int));
+
+		int k = *s1;
+		for (int i = 0; i < s2; ++i){
+			v1[k] = v2[i];
+			k++;
+		};
+
+		*s1 = k;
+
 	};
 
-	return v3;
+	
 
 };
 
