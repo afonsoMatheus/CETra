@@ -13,9 +13,11 @@ struct Clustering{
 };
 
 struct Tuple{
-	char ci;
-	char cj;
+	int ci;
+	int cj;
 };
+
+struct Clustering *readCsv(char* path);
 
 float **weightAge(int* sizes);
 float age(float last_w);
@@ -31,64 +33,9 @@ float **overlapMatrix(int **clu_index_1, int **clu_index_2, int *unique_c1, int 
 float overlap(int *c1, int count_i, int *c2, int count_j, float *age_j);
 
 void concatenate(int *v1, int *s1, int *v2, int s2);
-char *getCandidates(struct Tuple *absor_sur, int size, char j, int *s);
+int *getCandidates(struct Tuple *absor_sur, int size, int j, int *s);
 
-
-struct Clustering *readCsv(char* path){
-
-
-	struct Clustering *C = (struct Clustering *) malloc(sizeof(struct Clustering));
-	C->X = (float **) malloc(MAX * sizeof(float*));
-	for(int i = 0; i < MAX; i++) C->X[i] = (float *)malloc(FEA * sizeof(float));
-	
-	C->y = (int *) malloc(MAX * sizeof(int));
-
-	FILE* fp = fopen(path, "r");
-	char buffer[1024];
-	int row = 0;
-	int col = 0;
-	int c = 0;
-
-	while(fgets(buffer, 1024, fp)){
-
-		col = 0;
-		c = 0;
-		
-		
-		char *value = strtok(buffer, ",");
-
-		while (value) {
-
-			if (col == 0){
-				C->y[row] = atoi(value);
-
-			}else{
-
-				C->X[row][c] = atof(value);
-				c++;
-			};
-
-            value = strtok(NULL, ", "); 
-            col++; 
-       };
-
-       //printf("%d\n", C->y[row]);
-
-       //printf("%f %f %f\n", C->X[row][0], C->X[row][1], C->X[row][2]); 
-
-       row++;
-    };
-
-    C->s = row;
-
-    //printf("%d\n", row);
-
-    fclose(fp);
-
-    return C; 
-
-
-};
+void showTransictions(int *survs, int sur, struct Tuple *splits, int spl, int *births, int bir);
 
 
 void main(int argc, char const *argv[]){
@@ -135,21 +82,21 @@ void main(int argc, char const *argv[]){
 
 	//external transitions
 
-	char *deaths, *tracked = (char *) malloc ((usize_1 + usize_2) * sizeof(char));
-	struct Tuple *splits, *absors = (struct Tuple *) malloc ((usize_1 + usize_2) * sizeof(struct Tuple));
+	int *deaths, *tracked = (int *) malloc ((usize_1 + usize_2) * sizeof(int));
+	struct Tuple *absors = (struct Tuple *) malloc ((usize_1 + usize_2) * sizeof(struct Tuple));
+	struct Tuple *splits = (struct Tuple *) malloc ((usize_1 + usize_2) * sizeof(struct Tuple));;
 
-	int d, s, a, t = 0;
-
-
+	int s = 0, d = 0, t = 0, a = 0;
 
 	for (int i = 0; i < usize_1; ++i){
 
-		int *split_cand;
+		int *split_cand = (int *) malloc (usize_2 * sizeof(int));
 		split_cand[0] = -1;
 
 		int *split_union = (int *) malloc (sizeof(int));
 
-		int sc, su = 0;
+		int sc = 0, su = 0;
+
 		int surv_cand = -1;
 
 		for (int j = 0; j < usize_2; ++j){
@@ -162,7 +109,7 @@ void main(int argc, char const *argv[]){
 				}else if(mcell == surv_cand){
 
 					if (overlap_i[j][i] > overlap_i[surv_cand][i]){
-						surv_cand = unique_c2[j];
+						surv_cand = j;
 					};
 
 				};
@@ -174,20 +121,12 @@ void main(int argc, char const *argv[]){
 				
 				concatenate(split_union, &su, clu_index_2[j], cont_2[j]);
 
-				printf("aqui %d\n", su);
-
-				for (int k = 0; k < su; ++k){
-					printf("%d\n", split_union[k]);
-				}
-
 			};
 
 		};
 
-		/*
-
 		if (surv_cand == -1 && split_cand[0] == -1){
-			deaths[d] = (char) unique_c1[i];
+			deaths[d] = unique_c1[i];
 			d++;
 			
 		}else if(split_cand[0] != -1){
@@ -195,43 +134,41 @@ void main(int argc, char const *argv[]){
 			if (overlap(clu_index_1[i], cont_1[i], split_union, su, age_w[1]) > 0.5){
 				
 				for (int j = 0; j < sc; ++j){
-					splits[s].ci = (char) unique_c1[i];
-					splits[s].cj = (char) split_cand[j];
+
+					splits[s].ci = unique_c1[i];
+					splits[s].cj = unique_c2[split_cand[j]];
 					s++;
 
-					tracked[t] = (char) split_cand[j];
+					tracked[t] = unique_c2[split_cand[j]];
 					t++;
 				};
 
 
 			}else{
-				deaths[d] = (char) unique_c1[i];
+				deaths[d] = unique_c1[i];
 				d++;
 			};
 
 		}else{
 
-			absors[a].ci = (char) unique_c1[i];
-			absors[a].cj = (char) surv_cand;
+			absors[a].ci = unique_c1[i];
+			absors[a].cj = unique_c2[surv_cand];
 			a++;
 
 		};
-
-		*/
-		
+	
 	};
-
-	/*
-
+	
 	struct Tuple *absors_list = (struct Tuple *) malloc ((usize_1 + usize_2) * sizeof(struct Tuple));
-	char *survs = (char *) malloc ((usize_1 + usize_2) * sizeof(char));
+	int *survs = (int *) malloc ((usize_1) * sizeof(int));
 	int sur = 0;
 
 	for (int i = 0; i < usize_2; ++i){
 
-		int al;
-		char *absors_cand = getCandidates(absors, a, unique_c2[i], &al);
+		int al = 0;
+		int *absors_cand = getCandidates(absors, a, unique_c2[i], &al);		
 
+		
 		if (al > 1){
 
 			for (int j = 0; j < al; ++i){
@@ -239,30 +176,116 @@ void main(int argc, char const *argv[]){
 				absors_list[j].ci = absors_cand[j];
 				absors_list[j].cj = unique_c2[i];
 
-				tracked[t] = (char) unique_c2[i];
+				tracked[t] = unique_c2[i];
 				t++;
 				
 			};
 		 	
-		}else if (absors_cand[0] == unique_c2[i]){
+		}else if(absors_cand[0] == unique_c2[i]){
 			survs[sur] = unique_c2[i];
 			sur++;
-			tracked[t] = (char) unique_c2[i];
+			tracked[t] = unique_c2[i];
 			t++;
 
 		}; 
 
 	};
 
-	printf("%c\n", survs[0]);
+	int *birth = (int*) malloc(usize_2 * sizeof(int));
 
-	*/
+	int k = 0;
+	for (int i = 0; i < usize_2; ++i){
+		for (int j = 0; j < t; ++j){
+			if (tracked[j] == unique_c2[i]){
+				break;
+			}else if(j == t - 1){
+				birth[k] = unique_c2[i];
+				k++;
+			};
+		};
+
+	};
+
+	//showing transictions
+	
+	showTransictions(survs, sur, splits, s, birth, k);
+	
+};
+
+void showTransictions(int *survs, int sur, struct Tuple *splits, int spl, int *births, int bir){
+		
+		printf("Survivals:\n");
+		for (int i = 0; i < sur; ++i){
+			printf("C_%d -> C_%d\n", survs[i], survs[i]);
+		};
+		printf("\n");
+
+		printf("Splits:\n");
+		for (int i = 0; i < spl; ++i){
+			printf("C_%d -> C_%d\n", splits[i].ci, splits[i].cj);
+		};
+		printf("\n");
+
+		printf("Births:\n");
+		for (int i = 0; i < bir; ++i){
+			printf("* -> C_%d\n", births[i]);
+		};
+		printf("\n");
+};
+
+struct Clustering *readCsv(char* path){
+
+
+	struct Clustering *C = (struct Clustering *) malloc(sizeof(struct Clustering));
+	C->X = (float **) malloc(MAX * sizeof(float*));
+	for(int i = 0; i < MAX; i++) C->X[i] = (float *)malloc(FEA * sizeof(float));
+	
+	C->y = (int *) malloc(MAX * sizeof(int));
+
+	FILE* fp = fopen(path, "r");
+	char buffer[1024];
+	int row = 0;
+	int col = 0;
+	int c = 0;
+
+	while(fgets(buffer, 1024, fp)){
+
+		col = 0;
+		c = 0;
+		
+		
+		char *value = strtok(buffer, ",");
+
+		while (value) {
+
+			if (col == 0){
+				C->y[row] = atoi(value);
+
+			}else{
+
+				C->X[row][c] = atof(value);
+				c++;
+			};
+
+            value = strtok(NULL, ", "); 
+            col++; 
+       };
+
+       row++;
+    };
+
+    C->s = row;
+
+    fclose(fp);
+
+    return C; 
+
 
 };
 
-char *getCandidates(struct Tuple *absor_sur, int size, char j, int *s){
+int *getCandidates(struct Tuple *absor_sur, int size, int j, int *s){
 
-	char *absortion_cand = (char*) malloc(size * sizeof(char));
+	int *absortion_cand = (int*) malloc(size * sizeof(int));
 
 	int k = 0;
 	for (int i = 0; i < size; ++i){
@@ -469,9 +492,3 @@ void swap(int* xp, int* yp){
     *xp = *yp;
     *yp = temp;
 };
-
-
-
-
-
-
