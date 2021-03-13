@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> 
+#include <math.h>
 
 #define CLU 2 // number of clusterings
 #define MAX 105 // maximun sample size for vector alocation
@@ -15,28 +16,42 @@ struct Clustering{
 struct Tuple{
 	int ci;
 	int cj;
+
 };
 
-struct Clustering *readCsv(char* path);
+struct SurvTuple{
+	int ci;
+	int cj;
+	int i;
+	int j;
+};
 
-float **weightAge(int* sizes);
-float age(float last_w);
+struct Clustering *readCsv(char*);
 
-int *clusterIndex(int *y, int s, int clu, int *cont);
+float **weightAge(int*);
+float age(float);
 
-int *unique(int *y, int size, int *us);
-void selectionSort(int arr[], int n);
-void swap(int* xp, int* yp);
+int *clusterIndex(int *, int, int, int *);
 
-int max(int *v, int count);
-float **overlapMatrix(int **clu_index_1, int **clu_index_2, int *unique_c1, int *unique_c2, int usize_i, int usize_j, int* cont_ci, int* cont_cj, float *age_j);
-float overlap(int *c1, int count_i, int *c2, int count_j, float *age_j);
+int *unique(int *, int, int *);
+void selectionSort(int *, int);
+void swap(int*, int*);
 
-void concatenate(int *v1, int *s1, int *v2, int s2);
-int *getCandidates(struct Tuple *absor_sur, int size, int j, int *s);
+int max(int *, int);
+float **overlapMatrix(int **, int **, int *, int *, int, int, int*, int*, float *);
+float overlap(int *, int, int *, int, float *);
 
-void showTransictions(int *survs, int sur, struct Tuple *splits, int spl, int *births, int bir);
+void concatenate(int *, int *, int *, int);
+int *getCandidates(struct Tuple *, int, int, int*);
 
+void sizeTrans(int *, int, int *, int, float*, float *);
+void compTrans(int *, int, int *, int, float **, float **);
+void locTrans(int *, int, int *, int, float **, float **);
+
+float stdev(float **, int, int);
+float mean(float **, int, int);
+
+void showTransictions(struct SurvTuple *, int, struct Tuple *, int, int *, int, struct Tuple *, int, int *, int);
 
 void main(int argc, char const *argv[]){
 
@@ -82,7 +97,8 @@ void main(int argc, char const *argv[]){
 
 	//external transitions
 
-	int *deaths, *tracked = (int *) malloc ((usize_1 + usize_2) * sizeof(int));
+	int *tracked = (int *) malloc (usize_2 * sizeof(int));
+	int *deaths = (int *) malloc (usize_1 * sizeof(int));
 	struct Tuple *absors = (struct Tuple *) malloc ((usize_1 + usize_2) * sizeof(struct Tuple));
 	struct Tuple *splits = (struct Tuple *) malloc ((usize_1 + usize_2) * sizeof(struct Tuple));;
 
@@ -153,15 +169,17 @@ void main(int argc, char const *argv[]){
 
 			absors[a].ci = unique_c1[i];
 			absors[a].cj = unique_c2[surv_cand];
+
 			a++;
 
 		};
 	
 	};
 	
-	struct Tuple *absors_list = (struct Tuple *) malloc ((usize_1 + usize_2) * sizeof(struct Tuple));
-	int *survs = (int *) malloc ((usize_1) * sizeof(int));
+	struct Tuple *absors_list = (struct Tuple *) malloc (a * sizeof(struct Tuple));
+	struct SurvTuple *survs = (struct SurvTuple *) malloc ((usize_1) * sizeof(struct SurvTuple));
 	int sur = 0;
+	int abs = 0;
 
 	for (int i = 0; i < usize_2; ++i){
 
@@ -171,10 +189,11 @@ void main(int argc, char const *argv[]){
 		
 		if (al > 1){
 
-			for (int j = 0; j < al; ++i){
+			for (int j = 0; j < al; ++j){
 
 				absors_list[j].ci = absors_cand[j];
 				absors_list[j].cj = unique_c2[i];
+				abs++;
 
 				tracked[t] = unique_c2[i];
 				t++;
@@ -182,8 +201,20 @@ void main(int argc, char const *argv[]){
 			};
 		 	
 		}else if(absors_cand[0] == unique_c2[i]){
-			survs[sur] = unique_c2[i];
+			survs[sur].ci = absors_cand[0];
+			survs[sur].cj = unique_c2[i];
+			
+
+			for (int k = 0; k < usize_1; ++k){
+				if (unique_c1[k] == absors_cand[0]){
+					survs[sur].i = k;
+					break;
+				}
+			}
+
+			survs[sur].j = i;
 			sur++;
+
 			tracked[t] = unique_c2[i];
 			t++;
 
@@ -198,7 +229,7 @@ void main(int argc, char const *argv[]){
 		for (int j = 0; j < t; ++j){
 			if (tracked[j] == unique_c2[i]){
 				break;
-			}else if(j == t - 1){
+			}else if(j == t - 1 && unique_c2[i] != -1){
 				birth[k] = unique_c2[i];
 				k++;
 			};
@@ -206,23 +237,163 @@ void main(int argc, char const *argv[]){
 
 	};
 
+	//internal transitions
+
+	for (int i = 0; i < sur; ++i){
+
+		sizeTrans(clu_index_1[survs[i].i], cont_1[survs[i].i], clu_index_2[survs[i].j], cont_2[survs[i].j], age_w[0], age_w[1]);
+
+		compTrans(clu_index_1[survs[i].i], cont_1[survs[i].i], clu_index_2[survs[i].j], cont_2[survs[i].j], C_1->X, C_2->X);
+
+		locTrans(clu_index_1[survs[i].i], cont_1[survs[i].i], clu_index_2[survs[i].j], cont_2[survs[i].j], C_1->X, C_2->X);
+
+	};
+
 	//showing transictions
 	
-	showTransictions(survs, sur, splits, s, birth, k);
+	showTransictions(survs, sur, splits, s, birth, k, absors_list, abs, deaths, d);
+
+	
 	
 };
 
-void showTransictions(int *survs, int sur, struct Tuple *splits, int spl, int *births, int bir){
+void locTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float **X_ti, float **X_tj){
+	
+	float **Xi = (float **) malloc (size_ti * sizeof(float*));
+	for(int i = 0; i < size_ti; i++) Xi[i] = (float *)malloc(FEA * sizeof(float));
+	
+	for (int i = 0; i < size_ti; ++i){
+		for (int j = 0; j < FEA; ++j){
+			Xi[i][j] = X_ti[clu_ti[i]][j];
+		};
+	};
+
+	float **Xj = (float **) malloc (size_tj * sizeof(float*));
+	for(int i = 0; i < size_ti; i++) Xj[i] = (float *)malloc(FEA * sizeof(float));
+	
+	for (int i = 0; i < size_tj; ++i){
+		for (int j = 0; j < FEA; ++j){
+			Xj[i][j] = X_tj[clu_tj[i]][j];
+		};
+	};
+
+	float mean_i = mean(Xi, size_ti, FEA);
+	float mean_j = mean(Xj, size_tj, FEA);
+
+	if(mean_i - mean_j > 3){
+		printf("Localization\n");
+	};
+
+};
+
+
+float mean(float **X, int row, int col){
+
+	float sum = 0.0;
+	for (int i = 0; i < row; ++i){
+		for (int j = 0; j < col; ++j){
+			sum += X[i][j];
+		}
+	}
+
+	return sum/(row*col);
+
+};
+
+void compTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float **X_ti, float **X_tj){
+
+	float **Xi = (float **) malloc (size_ti * sizeof(float*));
+	for(int i = 0; i < size_ti; i++) Xi[i] = (float *)malloc(FEA * sizeof(float));
+	
+	for (int i = 0; i < size_ti; ++i){
+		for (int j = 0; j < FEA; ++j){
+			Xi[i][j] = X_ti[clu_ti[i]][j];
+		};
+	};
+
+	float **Xj = (float **) malloc (size_tj * sizeof(float*));
+	for(int i = 0; i < size_ti; i++) Xj[i] = (float *)malloc(FEA * sizeof(float));
+	
+	for (int i = 0; i < size_tj; ++i){
+		for (int j = 0; j < FEA; ++j){
+			Xj[i][j] = X_tj[clu_tj[i]][j];
+		};
+	};
+
+	float std_i = stdev(Xi, size_ti, FEA);
+	float std_j = stdev(Xj, size_tj, FEA);
+
+	if (std_j < std_i - 0.05){
+		printf("Compaction\n");
+	}else if(std_j > std_i + 0.05){
+		printf("Difusion\n");
+	}
+
+
+};
+
+float stdev(float **X, int row, int col){
+
+	float m = mean(X, row, col);
+
+	float sd = 0.0;
+	for (int i = 0; i < row; ++i){
+		for (int j = 0; j < col; ++j){
+			sd += pow(X[i][j] - m, 2);
+		}
+	}
+
+
+	return sqrt(sd/(row*col));
+
+};
+
+
+void sizeTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float *age_ti, float *age_tj){
+
+	float sum_i = 0;
+	for (int i = 0; i < size_ti; ++i){
+		sum_i = sum_i + age_ti[clu_ti[i]];
+	};
+
+	float sum_j = 0;
+	for (int j = 0; j < size_tj; ++j){
+		sum_j = sum_j + age_tj[clu_tj[j]];
+	};
+
+	if (sum_i*0.75 > sum_j + 10){
+		printf("Shrinked\n");		
+
+	}else if(sum_j > (sum_i*0.75) + 10){
+		printf("Expanded\n");
+	};
+
+};
+
+
+void showTransictions(struct SurvTuple *survs, int sur, struct Tuple *splits, int spl, int *births, int bir,  struct Tuple *absors, int abs, int *deaths, int dea){
 		
+		printf("Deaths:\n");
+		for (int i = 0; i < dea; ++i){
+			printf("C_%d -> DEATH \n", deaths[i]);
+		};
+		printf("\n");
+
 		printf("Survivals:\n");
 		for (int i = 0; i < sur; ++i){
-			printf("C_%d -> C_%d\n", survs[i], survs[i]);
+			printf("C_%d -> C_%d\n", survs[i].ci, survs[i].cj);
 		};
 		printf("\n");
 
 		printf("Splits:\n");
 		for (int i = 0; i < spl; ++i){
 			printf("C_%d -> C_%d\n", splits[i].ci, splits[i].cj);
+		};
+		printf("\n");
+
+		printf("Unions:\n");
+		for (int i = 0; i < abs; ++i){
+			printf("C_%d -> C_%d\n", absors[i].ci, absors[i].cj);
 		};
 		printf("\n");
 
