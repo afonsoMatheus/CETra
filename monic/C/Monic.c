@@ -1,64 +1,27 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h> 
-#include <math.h>
+/* Author: Afonso Matheus   */
+/* Date: 2021              */
+//---------------------------------------------------------------------------
 
-#define CLU 2 // number of clusterings
-#define MAX 105 // maximun sample size for vector alocation
-#define FEA 3 // number of features
+#include "Monic.h"
 
-struct Clustering{
-	float **X;
-	int *y;
-	int s;
-};
+int CLU = 2; // number of clusterings
+int MAX = 105; // maximun sample size for vector alocation
+int FEA = 3; // number of features
 
-struct Tuple{
-	int ci;
-	int cj;
-
-};
-
-struct SurvTuple{
-	int ci;
-	int cj;
-	int i;
-	int j;
-};
-
-struct Clustering *readCsv(char*);
-
-float **weightAge(int*);
-float age(float);
-
-int *clusterIndex(int *, int, int, int *);
-
-int *unique(int *, int, int *);
-void selectionSort(int *, int);
-void swap(int*, int*);
-
-int max(int *, int);
-float **overlapMatrix(int **, int **, int *, int *, int, int, int*, int*, float *);
-float overlap(int *, int, int *, int, float *);
-
-void concatenate(int *, int *, int *, int);
 int *getCandidates(struct Tuple *, int, int, int*);
 
 void sizeTrans(int *, int, int *, int, float*, float *);
+
 void compTrans(int *, int, int *, int, float **, float **);
+
 void locTrans(int *, int, int *, int, float **, float **);
-
-float stdev(float **, int, int);
-float mean(float **, int, int);
-
-void showTransictions(struct SurvTuple *, int, struct Tuple *, int, int *, int, struct Tuple *, int, int *, int);
 
 void main(int argc, char const *argv[]){
 
 	//inputs of the two clusterings
 
-	struct Clustering *C_1 = readCsv("evo_cluster_0.csv");
-	struct Clustering *C_2 = readCsv("evo_cluster_1.csv");
+	struct Clustering *C_1 = readCsv("Clusterings/evo_cluster_0.csv");
+	struct Clustering *C_2 = readCsv("Clusterings/evo_cluster_1.csv");
 
 	//getting clusters informations of each clustering
 
@@ -253,9 +216,14 @@ void main(int argc, char const *argv[]){
 	
 	showTransictions(survs, sur, splits, s, birth, k, absors_list, abs, deaths, d);
 
-	
+	free(clu_index_1);
+	free(clu_index_2);
+	free(cont_1);
+	free(cont_2);
 	
 };
+
+
 
 void locTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float **X_ti, float **X_tj){
 	
@@ -286,20 +254,6 @@ void locTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float **X_ti, 
 
 };
 
-
-float mean(float **X, int row, int col){
-
-	float sum = 0.0;
-	for (int i = 0; i < row; ++i){
-		for (int j = 0; j < col; ++j){
-			sum += X[i][j];
-		}
-	}
-
-	return sum/(row*col);
-
-};
-
 void compTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float **X_ti, float **X_tj){
 
 	float **Xi = (float **) malloc (size_ti * sizeof(float*));
@@ -327,26 +281,12 @@ void compTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float **X_ti,
 		printf("Compaction\n");
 	}else if(std_j > std_i + 0.05){
 		printf("Difusion\n");
-	}
+	};
 
 
 };
 
-float stdev(float **X, int row, int col){
 
-	float m = mean(X, row, col);
-
-	float sd = 0.0;
-	for (int i = 0; i < row; ++i){
-		for (int j = 0; j < col; ++j){
-			sd += pow(X[i][j] - m, 2);
-		}
-	}
-
-
-	return sqrt(sd/(row*col));
-
-};
 
 
 void sizeTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float *age_ti, float *age_tj){
@@ -472,194 +412,4 @@ int *getCandidates(struct Tuple *absor_sur, int size, int j, int *s){
 
 };
 
-void concatenate(int *v1, int *s1, int *v2, int s2){
 
-	if(*s1 == 0){
-
-		v1 = (int*) realloc(v1, MAX * sizeof(int));
-
-		//v1 = (int*) realloc(v1, s2 * sizeof(int));
-
-		for (int i = 0; i < s2; ++i){
-			v1[i] = v2[i];
-		};
-
-		*s1 = s2;
-		
-	}else{
-
-		//v1 = (int*) realloc(v1, (*s1 + s2) * sizeof(int));
-
-		int k = *s1;
-		for (int i = 0; i < s2; ++i){
-			v1[k] = v2[i];
-			k++;
-		};
-
-		*s1 = k;
-
-	};
-
-	
-
-};
-
-
-float **overlapMatrix(int **clu_index_1, int **clu_index_2, int *unique_c1, int *unique_c2, int usize_i, int usize_j, int* cont_ci, int* cont_cj, float *age_j){
-
-	float **overlaps = (float **) malloc(usize_i * sizeof(float*));
-	for(int i = 0; i < usize_i; i++) overlaps[i] = (float *) malloc(usize_j * sizeof(float));	
-	
-	for (int i = 0; i < usize_i ; ++i){
-
-		float sum_clusi = 0.0;
-
-		for (int j = 0; j < usize_j; ++j){
-
-			if (unique_c2[j] != -1){
-				overlaps[i][j] = overlap(clu_index_1[i], cont_ci[i], clu_index_2[j], cont_cj[j], age_j);
-			}else{
-
-				overlaps[i][j] = 0.0;
-
-			};
-		};
-	};
-	
-	return overlaps;
-};
-
-float overlap(int *c1, int count_i, int *c2, int count_j, float *age_j){
-
-	float inter_sum = 0.0;
-	float clus_i = 0.0;
-
-	for (int i = 0; i < count_i; ++i){
-		clus_i = clus_i + age_j[c1[i]];
-
-		for (int j = 0; j < count_j; ++j){
-			if (c1[i] == c2[j]){
-				inter_sum = inter_sum + age_j[c1[i]];
-			};
-		};	
-	};
-
-	return inter_sum/clus_i;
-
-};
-
-
-int max(int *v, int count){
-
-	int max_v = -1;
-	for (int i = 0; i < count; ++i){
-		if (v[i] > max_v){
-			max_v = v[i];	
-		};
-	};
-
-	return max_v;
-};
-
-
-float **weightAge(int* sizes){
-
-	float **age_w = (float **) malloc(CLU * sizeof(float*));
-	for(int i = 0; i < CLU; i++) age_w[i] = (float *)malloc(MAX * sizeof(float));
-
-	for (int i = 0; i < sizes[0]; ++i){
-		age_w[0][i] = 1.0;
-	};
-
-	for (int i = 1; i < CLU; ++i){
-		for (int j = 0; j < sizes[i]; ++j){
-
-			if(j < sizes[i-1]){
-				age_w[i][j] = age(age_w[i-1][j]);
-			}else{
-				age_w[i][j] = 1.0;
-			};
-
-		};	
-	};
-
-	return age_w;
-	
-};
-
-float age(float last_w){	
-	return last_w*0.75;
-};
-
-int *clusterIndex(int *y, int s, int clu, int *cont){
-
-	int *clu_index = malloc (sizeof (int) * MAX);
-	*cont = 0;
-
-	int j = 0;
-	for (int i = 0; i < s; ++i){
-		if(y[i] == clu){
-			clu_index[j] = i;
-			j++;
-			*cont = *cont + 1; 
-		};
-	};
-
-	return clu_index;
-
-};
-
-int *unique(int *y, int size, int *us){
-
-	int *clu_unique = (int*) malloc (sizeof (int) * 100);
-	
-	clu_unique[0] = y[0];
-
-	int s = 1;
-	int repeat;
-	for (int i = 1; i < size; i++){
-
-		repeat = 0;
-		for (int j = 0; j < s; j++){
-
-			if(y[i] == clu_unique[j]){
-				repeat++;
-			};
-		};
-
-		if (repeat < 1){
-			clu_unique[s] = y[i];
-			s++;
-		};
-
-	};
-
-	clu_unique = (int*) realloc (clu_unique, sizeof (int) * s);
-	*us = s;
-
-	selectionSort(clu_unique, s);
-
-	return clu_unique;
-
-};
- 
-void selectionSort(int arr[], int n){
-
-    int i, j, min_idx;
- 
-    for (i = 0; i < n - 1; i++) {
- 
-        min_idx = i;
-        for (j = i + 1; j < n; j++)
-            if (arr[j] < arr[min_idx])
-                min_idx = j;
- 
-        swap(&arr[min_idx], &arr[i]);
-    };
-};
-
-void swap(int* xp, int* yp){
-    int temp = *xp;
-    *xp = *yp;
-    *yp = temp;
-};
