@@ -10,6 +10,8 @@
 #include "Util.h"
 #include "OverlapMatrix.h"
 #include "WeightAge.h"
+#include "IntTransitions.h"
+#include "ExtTransitions.h"
 
 //---------------------------------------------------------------------------
 
