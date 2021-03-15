@@ -56,65 +56,17 @@ void main(int argc, char const *argv[]){
 
 	//internal transitions
 
-	TRANS.inters = (struct Internal*) malloc(TRANS.sur_size *sizeof(struct Internal));
+	intTransitions(&TRANS,  age_w, C_1, clu_index_1, cont_1, C_2, clu_index_2, cont_2);
 
-	for (int i = 0; i < TRANS.sur_size; ++i){
-
-		TRANS.inters[i].intSize = sizeTrans(clu_index_1[TRANS.survs[i].i], cont_1[TRANS.survs[i].i], clu_index_2[TRANS.survs[i].j], cont_2[TRANS.survs[i].j], age_w[0], age_w[1]);
-
-		TRANS.inters[i].intComp = compTrans(clu_index_1[TRANS.survs[i].i], cont_1[TRANS.survs[i].i], clu_index_2[TRANS.survs[i].j], cont_2[TRANS.survs[i].j], C_1->X, C_2->X);
-
-		TRANS.inters[i].intLocal = locTrans(clu_index_1[TRANS.survs[i].i], cont_1[TRANS.survs[i].i], clu_index_2[TRANS.survs[i].j], cont_2[TRANS.survs[i].j], C_1->X, C_2->X);
-
-	};
-
-	printf("%s\n", TRANS.inters[0].intSize);
-	printf("%s\n", TRANS.inters[0].intComp);
-	printf("%s\n", TRANS.inters[0].intLocal);
-
-	//showing transictions
+	//showing transitions
 	
-	showTransictions(TRANS.survs, TRANS.sur_size, TRANS.splits, TRANS.spl_size, TRANS.births, TRANS.bir_size, TRANS.absors, TRANS.abs_size, TRANS.deaths, TRANS.dea_size);
+	showTransitions(TRANS);
 
 	free(clu_index_1);
 	free(clu_index_2);
 	free(cont_1);
 	free(cont_2);
 	
-};
-
-
-void showTransictions(struct SurvTuple *survs, int sur, struct Tuple *splits, int spl, int *births, int bir,  struct Tuple *absors, int abs, int *deaths, int dea){
-		
-		printf("Deaths:\n");
-		for (int i = 0; i < dea; ++i){
-			printf("C_%d -> DEATH \n", deaths[i]);
-		};
-		printf("\n");
-
-		printf("Survivals:\n");
-		for (int i = 0; i < sur; ++i){
-			printf("C_%d -> C_%d\n", survs[i].ci, survs[i].cj);
-		};
-		printf("\n");
-
-		printf("Splits:\n");
-		for (int i = 0; i < spl; ++i){
-			printf("C_%d -> C_%d\n", splits[i].ci, splits[i].cj);
-		};
-		printf("\n");
-
-		printf("Unions:\n");
-		for (int i = 0; i < abs; ++i){
-			printf("C_%d -> C_%d\n", absors[i].ci, absors[i].cj);
-		};
-		printf("\n");
-
-		printf("Births:\n");
-		for (int i = 0; i < bir; ++i){
-			printf("* -> C_%d\n", births[i]);
-		};
-		printf("\n");
 };
 
 struct Clustering *readCsv(char* path){
@@ -166,6 +118,53 @@ struct Clustering *readCsv(char* path){
 
 
 };
+
+
+void showTransitions(struct Transitions TRANS){
+		
+		printf("Deaths:\n");
+		for (int i = 0; i < TRANS.dea_size; ++i){
+			printf("C_%d -> DEATH \n", TRANS.deaths[i]);
+		};
+		printf("\n");
+
+		printf("Survivals:\n");
+		for (int i = 0; i < TRANS.sur_size; ++i){
+			printf("C_%d -> C_%d\n", TRANS.survs[i].ci, TRANS.survs[i].cj);
+
+			if(TRANS.inters[i].intSize != NULL){
+				printf("	C_%d -> %s\n", TRANS.survs[i].ci, TRANS.inters[i].intSize);
+			};
+			if(TRANS.inters[i].intComp != NULL){
+				printf("	C_%d -> %s\n", TRANS.survs[i].ci, TRANS.inters[i].intComp);
+			};
+			if(TRANS.inters[i].intLocal != NULL){
+				printf("	C_%d -> %s\n", TRANS.survs[i].ci, TRANS.inters[i].intLocal);
+			};
+		
+		};
+		printf("\n");
+
+		printf("Splits:\n");
+		for (int i = 0; i < TRANS.spl_size; ++i){
+			printf("C_%d -> C_%d\n", TRANS.splits[i].ci, TRANS.splits[i].cj);
+		};
+		printf("\n");
+
+		printf("Unions:\n");
+		for (int i = 0; i < TRANS.abs_size; ++i){
+			printf("C_%d -> C_%d\n", TRANS.absors[i].ci, TRANS.absors[i].cj);
+		};
+		printf("\n");
+
+		printf("Births:\n");
+		for (int i = 0; i < TRANS.bir_size; ++i){
+			printf("* -> C_%d\n", TRANS.births[i]);
+		};
+		printf("\n");
+};
+
+
 
 
 

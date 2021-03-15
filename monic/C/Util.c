@@ -38,11 +38,11 @@ float mean(float **X, int row, int col){
 
 void concatenate(int *v1, int *s1, int *v2, int s2){
 
+	//int tam = *s1 + s2;
+
 	if(*s1 == 0){
 
-		v1 = (int*) realloc(v1, MAX * sizeof(int));
-
-		//v1 = (int*) realloc(v1, s2 * sizeof(int));
+		v1 = (int*) realloc(v1, s2 * sizeof(int));
 
 		for (int i = 0; i < s2; ++i){
 			v1[i] = v2[i];
@@ -52,7 +52,7 @@ void concatenate(int *v1, int *s1, int *v2, int s2){
 		
 	}else{
 
-		//v1 = (int*) realloc(v1, (*s1 + s2) * sizeof(int));
+		v1 = (int*) realloc(v1, (*s1 + s2) * sizeof(int));
 
 		int k = *s1;
 		for (int i = 0; i < s2; ++i){
@@ -63,9 +63,6 @@ void concatenate(int *v1, int *s1, int *v2, int s2){
 		*s1 = k;
 
 	};
-
-	
-
 };
 
 int max(int *v, int count){

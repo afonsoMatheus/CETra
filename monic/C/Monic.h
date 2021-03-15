@@ -15,7 +15,7 @@
 
 //---------------------------------------------------------------------------
 
-void showTransictions(struct SurvTuple *, int, struct Tuple *, int, int *, int, struct Tuple *, int, int *, int); 
+void showTransitions(struct Transitions); 
 
 struct Clustering *readCsv(char*);
 

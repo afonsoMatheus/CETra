@@ -85,7 +85,6 @@ struct Transitions extTransitions(int ** clu_index_1, int ** clu_index_2, int *c
 
 			absors[a].ci = unique_c1[i];
 			absors[a].cj = unique_c2[surv_cand];
-
 			a++;
 
 		};

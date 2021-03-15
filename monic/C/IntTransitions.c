@@ -7,6 +7,21 @@
 
 //---------------------------------------------------------------------------
 
+void intTransitions(struct Transitions *TRANS, float **age_w, struct Clustering *C_1, int **clu_index_1, int *cont_1, struct Clustering *C_2, int **clu_index_2, int *cont_2){
+
+	TRANS->inters = (struct Internal*) malloc(TRANS->sur_size *sizeof(struct Internal));
+
+	for (int i = 0; i < TRANS->sur_size; ++i){
+
+		TRANS->inters[i].intSize = sizeTrans(clu_index_1[TRANS->survs[i].i], cont_1[TRANS->survs[i].i], clu_index_2[TRANS->survs[i].j], cont_2[TRANS->survs[i].j], age_w[0], age_w[1]);
+
+		TRANS->inters[i].intComp = compTrans(clu_index_1[TRANS->survs[i].i], cont_1[TRANS->survs[i].i], clu_index_2[TRANS->survs[i].j], cont_2[TRANS->survs[i].j], C_1->X, C_2->X);
+
+		TRANS->inters[i].intLocal = locTrans(clu_index_1[TRANS->survs[i].i], cont_1[TRANS->survs[i].i], clu_index_2[TRANS->survs[i].j], cont_2[TRANS->survs[i].j], C_1->X, C_2->X);
+
+	};
+
+}; 
 
 const char *locTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float **X_ti, float **X_tj){
 	
@@ -34,7 +49,7 @@ const char *locTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float *
 	if(mean_i - mean_j > 3){
 		return "Localization";
 	}else{
-		return "-";
+		return NULL;
 	};
 
 };
@@ -67,7 +82,7 @@ const char *compTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float 
 	}else if(std_j > std_i + 0.05){
 		return "Difusion";
 	}else{
-		return "-";
+		return NULL;
 	};
 
 };
@@ -86,11 +101,10 @@ const char *sizeTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float 
 
 	if (sum_i * 0.75 > sum_j + 10){
 		return "Shrinked";		
-
 	}else if(sum_j > (sum_i * 0.75) + 10){
 		return "Expanded";
 	}else{
-		return "-";
+		return NULL;
 	};
 
 };

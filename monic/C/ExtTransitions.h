@@ -6,7 +6,6 @@
 #define EXTRANS_H
 
 #include "General.h"
-#include "IntTransitions.h"
 
 struct Transitions{
 
@@ -26,6 +25,14 @@ struct Transitions{
 
 	int *births; 
 	int bir_size;
+};
+
+struct Internal{
+
+	const char *intComp;
+	const char *intSize;
+	const char *intLocal;
+
 };
 
 //---------------------------------------------------------------------------
