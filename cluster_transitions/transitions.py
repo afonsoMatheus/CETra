@@ -68,9 +68,13 @@ def int_size_reduc(X, y, clu, k):
     clu_index = cluster_index(X, y, clu)
             
     r_index = sample(clu_index, k)
+    
+    for i in r_index:
+        #X[i] = 0
+        y[i] = -1
                 
-    X = np.delete(X, r_index, axis = 0)
-    y = np.delete(y, r_index, axis = 0)  
+    #X = np.delete(X, r_index, axis = 0)
+    #y = np.delete(y, r_index, axis = 0)  
           
     return X, y
     

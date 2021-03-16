@@ -146,11 +146,11 @@ def ch_transition(tr, X, y, colors, centers, num_f):
         new_c = find_centroids(X, y, num_f)
 
     if("ext_union" in tr):
-        X, y, colors = trans.ext_union(X, y, colors, [2,3], [10,40,25], num_f)
+        X, y, colors = trans.ext_union(X, y, colors, [0,2], [10,40,25], num_f)
         new_c = find_centroids(X, y, num_f)
 
     if("ext_div" in tr):
-        X, y, colors = trans.ext_div(X, y, colors, [0], [[10,30,20],[20,10,25]], [0.5,0.5], num_f)
+        X, y, colors = trans.ext_div(X, y, colors, [3], [[10,10,10],[35,25,25]], [0.5,0.5], num_f)
         new_c = find_centroids(X, y, num_f)
 
     return X, y, colors, new_c
