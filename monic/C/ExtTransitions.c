@@ -23,22 +23,27 @@ struct Transitions extTransitions(int ** clu_index_1, int ** clu_index_2, int *c
 	for (int i = 0; i < usize_1; ++i){
 
 		int *split_cand = (int *) malloc (usize_2 * sizeof(int));
-		split_cand[0] = -1;
+		split_cand[0] = -2;
 
 		int *split_union = (int *) malloc (sizeof(int));
 
 		int sc = 0, su = 0;
 
-		int surv_cand = -1;
+		int surv_cand = -2;
 
 		for (int j = 0; j < usize_2; ++j){
 			
 			float mcell = overlap_m[i][j];
 
 			if (mcell > 0.5){
-				if (mcell > surv_cand){
+
+				if(surv_cand == -2){
 					surv_cand = j;
-				}else if(mcell == surv_cand){
+
+				}else if (mcell > overlap_m[i][surv_cand]){
+					surv_cand = j;
+				
+				}else if(mcell == overlap_m[i][surv_cand]){
 
 					if (overlap_i[j][i] > overlap_i[surv_cand][i]){
 						surv_cand = j;
@@ -57,11 +62,11 @@ struct Transitions extTransitions(int ** clu_index_1, int ** clu_index_2, int *c
 
 		};
 
-		if (surv_cand == -1 && split_cand[0] == -1){
+		if (surv_cand == -2 && split_cand[0] == -2){
 			trans.deaths[trans.dea_size] = unique_c1[i];
 			trans.dea_size++;
 			
-		}else if(split_cand[0] != -1){
+		}else if(split_cand[0] != -2){
 
 			if (overlap(clu_index_1[i], cont_1[i], split_union, su, age_j) > 0.5){
 				
@@ -104,9 +109,20 @@ struct Transitions extTransitions(int ** clu_index_1, int ** clu_index_2, int *c
 
 			for (int j = 0; j < al; ++j){
 
-				trans.absors[j].ci = absors_cand[j];
-				trans.absors[j].cj = unique_c2[i];
-				trans.abs_size++;
+				if(absors_cand[j] == unique_c2[i]){
+					trans.survs[trans.sur_size].ci = absors_cand[j];
+					trans.survs[trans.sur_size].cj = unique_c2[i];
+
+					trans.survs[trans.sur_size].j = i;
+					trans.sur_size++;
+
+				}else{
+
+					trans.absors[trans.abs_size].ci = absors_cand[j];
+					trans.absors[trans.abs_size].cj = unique_c2[i];
+					trans.abs_size++;
+
+				};	
 
 				tracked[t] = unique_c2[i];
 				t++;
@@ -116,14 +132,6 @@ struct Transitions extTransitions(int ** clu_index_1, int ** clu_index_2, int *c
 		}else if(absors_cand[0] == unique_c2[i]){
 			trans.survs[trans.sur_size].ci = absors_cand[0];
 			trans.survs[trans.sur_size].cj = unique_c2[i];
-			
-
-			for (int k = 0; k < usize_1; ++k){
-				if (unique_c1[k] == absors_cand[0]){
-					trans.survs[trans.sur_size].i = k;
-					break;
-				}
-			}
 
 			trans.survs[trans.sur_size].j = i;
 			trans.sur_size++;
@@ -135,9 +143,18 @@ struct Transitions extTransitions(int ** clu_index_1, int ** clu_index_2, int *c
 
 	};
 
-	trans.births = (int*) malloc(usize_2 * sizeof(int));
+	for (int i = 0; i < trans.sur_size; ++i){
+		for (int k = 0; k < usize_1; ++k){
+			if (unique_c1[k] == trans.survs[i].ci){
+				trans.survs[i].i = k;
+				break;
+			}
+		}
+	}
 
+	trans.births = (int*) malloc(usize_2 * sizeof(int));
 	trans.bir_size = 0;
+	
 	for (int i = 0; i < usize_2; ++i){
 		for (int j = 0; j < t; ++j){
 			if (tracked[j] == unique_c2[i]){

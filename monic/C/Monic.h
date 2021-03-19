@@ -1,5 +1,5 @@
 /* Author: Afonso Matheus   */
-/* Date: 2021              */
+/* Date: 2021               */
 //---------------------------------------------------------------------------
 
 #ifndef MONIC_H
@@ -15,8 +15,14 @@
 
 //---------------------------------------------------------------------------
 
+void monic(struct Clustering C_1, struct Clustering C_2, float *age_i, float *age_j);
+
+float **retrieveWAge(struct Clustering *C);
+
+struct Clustering *retrieveClusterings();
+
 void showTransitions(struct Transitions); 
 
-struct Clustering *readCsv(char*);
+struct Clustering readCsv(char*);
 
 #endif

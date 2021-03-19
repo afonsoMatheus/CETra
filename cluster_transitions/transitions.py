@@ -9,19 +9,13 @@ import numpy as np
 ''' internal transitions '''
 
 #localization changes
-def int_local(X, y, clu, num_f, rang):
-    
-    d = {}
-    for i in range(num_f):
-        d[i] = randint(rang[0],rang[1])
+def int_local(X, y, clu, n_center, num_f):
     
     clu_index = cluster_index(X, y, clu)
-     
-    for i in clu_index:
-        for j in range(num_f):
-            X[i][j] = X[i][j] + d[j]
+    
+    X = approaching_center(X, y, clu, n_center, clu_index, num_f)
             
-    return X, y
+    return X
 
 #density changes
 #--difusion
@@ -31,7 +25,7 @@ def int_den_dif(X, y, centers, clu, num_f):
         
     X = dist_points_den(X, centers[clu[0]], clu_index, num_f, 0) 
         
-    return X, y
+    return X
     
 #--compaction
 def int_den_comp(X, y, centers, clu, num_f):
@@ -40,11 +34,11 @@ def int_den_comp(X, y, centers, clu, num_f):
     
     X = dist_points_den(X, centers[clu[0]], clu_index, num_f, 1) 
     
-    return X, y
+    return X
 
 #size changes
 #--growing
-def int_size_grow(X, y, centers, clu, num_f, q):
+def int_size_grow(X, y, centers, clu, q, num_f):
         
     max_d = 0
     max_point = 0
@@ -70,20 +64,16 @@ def int_size_reduc(X, y, clu, k):
     r_index = sample(clu_index, k)
     
     for i in r_index:
-        #X[i] = 0
         y[i] = -1
-                
-    #X = np.delete(X, r_index, axis = 0)
-    #y = np.delete(y, r_index, axis = 0)  
           
-    return X, y
+    return y
     
 ''' external transitions '''
 
 #birth
-def ext_birth(X, y, colors, num_f, q):
+def ext_birth(X, y, colors, num_f, q, new_c):
     
-    X_new, y_new = make_blobs(n_samples=[q], centers=[(35,10,20)], n_features=num_f ,random_state=1)
+    X_new, y_new = make_blobs(n_samples=[q], centers= new_c, n_features=num_f ,random_state=1)
             
     for i in range(len(y_new)):
         y_new[i] = max(y) + 1
@@ -101,7 +91,6 @@ def ext_death(X, y, clu, colors):
     clu_index = cluster_index(X, y, clu)
     
     for i in clu_index:
-        #X[i] = 0
         y[i] = -1
     
     del colors[clu[0]]
@@ -109,29 +98,50 @@ def ext_death(X, y, clu, colors):
     return X, y, colors
     
 #union
-def ext_union(X, y, colors, clusters, n_center, num_f):
+def ext_union(X, y, colors, centers, clusters, n_center, exp, num_f):
     
     clu_index = cluster_index(X, y, clusters)
     
     X = approaching_center(X, y, clusters, n_center, clu_index, num_f)
     
-    num_y = max(y) + 1
-    
+    max_d = 0
     for i in clu_index:
-        y[i] = num_y
-                        
-    colors[num_y] = '#%06X' % randint(0, 0xFFFFFF)
+        if(euc_distance(X[i], n_center) > max_d):
+            max_d = euc_distance(X[i], n_center)
+    
+    num_y = -1
+    cen = math.inf
+    for i in centers.keys():
+        if(euc_distance(centers[i], n_center) < max_d * exp and cen > euc_distance(centers[i], n_center)): 
+            cen = euc_distance(centers[i], n_center)
+            num_y = i
+            
+    if(num_y == -1):
+        num_y = max(y) + 1   
+        for i in clu_index:
+            y[i] = num_y
+        colors[num_y] = '#%06X' % randint(0, 0xFFFFFF)
+    else:
+        for i in clu_index:
+            y[i] = num_y
     
     return X, y, colors
 
 #division
-def ext_div(X, y, colors, clu, n_centers, ratio, num_f):
+def ext_div(X, y, colors, centers, clu, n_centers, ratio, exp, num_f):
     
     clu_index = cluster_index(X, y, clu)
     
     new_clusters = {}
-    
     ys = {}
+    
+    max_d = {}
+    
+    for i in np.unique(y):
+        max_d[i] = 0
+    for i in range(len(X)):
+        if(euc_distance(X[i], centers[y[i]]) > max_d[y[i]]):
+            max_d[y[i]] = euc_distance(X[i], centers[y[i]])
     
     aux = clu_index
     shuffle(aux)
@@ -140,22 +150,55 @@ def ext_div(X, y, colors, clu, n_centers, ratio, num_f):
         new_clusters[i] = aux[:len_ratio]
         aux = aux[len_ratio:]
         ys[i] = {}
+            
+    nc = max(y) + 1
+    for i in range(len(ratio)):
+        ys[i] = None
+        for j in centers.keys():
+            if(euc_distance(centers[j], n_centers[i]) < max_d[j]*exp and j != clu):
+                ys[i] = j
         
-    ys[0] = max(y) + 1
-    colors[ys[0]] = '#%06X' % randint(0, 0xFFFFFF)
-    for i in range(1,len(ratio)):
-        ys[i] = ys[i-1]+1
-        colors[ys[i]] = '#%06X' % randint(0, 0xFFFFFF)
+        if(ys[i] == None):
+            ys[i] = nc
+            nc = nc + 1
+            colors[ys[i]] = '#%06X' % randint(0, 0xFFFFFF)
         
     for i in new_clusters.keys():
-        for j in new_clusters[i]:
+        for j in new_clusters[i]:    
             y[j] = ys[i]
     
     for i in new_clusters.keys():                
         X = approaching_center(X, y, [ys[i]], n_centers[i], new_clusters[i], num_f)
         
     return X, y, colors
+
+def approaching_center(X, y, clusters, n_center, clu_index, num_f):
+        
+    if(n_center[0] <= n_center[1]):
+        for j in range(2, num_f):
+            n_center.append(randint(n_center[0],n_center[1]))
+    else:
+        for j in range(2, num_f):
+            n_center.append(randint(n_center[1],n_center[0]))
     
+    max_d = {}
+    for i in clusters:
+        max_d[i] = []
+        for j in range(num_f):
+            max_d[i].append(0)
+
+    for i in clu_index:
+        for j in range(num_f):
+            if(abs(X[i][j] - n_center[j]) > max_d[y[i]][j]):
+                max_d[y[i]][j] = abs(X[i][j] - n_center[j])
+
+    for i in clu_index:
+        for j in range(num_f):
+            if(X[i][j] < n_center[j]):
+                X[i][j] = X[i][j] + max_d[y[i]][j]
+            else:
+                X[i][j] = X[i][j] - max_d[y[i]][j]
+    return X
 
 
 ''' other functions '''
@@ -209,29 +252,7 @@ def gen_samples(max_d, clu, center, num_f, q):
             new_samples_X[i].append(uniform(center[j] - max_d, center[j] + max_d))
         new_samples_Y.append(clu)
         
-    return new_samples_X, new_samples_Y
-
-def approaching_center(X, y, clusters, n_center, clu_index, num_f):
-    
-    max_d = {}
-    for i in clusters:
-        max_d[i] = []
-        for j in range(num_f):
-            max_d[i].append(0)
-
-    for i in clu_index:
-        for j in range(num_f):
-            if(abs(X[i][j] - n_center[j]) > max_d[y[i]][j]):
-                max_d[y[i]][j] = abs(X[i][j] - n_center[j])
-
-    for i in clu_index:
-        for j in range(num_f):
-            if(X[i][j] < n_center[j]):
-                X[i][j] = X[i][j] + max_d[y[i]][j]
-            else:
-                X[i][j] = X[i][j] - max_d[y[i]][j]
-    return X
-                            
+    return new_samples_X, new_samples_Y                
     
 def euc_distance(d1, d2):
     return math.sqrt(sum([(a - b) ** 2 for a, b in zip(d1, d2)]))

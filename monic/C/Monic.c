@@ -1,75 +1,142 @@
-/* Author: Afonso Matheus   */
-/* Date: 2021              */
-//---------------------------------------------------------------------------
+/* Author: Afonso Matheus                                                     */
+/* Date: 2021                                                                 */
+//----------------------------------------------------------------------------//                                                                          
+//                                                                            //
+// Script that contains the implementation of cluster's transiction detection // 
+// between two n-dimensional clusterings (MONIC)                              //
+//                                                                            //
+//----------------------------------------------------------------------------//
 
 #include "Monic.h"
 
-int CLU = 2; // number of clusterings
+/*Variables used between all modules*/
+
+int CLU = 3; // number of clusterings
 int MAX = 105; // maximun sample size for vector alocation
 int FEA = 3; // number of features
 
-void main(int argc, char const *argv[]){
+/*
+*
+*	Func: 		
+*		monic(struct Clustering, struct Clustering, float *, float *);
+*	Args: 
+*		Clustering in time i; Clustering in time j; The weights assigned to 
+*		samples in time i; The weights assigned to samples in time j (j > i)
+*	Ret: 
+*		None, detects the transitions of the clusters between the clustering i 
+*		and the clustering j
+*
+*/
+void monic(struct Clustering C_i, struct Clustering C_j, float *age_i, float *age_j){
 
-	//inputs of the two clusterings
+	int usize_i; 
+	int *unique_ci = unique(C_i.y, C_i.s, &usize_i);
 
-	struct Clustering *C_1 = readCsv("Clusterings/evo_cluster_0.csv");
-	struct Clustering *C_2 = readCsv("Clusterings/evo_cluster_1.csv");
-
-	//getting clusters informations of each clustering
-
-	int size_1 = C_1->s;
-	int size_2 = C_2->s;
-
-	int usize_1; 
-	int *unique_c1 = unique(C_1->y, size_1, &usize_1);
-
-	int usize_2;
-	int *unique_c2 = unique(C_2->y, size_2, &usize_2);
-
-	//assigning the weights of each sample for each clustering
-
-	int sizes[] = {size_1, size_2};
-	float **age_w = weightAge(sizes);
+	int usize_j;
+	int *unique_cj = unique(C_j.y, C_j.s, &usize_j);
 
 	//getting the samples' indexes for each cluster in each clustering
 
-	int *cont_1 = (int *) malloc(MAX * sizeof(int*));
-	int **clu_index_1 = (int **) malloc(usize_1 * sizeof(int*));
-	for (int i = 0; i < usize_1; ++i){
-		clu_index_1[i] = clusterIndex(C_1->y, size_1, unique_c1[i], &cont_1[i]);
+	int *cont_i = (int *) malloc(MAX * sizeof(int));
+	int **clu_index_i = (int **) malloc(usize_i * sizeof(int*));
+	for (int i = 0; i < usize_i; ++i){
+		clu_index_i[i] = clusterIndex(C_i.y, C_i.s, unique_ci[i], &cont_i[i]);
 	}; 
 
-	int *cont_2 = (int *) malloc(MAX * sizeof(int*));
-	int **clu_index_2 = (int **) malloc(usize_2 * sizeof(int*));
-	for (int i = 0; i < usize_2; ++i){
-		clu_index_2[i] = clusterIndex(C_2->y, size_2, unique_c2[i], &cont_2[i]);
+	int *cont_j = (int *) malloc(MAX  * sizeof(int));
+	int **clu_index_j = (int **) malloc(usize_j * sizeof(int*));
+	for (int i = 0; i < usize_j; ++i){
+		clu_index_j[i] = clusterIndex(C_j.y, C_j.s, unique_cj[i], &cont_j[i]);
 	};
 
 	//building overlapping matrix
 
-	float **overlap_m = overlapMatrix(clu_index_1, clu_index_2, unique_c1, unique_c2, usize_1, usize_2, cont_1 , cont_2, age_w[1]);
-	float **overlap_i = overlapMatrix(clu_index_2, clu_index_1, unique_c2, unique_c1, usize_2, usize_1, cont_2 , cont_1, age_w[1]);
+	float **overlap_m = overlapMatrix(clu_index_i, clu_index_j, unique_ci, unique_cj, usize_i, usize_j, cont_i , cont_j, age_j);
+	float **overlap_i = overlapMatrix(clu_index_j, clu_index_i, unique_cj, unique_ci, usize_j, usize_i, cont_j , cont_i, age_j);
 
 	//external transitions
 
-	struct Transitions TRANS = extTransitions(clu_index_1, clu_index_2, cont_1, cont_2, unique_c1, unique_c2, usize_1, usize_2,  age_w[1],overlap_m, overlap_i);
+	struct Transitions TRANS = extTransitions(clu_index_i, clu_index_j, cont_i, cont_j, unique_ci, unique_cj, usize_i, usize_j, age_j, overlap_m, overlap_i);
 
 	//internal transitions
 
-	intTransitions(&TRANS,  age_w, C_1, clu_index_1, cont_1, C_2, clu_index_2, cont_2);
+	intTransitions(&TRANS, age_i, age_j, C_i, clu_index_i, cont_i, C_j, clu_index_j, cont_j);
 
 	//showing transitions
 	
 	showTransitions(TRANS);
 
-	free(clu_index_1);
-	free(clu_index_2);
-	free(cont_1);
-	free(cont_2);
-	
+	//deallocating memory
+
+	free(unique_ci);
+	free(unique_cj);
+
+	free(cont_i);
+	free(cont_j);
+
+	free(clu_index_i);
+	free(clu_index_j);
+
+	free(overlap_m);
+	free(overlap_i);	
+
 };
 
-struct Clustering *readCsv(char* path){
+/*
+*
+*	Func: 
+*		retrieveWAge(struct Clustering *);
+*	Args: 
+*		Array of clusterings
+*	Ret: 
+*		Matrix of float, with each line representing a clustering and each cell 
+*		representing an weight assigned to a sample's index
+*
+*/
+float **retrieveWAge(struct Clustering *C){
+
+	float **age_w = weightAge(C);
+
+	return age_w;
+
+};
+
+/*
+*
+*	Func: 
+*		retrieveClusterings();
+*	Args: 
+*		None
+*	Ret: 
+*		An array of struct Clustering, containing all the clusterings obtained
+*		by reading the csv files
+*
+*/
+struct Clustering *retrieveClusterings(){
+
+	struct Clustering *C = (struct Clustering*) malloc(CLU * sizeof(struct Clustering*));
+
+	for (int i = 0; i < CLU; ++i){
+		char file[40];
+		snprintf (file, sizeof (file), "Clusterings/evo_cluster_%d.csv", i);
+		C[i] = readCsv(file);
+	};
+
+	return C;
+
+};
+
+/*
+*
+*	Func: 
+*		readCsv(char*);
+*	Args: 
+*		The string path to the file containing the clustering
+*	Ret: 
+*		A clustering obtained in the file, with it samples, labels and size 
+*
+*/
+struct Clustering readCsv(char* path){
 
 
 	struct Clustering *C = (struct Clustering *) malloc(sizeof(struct Clustering));
@@ -114,12 +181,22 @@ struct Clustering *readCsv(char* path){
 
     fclose(fp);
 
-    return C; 
-
+    return *C; 
 
 };
 
 
+
+/*
+*
+*	Func: 
+*		showTransitions(struct Transitions);
+*	Args: 
+*		The clusters transictions between clusterings in time i and time j (j > i)
+*	Ret: 
+*		None, shows to the user all the transitions obtained  
+*
+*/
 void showTransitions(struct Transitions TRANS){
 		
 		printf("Deaths:\n");
@@ -162,6 +239,8 @@ void showTransitions(struct Transitions TRANS){
 			printf("* -> C_%d\n", TRANS.births[i]);
 		};
 		printf("\n");
+		printf("-----------------------------------------------------\n");
+
 };
 
 

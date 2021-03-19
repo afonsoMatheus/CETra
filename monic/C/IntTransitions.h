@@ -9,7 +9,7 @@
 
 //---------------------------------------------------------------------------
 
-void intTransitions(struct Transitions *TRANS, float **age_w, struct Clustering *C_1, int **clu_index_1, int *cont_1, struct Clustering *C_2, int **clu_index_2, int *cont_2);
+void intTransitions(struct Transitions *, float *, float *, struct Clustering, int **, int *, struct Clustering, int **, int *);
 
 const char *sizeTrans(int *, int, int *, int, float*, float *);
 

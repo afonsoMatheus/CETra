@@ -38,8 +38,6 @@ float mean(float **X, int row, int col){
 
 void concatenate(int *v1, int *s1, int *v2, int s2){
 
-	//int tam = *s1 + s2;
-
 	if(*s1 == 0){
 
 		v1 = (int*) realloc(v1, s2 * sizeof(int));

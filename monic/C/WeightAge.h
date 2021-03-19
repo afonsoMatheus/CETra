@@ -9,7 +9,7 @@
 
 //---------------------------------------------------------------------------
 
-float **weightAge(int*);
+float **weightAge(struct Clustering*);
 
 float age(float);
 

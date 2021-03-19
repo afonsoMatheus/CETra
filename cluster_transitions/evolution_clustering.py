@@ -30,24 +30,101 @@ class Evocluster:
         self.evo_clustering[0] = X,y,colors
         self.centers[0] = find_centroids(X,y, num_f)
         
+        self.next_clustering = {}
+    
+    #Args None, None
+    #Ret None; starts to assign a new clustering
+    def new_clustering(self):
+        self.next_clustering = self.Newcluster(self.evo_clustering, self.centers, self.num_f)
+    
+    #Args None, None
+    #Ret None; adds the new clustering with all transitions previously allocated
+    def make_clustering(self):
+        self.evo_clustering = self.next_clustering.next_clustering
+        del self.next_clustering.next_clustering
+    
+    class Newcluster:
         
-    #Args transitions, list
-    #Ret None; makes the next clustering with the chosen transictions 
-    def new_clustering(self, transitions):
+        #Args evo_clustering centers num_f, dict dict int
+        #Ret None; makes a copy of the lattest clustering
+        def __init__(self, evo_clustering, centers, num_f):
+            self.next_clustering = copy.deepcopy(evo_clustering)
+            self.next_centers = centers
+            self.num_f = num_f
+            
+            self.last_t = list(evo_clustering)[-1]
+            self.X, self.y, self.colors = evo_clustering[self.last_t]
+            
+        '''External Transitions'''
         
-        for tr in transitions:
-                        
-            next_clustering = copy.deepcopy(self.evo_clustering)    
-            last_t = list(self.evo_clustering)[-1]
-
-            X, y, colors = self.evo_clustering[last_t]
-
-            X, y, colors, new_c = ch_transition(tr, X, y, colors,  self.centers[last_t], self.num_f)
-            next_clustering[last_t+1] = X, y, colors
-
-            self.evo_clustering = next_clustering
-            self.centers[last_t+1] = new_c
-                
+        #Args clu, int
+        #Ret None; makes a death transitons and updates the newest clustering
+        def death_transition(self, clu):
+            self.X, self.y, self.colors = trans.ext_death(self.X, self.y, [clu], self.colors)
+            
+            self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
+            self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
+        
+        #Args qtd, int
+        #Ret None; makes a cluster birth and updates the newest clustering
+        def birth_transition(self, qtd, new_c):
+            self.X, self.y, self.colors = trans.ext_birth(self.X, self.y, self.colors, self.num_f, qtd, [new_c])
+            
+            self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
+            self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
+        
+        #Args clus union_c, int*array int*array
+        #Ret None; makes a union transiton and updates the newest clustering
+        def absor_transition(self, clus, union_c, exp):
+            self.X, self.y, self.colors = trans.ext_union(self.X, self.y, self.colors, self.next_centers[self.last_t], clus, union_c, exp, self.num_f)
+            
+            self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
+            self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
+        
+        #Args clu split_cs ratio, int int*matrix float*array
+        #Ret None; makes a split transiton and updates the newest clustering
+        def split_transition(self, clu, split_cs, ratio, exp):
+            self.X, self.y, self.colors = trans.ext_div(self.X, self.y, self.colors, self.next_centers[self.last_t], clu, split_cs, ratio, exp, self.num_f)
+            
+            self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
+            self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
+            
+        '''Internal Transitions'''
+        
+        def density_difusion(self, clu):
+            
+            self.X = trans.int_den_dif(self.X, self.y, self.next_centers[self.last_t], [clu], self.num_f)
+            self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
+            self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
+            
+        def density_compactation(self, clu):
+            
+            self.X = trans.int_den_comp(self.X, self.y, self.next_centers[self.last_t], [clu], self.num_f)
+            self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
+            self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
+           
+        def size_grow(self, clu, qtd):
+            
+            self.X, self.y = trans.int_size_grow(self.X, self.y, self.next_centers[self.last_t], [clu], qtd, self.num_f)
+            
+            self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
+            self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
+            
+        def size_reduction(self, clu, qtd):
+            
+            self.y = trans.int_size_reduc(self.X, self.y, [clu], qtd)
+            
+            self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
+            self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
+            
+        def localization_change(self, clu, n_center):
+            
+            self.X = trans.int_local(self.X, self.y, [clu], n_center, self.num_f)
+            
+            self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
+            self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
+    
+              
     #Args None, None
     #Ret None; plots graphs for all clusterings
     def plot_view_all(self):
@@ -104,56 +181,6 @@ class Evocluster:
             
         return clusterings
         
-        
-        
-            
-#Args tr X y colors centers num_f, list list list dict dict int
-#Ret list list dict dict; returns the new data for the next clustering 
-def ch_transition(tr, X, y, colors, centers, num_f):
-
-    new_c = 0
-    
-    #internal transitions
-
-    if("int_den_dif" in tr):
-        X, y = trans.int_den_dif(X, y, centers, [2], num_f)
-        new_c = find_centroids(X, y, num_f)
-
-    if("int_den_comp" in tr):
-        X, y = trans.int_den_comp(X, y, centers, [2], num_f)
-        new_c = find_centroids(X, y, num_f)
-
-    if("int_size_grow" in tr):
-        X, y = trans.int_size_grow(X, y, centers, [2], num_f, 30)
-        new_c = find_centroids(X, y, num_f)
-
-    if("int_size_reduc" in tr):
-        X, y = trans.int_size_reduc(X, y, [4], 7)
-        new_c = find_centroids(X, y, num_f)
-
-    if("int_local" in tr):   
-        X, y = trans.int_local(X, y, [4], num_f, (-5,-5))
-        new_c = find_centroids(X, y, num_f)
-
-    #external transitions
-
-    if("ext_death" in tr):
-        X, y, colors = trans.ext_death(X, y, [1], colors)
-        new_c = find_centroids(X, y, num_f)
-
-    if("ext_birth" in tr):
-        X, y, colors = trans.ext_birth(X, y, colors, num_f, 15)
-        new_c = find_centroids(X, y, num_f)
-
-    if("ext_union" in tr):
-        X, y, colors = trans.ext_union(X, y, colors, [0,2], [10,40,25], num_f)
-        new_c = find_centroids(X, y, num_f)
-
-    if("ext_div" in tr):
-        X, y, colors = trans.ext_div(X, y, colors, [3], [[10,10,10],[35,25,25]], [0.5,0.5], num_f)
-        new_c = find_centroids(X, y, num_f)
-
-    return X, y, colors, new_c
 
 
 #Args y, list

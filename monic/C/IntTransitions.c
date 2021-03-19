@@ -7,19 +7,20 @@
 
 //---------------------------------------------------------------------------
 
-void intTransitions(struct Transitions *TRANS, float **age_w, struct Clustering *C_1, int **clu_index_1, int *cont_1, struct Clustering *C_2, int **clu_index_2, int *cont_2){
+void intTransitions(struct Transitions *TRANS, float *age_i, float *age_j, struct Clustering C_1, int **clu_index_1, int *cont_1, struct Clustering C_2, int **clu_index_2, int *cont_2){
 
 	TRANS->inters = (struct Internal*) malloc(TRANS->sur_size *sizeof(struct Internal));
 
 	for (int i = 0; i < TRANS->sur_size; ++i){
 
-		TRANS->inters[i].intSize = sizeTrans(clu_index_1[TRANS->survs[i].i], cont_1[TRANS->survs[i].i], clu_index_2[TRANS->survs[i].j], cont_2[TRANS->survs[i].j], age_w[0], age_w[1]);
+		TRANS->inters[i].intSize = sizeTrans(clu_index_1[TRANS->survs[i].i], cont_1[TRANS->survs[i].i], clu_index_2[TRANS->survs[i].j], cont_2[TRANS->survs[i].j], age_i, age_j);
 
-		TRANS->inters[i].intComp = compTrans(clu_index_1[TRANS->survs[i].i], cont_1[TRANS->survs[i].i], clu_index_2[TRANS->survs[i].j], cont_2[TRANS->survs[i].j], C_1->X, C_2->X);
+		TRANS->inters[i].intComp = compTrans(clu_index_1[TRANS->survs[i].i], cont_1[TRANS->survs[i].i], clu_index_2[TRANS->survs[i].j], cont_2[TRANS->survs[i].j], C_1.X, C_2.X);
 
-		TRANS->inters[i].intLocal = locTrans(clu_index_1[TRANS->survs[i].i], cont_1[TRANS->survs[i].i], clu_index_2[TRANS->survs[i].j], cont_2[TRANS->survs[i].j], C_1->X, C_2->X);
+		TRANS->inters[i].intLocal = locTrans(clu_index_1[TRANS->survs[i].i], cont_1[TRANS->survs[i].i], clu_index_2[TRANS->survs[i].j], cont_2[TRANS->survs[i].j], C_1.X, C_2.X);
 
 	};
+
 
 }; 
 
@@ -35,7 +36,7 @@ const char *locTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float *
 	};
 
 	float **Xj = (float **) malloc (size_tj * sizeof(float*));
-	for(int i = 0; i < size_ti; i++) Xj[i] = (float *)malloc(FEA * sizeof(float));
+	for(int i = 0; i < size_tj; i++) Xj[i] = (float *)malloc(FEA * sizeof(float));
 	
 	for (int i = 0; i < size_tj; ++i){
 		for (int j = 0; j < FEA; ++j){
@@ -65,12 +66,14 @@ const char *compTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float 
 		};
 	};
 
+
 	float **Xj = (float **) malloc (size_tj * sizeof(float*));
-	for(int i = 0; i < size_ti; i++) Xj[i] = (float *)malloc(FEA * sizeof(float));
+	for(int i = 0; i < size_tj; i++) Xj[i] = (float *)malloc(FEA * sizeof(float));
 	
 	for (int i = 0; i < size_tj; ++i){
 		for (int j = 0; j < FEA; ++j){
 			Xj[i][j] = X_tj[clu_tj[i]][j];
+
 		};
 	};
 
