@@ -8,6 +8,16 @@
 
 #include "WeightAge.h"
 
+/*
+*
+*	Func: 		
+*		weightAge(struct Clustering *);
+*	Args: 
+*		Array of clusterings. 
+*	Ret: 
+*		Matrix of float, the assigned values for each sample in each clustering.
+*
+*/
 float **weightAge(struct Clustering *C){
 
 	float **age_w = (float **) malloc(CLU * sizeof(float*));
@@ -36,6 +46,16 @@ float **weightAge(struct Clustering *C){
 	
 };
 
+/*
+*
+*	Func: 		
+*		age(float);
+*	Args: 
+*		A float value.
+*	Ret: 
+*		The aged (devaluation) float value. 
+*
+*/
 float age(float last_w){	
 	return last_w*0.75;
 };

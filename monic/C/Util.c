@@ -1,12 +1,27 @@
-/* Author: Afonso Matheus   */
-/* Date: 2021              */
-//---------------------------------------------------------------------------
+/* Author: Afonso Matheus                                                      */
+/* Date: 2021                                                                  */
+//-----------------------------------------------------------------------------//
+//                                                                             //
+// Script that contains the implementation of utility functions used between   //
+// the main files                                                              //
+//                                                                             //
+//-----------------------------------------------------------------------------//
 
 #include "Util.h"
 #include <math.h>
 
-//---------------------------------------------------------------------------
-
+/*
+*
+*	Func: 		
+*		stdev(float **, int, int);
+*	Args: 
+*		Matrix of n-dimensional samples,
+*		Size of rows,
+*		Size of columns.
+*	Ret: 
+*		The standart deviation of a n-dimensional sample set.
+*
+*/
 float stdev(float **X, int row, int col){
 
 	float m = mean(X, row, col);
@@ -18,11 +33,22 @@ float stdev(float **X, int row, int col){
 		};
 	};
 
-
 	return sqrt(sd/(row*col));
 
 };
 
+/*
+*
+*	Func: 		
+*		mean(float **, int, int);
+*	Args: 
+*		Matrix of n-dimensional samples,
+*		Size of rows,
+*		Size of columns.
+*	Ret: 
+*		The mean of a n-dimensional sample set.
+*
+*/
 float mean(float **X, int row, int col){
 
 	float sum = 0.0;
@@ -36,6 +62,20 @@ float mean(float **X, int row, int col){
 
 };
 
+/*
+*
+*	Func: 		
+*		concatenate(int *, int *, int *, int);
+*	Args: 
+*		First array of values,
+*		Size of the first array,
+*		Second array of values,
+*		Size of the second array.
+*	Ret: 
+*		None, updates the first array making an union with the
+*		elements of the second array.
+*
+*/
 void concatenate(int *v1, int *s1, int *v2, int s2){
 
 	if(*s1 == 0){
@@ -63,6 +103,17 @@ void concatenate(int *v1, int *s1, int *v2, int s2){
 	};
 };
 
+/*
+*
+*	Func: 		
+*		max(int *, int);
+*	Args: 
+*		Array of values,
+*		Size of array.
+*	Ret: 
+*		The max value of an array.
+*
+*/
 int max(int *v, int count){
 
 	int max_v = -1;
@@ -75,6 +126,18 @@ int max(int *v, int count){
 	return max_v;
 };
 
+/*
+*
+*	Func: 		
+*		unique(int *, int, int *);
+*	Args: 
+*		Array with the label of each sample,
+*		Size of the label array,
+*		Current size of the unique labels array.
+*	Ret: 
+*		An array with the unique values of labels for a clustering.
+*
+*/
 int *unique(int *y, int size, int *us){
 
 	int *clu_unique = (int*) malloc (sizeof (int) * 100);
@@ -108,7 +171,18 @@ int *unique(int *y, int size, int *us){
 	return clu_unique;
 
 };
- 
+
+/*
+*
+*	Func: 		
+*		selectionSort(int *, int);
+*	Args: 
+*		Array of values,
+*		Size of array.
+*	Ret: 
+*		None, returns the sorted array.
+*
+*/ 
 void selectionSort(int arr[], int n){
 
     int i, j, min_idx;
@@ -124,12 +198,36 @@ void selectionSort(int arr[], int n){
     };
 };
 
+/*
+*
+*	Func: 		
+*		swap(int* , int*);
+*	Args: 
+*		Address of index 1,
+*		Address of index 2.
+*	Ret: 
+*		None, swaps indexes addresses.
+*
+*/ 
 void swap(int* xp, int* yp){
     int temp = *xp;
     *xp = *yp;
     *yp = temp;
 };
 
+/*
+*
+*	Func: 		
+*		clusterIndex(int *, int, int, int *);
+*	Args: 
+*		Array with unique labels,
+*		Size of the array with unique labels,
+*		Wanted cluster label,
+*		Current size of the wanted cluster. 
+*	Ret: 
+*		An array with the wanted clusters indexes.
+*
+*/ 
 int *clusterIndex(int *y, int s, int clu, int *cont){
 
 	int *clu_index = malloc (sizeof (int) * MAX);

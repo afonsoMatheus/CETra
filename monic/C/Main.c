@@ -1,6 +1,11 @@
-/* Author: Afonso Matheus   */
-/* Date: 2021               */
-//---------------------------------------------------------------------------
+/* Author: Afonso Matheus                                                      */
+/* Date: 2021                                                                  */
+//-----------------------------------------------------------------------------//                                                                          
+//                                                                             //
+// Script that contains the main function for detection of transitions between //
+// clusterings (See global consts in monic.c before running)                   // 
+//                                                                             //
+//-----------------------------------------------------------------------------//
 
 #include "Monic.h"
 

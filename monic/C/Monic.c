@@ -20,11 +20,13 @@ int FEA = 3; // number of features
 *	Func: 		
 *		monic(struct Clustering, struct Clustering, float *, float *);
 *	Args: 
-*		Clustering in time i; Clustering in time j; The weights assigned to 
-*		samples in time i; The weights assigned to samples in time j (j > i)
+*		Clustering in time i, 
+*		Clustering in time j, 
+*		The weights assigned to samples in time i, 
+*		The weights assigned to samples in time j. (j > i)
 *	Ret: 
 *		None, detects the transitions of the clusters between the clustering i 
-*		and the clustering j
+*		and the clustering j.
 *
 */
 void monic(struct Clustering C_i, struct Clustering C_j, float *age_i, float *age_j){
@@ -87,10 +89,10 @@ void monic(struct Clustering C_i, struct Clustering C_j, float *age_i, float *ag
 *	Func: 
 *		retrieveWAge(struct Clustering *);
 *	Args: 
-*		Array of clusterings
+*		Array of clusterings.
 *	Ret: 
 *		Matrix of float, with each line representing a clustering and each cell 
-*		representing an weight assigned to a sample's index
+*		representing an weight assigned to a sample's index.
 *
 */
 float **retrieveWAge(struct Clustering *C){
@@ -109,7 +111,7 @@ float **retrieveWAge(struct Clustering *C){
 *		None
 *	Ret: 
 *		An array of struct Clustering, containing all the clusterings obtained
-*		by reading the csv files
+*		by reading the csv files.
 *
 */
 struct Clustering *retrieveClusterings(){
@@ -131,13 +133,12 @@ struct Clustering *retrieveClusterings(){
 *	Func: 
 *		readCsv(char*);
 *	Args: 
-*		The string path to the file containing the clustering
+*		The string path to the file containing the clustering.
 *	Ret: 
-*		A clustering obtained in the file, with it samples, labels and size 
+*		A clustering obtained in the file, with it samples, labels and size.
 *
 */
 struct Clustering readCsv(char* path){
-
 
 	struct Clustering *C = (struct Clustering *) malloc(sizeof(struct Clustering));
 	C->X = (float **) malloc(MAX * sizeof(float*));
@@ -192,9 +193,9 @@ struct Clustering readCsv(char* path){
 *	Func: 
 *		showTransitions(struct Transitions);
 *	Args: 
-*		The clusters transictions between clusterings in time i and time j (j > i)
+*		The clusters transictions between clusterings in time i and time j. (j > i)
 *	Ret: 
-*		None, shows to the user all the transitions obtained  
+*		None, shows to the user all the transitions obtained.  
 *
 */
 void showTransitions(struct Transitions TRANS){

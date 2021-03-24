@@ -1,29 +1,64 @@
-/* Author: Afonso Matheus   */
-/* Date: 2021              */
-//---------------------------------------------------------------------------
+/* Author: Afonso Matheus                                                      */
+/* Date: 2021                                                                  */
+//-----------------------------------------------------------------------------//
+//                                                                             //
+// Script that contains the implementation of the internal transitions         //
+// detector, for survived clusters                                             //
+//                                                                             //
+//-----------------------------------------------------------------------------//
 
 #include "IntTransitions.h"
 #include "Util.h"
 
-//---------------------------------------------------------------------------
-
-void intTransitions(struct Transitions *TRANS, float *age_i, float *age_j, struct Clustering C_1, int **clu_index_1, int *cont_1, struct Clustering C_2, int **clu_index_2, int *cont_2){
+/*
+*
+*	Func: 		
+*		intTransitions(struct Transitions *, float *, float *, struct Clustering, int **, int *, struct Clustering, int **, int *);
+*	Args:
+*		Transition detected previously,
+*		Array with the aged weight of clustering i,
+*		Array with the aged weight of clustering j, 
+*		Clustering i, 
+*		Matrix with indexes of each cluster in clustering i,
+*		Array with the size of each cluster in clustering i,
+*		Clustering j, 
+*		Matrix with indexes of each cluster in clustering j,
+*		Array with the size of each cluster in clustering j.
+*	Ret: 
+*		None, the transitions are updated with the internal ones. 
+*
+*/
+void intTransitions(struct Transitions *TRANS, float *age_i, float *age_j, struct Clustering C_i, int **clu_index_i, int *cont_i, struct Clustering C_j, int **clu_index_j, int *cont_j){
 
 	TRANS->inters = (struct Internal*) malloc(TRANS->sur_size *sizeof(struct Internal));
 
 	for (int i = 0; i < TRANS->sur_size; ++i){
 
-		TRANS->inters[i].intSize = sizeTrans(clu_index_1[TRANS->survs[i].i], cont_1[TRANS->survs[i].i], clu_index_2[TRANS->survs[i].j], cont_2[TRANS->survs[i].j], age_i, age_j);
+		TRANS->inters[i].intSize = sizeTrans(clu_index_i[TRANS->survs[i].i], cont_i[TRANS->survs[i].i], clu_index_j[TRANS->survs[i].j], cont_j[TRANS->survs[i].j], age_i, age_j);
 
-		TRANS->inters[i].intComp = compTrans(clu_index_1[TRANS->survs[i].i], cont_1[TRANS->survs[i].i], clu_index_2[TRANS->survs[i].j], cont_2[TRANS->survs[i].j], C_1.X, C_2.X);
+		TRANS->inters[i].intComp = compTrans(clu_index_i[TRANS->survs[i].i], cont_i[TRANS->survs[i].i], clu_index_j[TRANS->survs[i].j], cont_j[TRANS->survs[i].j], C_i.X, C_j.X);
 
-		TRANS->inters[i].intLocal = locTrans(clu_index_1[TRANS->survs[i].i], cont_1[TRANS->survs[i].i], clu_index_2[TRANS->survs[i].j], cont_2[TRANS->survs[i].j], C_1.X, C_2.X);
+		TRANS->inters[i].intLocal = locTrans(clu_index_i[TRANS->survs[i].i], cont_i[TRANS->survs[i].i], clu_index_j[TRANS->survs[i].j], cont_j[TRANS->survs[i].j], C_i.X, C_j.X);
 
 	};
 
-
 }; 
 
+/*
+*
+*	Func: 		
+*		locTrans(int *, int, int *, int, float **, float **);
+*	Args: 
+*		List of indexes of a cluster in clustering i,
+*		Size of the cluster in clustering i,
+*		List of indexes of a cluster in clustering j,
+*		Size of the cluster in clustering j,
+*		Samples of clustering i,
+*		Samples of clustering j.
+*	Ret: 
+*		If the cluster had a localization transition.
+*
+*/
 const char *locTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float **X_ti, float **X_tj){
 	
 	float **Xi = (float **) malloc (size_ti * sizeof(float*));
@@ -55,6 +90,21 @@ const char *locTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float *
 
 };
 
+/*
+*
+*	Func: 		
+*		compTrans(int *, int, int *, int, float **, float **);
+*	Args: 
+*		List of indexes of a cluster in clustering i,
+*		Size of the cluster in clustering i,
+*		List of indexes of a cluster in clustering j,
+*		Size of the cluster in clustering j,
+*		Samples of clustering i,
+*		Samples of clustering j.
+*	Ret: 
+*		If the cluster had any density transition.
+*
+*/
 const char *compTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float **X_ti, float **X_tj){
 
 	float **Xi = (float **) malloc (size_ti * sizeof(float*));
@@ -90,6 +140,21 @@ const char *compTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float 
 
 };
 
+/*
+*
+*	Func: 		
+*		sizeTrans(int *, int, int *, int, float *, float *);
+*	Args: 
+*		List of indexes of a cluster in clustering i,
+*		Size of the cluster in clustering i,
+*		List of indexes of a cluster in clustering j,
+*		Size of the cluster in clustering j,
+*		Weighted values of each sample in clustering i,
+*		Weighted values of each sample in clustering j.
+*	Ret: 
+*		If the cluster had any size transition.
+*
+*/
 const char *sizeTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float *age_ti, float *age_tj){
 
 	float sum_i = 0;
