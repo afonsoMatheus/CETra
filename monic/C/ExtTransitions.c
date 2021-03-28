@@ -71,7 +71,6 @@ struct Transitions extTransitions(int ** clu_index_i, int ** clu_index_j, int *c
 					if (overlap_i[j][i] > overlap_i[surv_cand][i]){
 						surv_cand = j;
 					};
-
 				};
 
 			}else if(mcell > 0.25){
@@ -99,6 +98,21 @@ struct Transitions extTransitions(int ** clu_index_i, int ** clu_index_j, int *c
 					trans.splits[trans.spl_size].cj = unique_cj[split_cand[j]];
 					trans.spl_size++;
 
+					/*
+					if(unique_ci[i] != unique_cj[split_cand[j]]){
+						trans.splits[trans.spl_size].ci = unique_ci[i];
+						trans.splits[trans.spl_size].cj = unique_cj[split_cand[j]];
+						trans.spl_size++;
+					}else{
+						trans.survs[trans.sur_size].ci = unique_ci[i];
+						trans.survs[trans.sur_size].cj = unique_cj[split_cand[j]];
+
+						trans.survs[trans.sur_size].j = split_cand[j];
+						trans.sur_size++;
+
+					};
+					*/
+
 					tracked[t] = unique_cj[split_cand[j]];
 					t++;
 				};
@@ -118,7 +132,7 @@ struct Transitions extTransitions(int ** clu_index_i, int ** clu_index_j, int *c
 		};
 	
 	};
-	
+
 	trans.absors = (struct Tuple *) malloc (a * sizeof(struct Tuple));
 	trans.survs = (struct SurvTuple *) malloc ((usize_i) * sizeof(struct SurvTuple));
 	trans.sur_size = 0, trans.abs_size = 0;
@@ -132,6 +146,11 @@ struct Transitions extTransitions(int ** clu_index_i, int ** clu_index_j, int *c
 
 			for (int j = 0; j < al; ++j){
 
+				trans.absors[trans.abs_size].ci = absors_cand[j];
+				trans.absors[trans.abs_size].cj = unique_cj[i];
+				trans.abs_size++;
+
+				/*
 				if(absors_cand[j] == unique_cj[i]){
 					trans.survs[trans.sur_size].ci = absors_cand[j];
 					trans.survs[trans.sur_size].cj = unique_cj[i];
@@ -145,7 +164,7 @@ struct Transitions extTransitions(int ** clu_index_i, int ** clu_index_j, int *c
 					trans.absors[trans.abs_size].cj = unique_cj[i];
 					trans.abs_size++;
 
-				};	
+				};*/	
 
 				tracked[t] = unique_cj[i];
 				t++;

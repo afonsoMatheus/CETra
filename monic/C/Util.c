@@ -157,6 +157,7 @@ int *unique(int *y, int size, int *us){
 		};
 
 		if (repeat < 1){
+
 			clu_unique[s] = y[i];
 			s++;
 		};

@@ -12,8 +12,8 @@
 /*Variables used between all modules*/
 
 int CLU = 3; // number of clusterings
-int MAX = 105; // maximun sample size for vector alocation
-int FEA = 3; // number of features
+int MAX = 60000; // maximun sample size for vector alocation
+int FEA = 100; // number of features
 
 /*
 *
@@ -31,13 +31,19 @@ int FEA = 3; // number of features
 */
 void monic(struct Clustering C_i, struct Clustering C_j, float *age_i, float *age_j){
 
+	clock_t begin, end;
+
+	//getting the samples' indexes for each cluster in each clustering
+	
+	printf("	Building clusters indexes and labels for clusterings i and j...\n");
+
+	begin = clock();
+
 	int usize_i; 
 	int *unique_ci = unique(C_i.y, C_i.s, &usize_i);
 
 	int usize_j;
 	int *unique_cj = unique(C_j.y, C_j.s, &usize_j);
-
-	//getting the samples' indexes for each cluster in each clustering
 
 	int *cont_i = (int *) malloc(MAX * sizeof(int));
 	int **clu_index_i = (int **) malloc(usize_i * sizeof(int*));
@@ -51,20 +57,50 @@ void monic(struct Clustering C_i, struct Clustering C_j, float *age_i, float *ag
 		clu_index_j[i] = clusterIndex(C_j.y, C_j.s, unique_cj[i], &cont_j[i]);
 	};
 
+	end = clock();
+
+	printf("		Done! (%.2f seconds)\n\n", (double)(end - begin) / CLOCKS_PER_SEC);
+
 	//building overlapping matrix
+
+	printf("	Making overlap matrix...\n");
+
+	begin = clock();
 
 	float **overlap_m = overlapMatrix(clu_index_i, clu_index_j, unique_ci, unique_cj, usize_i, usize_j, cont_i , cont_j, age_j);
 	float **overlap_i = overlapMatrix(clu_index_j, clu_index_i, unique_cj, unique_ci, usize_j, usize_i, cont_j , cont_i, age_j);
 
+	end = clock();
+
+	printf("		Done! (%.2f seconds)\n\n", (double)(end - begin) / CLOCKS_PER_SEC);
+
 	//external transitions
+
+	printf("	Tracking external transitions...\n");
+
+	begin = clock();
 
 	struct Transitions TRANS = extTransitions(clu_index_i, clu_index_j, cont_i, cont_j, unique_ci, unique_cj, usize_i, usize_j, age_j, overlap_m, overlap_i);
 
+	end = clock();
+
+	printf("		Done! (%.2f seconds)\n\n", (double)(end - begin) / CLOCKS_PER_SEC);
+
 	//internal transitions
+
+	printf("	Tracking internal transitions...\n");
+
+	begin = clock();
 
 	intTransitions(&TRANS, age_i, age_j, C_i, clu_index_i, cont_i, C_j, clu_index_j, cont_j);
 
+	end = clock();
+
+	printf("		Done! (%.2f seconds)\n\n", (double)(end - begin) / CLOCKS_PER_SEC);
+
 	//showing transitions
+
+	printf("----------------------TRANSITIONS----------------------\n\n");
 	
 	showTransitions(TRANS);
 
@@ -122,6 +158,7 @@ struct Clustering *retrieveClusterings(){
 		char file[40];
 		snprintf (file, sizeof (file), "Clusterings/evo_cluster_%d.csv", i);
 		C[i] = readCsv(file);
+
 	};
 
 	return C;
@@ -147,16 +184,17 @@ struct Clustering readCsv(char* path){
 	C->y = (int *) malloc(MAX * sizeof(int));
 
 	FILE* fp = fopen(path, "r");
-	char buffer[1024];
+
+	char *buffer = (char*) malloc(MAX * sizeof(char));
+
 	int row = 0;
 	int col = 0;
 	int c = 0;
 
-	while(fgets(buffer, 1024, fp)){
+	while(fgets(buffer, MAX * sizeof(char), fp)){
 
 		col = 0;
 		c = 0;
-		
 		
 		char *value = strtok(buffer, ",");
 
@@ -180,7 +218,10 @@ struct Clustering readCsv(char* path){
 
     C->s = row;
 
+    free(buffer);
+
     fclose(fp);
+
 
     return *C; 
 
@@ -202,7 +243,10 @@ void showTransitions(struct Transitions TRANS){
 		
 		printf("Deaths:\n");
 		for (int i = 0; i < TRANS.dea_size; ++i){
-			printf("C_%d -> DEATH \n", TRANS.deaths[i]);
+			if(TRANS.deaths[i] != -1){
+				printf("C_%d -> DEATH \n", TRANS.deaths[i]);	
+			};
+			
 		};
 		printf("\n");
 
@@ -240,7 +284,7 @@ void showTransitions(struct Transitions TRANS){
 			printf("* -> C_%d\n", TRANS.births[i]);
 		};
 		printf("\n");
-		printf("-----------------------------------------------------\n");
+		printf("*********************************************************\n");
 
 };
 

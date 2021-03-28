@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from random import uniform, sample, randint, shuffle
+from random import uniform, sample, randint, shuffle, uniform
 from sklearn.datasets import make_blobs
 import math
 import numpy as np
@@ -19,20 +19,20 @@ def int_local(X, y, clu, n_center, num_f):
 
 #density changes
 #--difusion
-def int_den_dif(X, y, centers, clu, num_f):
+def int_den_dif(X, y, centers, clu, exp, num_f):
     
     clu_index = cluster_index(X, y, clu)
         
-    X = dist_points_den(X, centers[clu[0]], clu_index, num_f, 0) 
+    X = dist_points_den(X, centers[clu[0]], clu_index, num_f, exp, 0) 
         
     return X
     
 #--compaction
-def int_den_comp(X, y, centers, clu, num_f):
+def int_den_comp(X, y, centers, clu, exp, num_f):
     
     clu_index = cluster_index(X, y, clu)
     
-    X = dist_points_den(X, centers[clu[0]], clu_index, num_f, 1) 
+    X = dist_points_den(X, centers[clu[0]], clu_index, num_f, exp, 1) 
     
     return X
 
@@ -71,9 +71,11 @@ def int_size_reduc(X, y, clu, k):
 ''' external transitions '''
 
 #birth
-def ext_birth(X, y, colors, num_f, q, new_c):
+def ext_birth(X, y, colors, num_f, q, new_c, std):
     
-    X_new, y_new = make_blobs(n_samples=[q], centers= new_c, n_features=num_f ,random_state=1)
+    new_c = make_centers(new_c, num_f)[0]
+        
+    X_new, y_new = make_blobs(n_samples=[q], centers = [new_c], cluster_std = std, n_features=num_f ,random_state=1)
             
     for i in range(len(y_new)):
         y_new[i] = max(y) + 1
@@ -100,20 +102,22 @@ def ext_death(X, y, clu, colors):
 #union
 def ext_union(X, y, colors, centers, clusters, n_center, exp, num_f):
     
+    n_center = make_centers([n_center], num_f)
+    
     clu_index = cluster_index(X, y, clusters)
     
-    X = approaching_center(X, y, clusters, n_center, clu_index, num_f)
+    X = approaching_center(X, y, clusters, n_center[0], clu_index, num_f)
     
     max_d = 0
     for i in clu_index:
-        if(euc_distance(X[i], n_center) > max_d):
-            max_d = euc_distance(X[i], n_center)
+        if(euc_distance(X[i], n_center[0]) > max_d):
+            max_d = euc_distance(X[i], n_center[0])
     
     num_y = -1
     cen = math.inf
     for i in centers.keys():
-        if(euc_distance(centers[i], n_center) < max_d * exp and cen > euc_distance(centers[i], n_center)): 
-            cen = euc_distance(centers[i], n_center)
+        if(euc_distance(centers[i], n_center[0]) < max_d * exp and cen > euc_distance(centers[i], n_center[0])): 
+            cen = euc_distance(centers[i], n_center[0])
             num_y = i
             
     if(num_y == -1):
@@ -129,6 +133,8 @@ def ext_union(X, y, colors, centers, clusters, n_center, exp, num_f):
 
 #division
 def ext_div(X, y, colors, centers, clu, n_centers, ratio, exp, num_f):
+    
+    n_centers = make_centers(n_centers, num_f)
     
     clu_index = cluster_index(X, y, clu)
     
@@ -172,15 +178,20 @@ def ext_div(X, y, colors, centers, clu, n_centers, ratio, exp, num_f):
         
     return X, y, colors
 
+def make_centers(centers, num_f):
+    
+    for i in range(len(centers)):
+        centers.append([centers[i][0]] + [centers[i][1]])
+        centers[i] = centers[i] + ([centers[i][1]] * (num_f - 2))
+        
+    return centers
+
+
+
+''' other functions '''
+
 def approaching_center(X, y, clusters, n_center, clu_index, num_f):
         
-    if(n_center[0] <= n_center[1]):
-        for j in range(2, num_f):
-            n_center.append(randint(n_center[0],n_center[1]))
-    else:
-        for j in range(2, num_f):
-            n_center.append(randint(n_center[1],n_center[0]))
-    
     max_d = {}
     for i in clusters:
         max_d[i] = []
@@ -200,9 +211,6 @@ def approaching_center(X, y, clusters, n_center, clu_index, num_f):
                 X[i][j] = X[i][j] - max_d[y[i]][j]
     return X
 
-
-''' other functions '''
-
 def cluster_index(X, y, clusters):
     clu_index = []
     for i in range(X.shape[0]):
@@ -211,32 +219,25 @@ def cluster_index(X, y, clusters):
     return clu_index
     
 
-def dist_points_den(X, center, clu_index, num_f, t):
-    
-    max_d = []
-    for i in range(num_f):
-        max_d.append(0)
-
-    for i in clu_index:
-        for j in range(num_f):
-            if(abs(X[i][j] - center[j]) > max_d[j]):
-                max_d[j] = abs(X[i][j] - center[j])
-                
+def dist_points_den(X, center, clu_index, num_f, exp, t):
+        
+    std = np.std(X[clu_index])* exp 
+                    
     if(t == 0):      
         for i in clu_index:
             for j in range(num_f):
                 if(X[i][j] < center[j]):
-                    X[i][j] = X[i][j] - max_d[j]/2
+                    X[i][j] = X[i][j] - abs(uniform(-std,std))
                 else:
-                    X[i][j] = X[i][j] + max_d[j]/2
+                    X[i][j] = X[i][j] + abs(uniform(-std,std))
     
     if(t == 1):
          for i in clu_index:
             for j in range(num_f):
                 if(X[i][j] < center[j]):
-                    X[i][j] = X[i][j] + max_d[j]/2
+                    X[i][j] = X[i][j] + abs(uniform(-std,std))
                 else:
-                    X[i][j] = X[i][j] - max_d[j]/2
+                    X[i][j] = X[i][j] - abs(uniform(-std,std))
 
     return X
 

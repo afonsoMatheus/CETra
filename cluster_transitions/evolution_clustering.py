@@ -9,26 +9,34 @@ from matplotlib import pyplot as plt
 from random import randint
 from math import floor
 
-
 '''
-The purpose of this algorithm is to enable the simulation of different types of group transitions, both internal and external, between multiple clusterings in a n-dimensional space.
+The purpose of this algorithm is to enable the simulation of different types of group 
+transitions, both internal and external, between multiple clusterings in a n-dimensional 
+space.
 '''
 
 class Evocluster:
 
     #Args n_samples l_centers num_f r_state, list 2dlist int int
     #Ret None; makes the initial clustering 
-    def __init__(self, n_samples, l_centers, num_f, r_state):
+    def __init__(self, n_samples, l_centers, stdev, num_f, r_state):
     
         self.evo_clustering = {}
         self.centers = {}
         self.num_f = num_f
+        
+        centers = []
+        samples = []
+        for i in range(len(l_centers)):
+            samples = [n_samples] * len(l_centers)
+            centers.append([l_centers[i][0]] + [l_centers[i][1]])
+            centers[i] = l_centers[i] + ([l_centers[i][1]] * (num_f - 2))
 
-        X, y = make_blobs(n_samples, centers = l_centers, n_features=self.num_f, random_state = r_state)
+        X, y = make_blobs(samples, centers = centers, cluster_std = stdev, n_features=self.num_f, random_state = r_state)
         colors = att_colors(y)
 
         self.evo_clustering[0] = X,y,colors
-        self.centers[0] = find_centroids(X,y, num_f)
+        self.centers[0] = find_centroids(X,y, self.num_f)
         
         self.next_clustering = {}
     
@@ -67,13 +75,13 @@ class Evocluster:
         
         #Args qtd, int
         #Ret None; makes a cluster birth and updates the newest clustering
-        def birth_transition(self, qtd, new_c):
-            self.X, self.y, self.colors = trans.ext_birth(self.X, self.y, self.colors, self.num_f, qtd, [new_c])
+        def birth_transition(self, qtd, new_c, std):
+            self.X, self.y, self.colors = trans.ext_birth(self.X, self.y, self.colors, self.num_f, qtd, [new_c], std)
             
             self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
             self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
         
-        #Args clus union_c, int*array int*array
+        #Args clus union_c, int*array int*array int
         #Ret None; makes a union transiton and updates the newest clustering
         def absor_transition(self, clus, union_c, exp):
             self.X, self.y, self.colors = trans.ext_union(self.X, self.y, self.colors, self.next_centers[self.last_t], clus, union_c, exp, self.num_f)
@@ -81,49 +89,52 @@ class Evocluster:
             self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
             self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
         
-        #Args clu split_cs ratio, int int*matrix float*array
+        #Args clu split_cs ratio, int int*matrix float*array int
         #Ret None; makes a split transiton and updates the newest clustering
         def split_transition(self, clu, split_cs, ratio, exp):
-            self.X, self.y, self.colors = trans.ext_div(self.X, self.y, self.colors, self.next_centers[self.last_t], clu, split_cs, ratio, exp, self.num_f)
+            self.X, self.y, self.colors = trans.ext_div(self.X, self.y, self.colors, self.next_centers[self.last_t], [clu], split_cs, ratio, exp, self.num_f)
             
             self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
             self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
             
         '''Internal Transitions'''
-        
-        def density_difusion(self, clu):
-            
-            self.X = trans.int_den_dif(self.X, self.y, self.next_centers[self.last_t], [clu], self.num_f)
+
+        def density_difusion(self, clu, exp):
+
+            self.X = trans.int_den_dif(self.X, self.y, self.next_centers[self.last_t], [clu], exp, self.num_f)
+
             self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
             self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
-            
-        def density_compactation(self, clu):
-            
-            self.X = trans.int_den_comp(self.X, self.y, self.next_centers[self.last_t], [clu], self.num_f)
+
+        def density_compactation(self, clu, exp):
+
+            self.X = trans.int_den_comp(self.X, self.y, self.next_centers[self.last_t], [clu], exp, self.num_f)
+
             self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
             self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
-           
+
         def size_grow(self, clu, qtd):
-            
+
             self.X, self.y = trans.int_size_grow(self.X, self.y, self.next_centers[self.last_t], [clu], qtd, self.num_f)
-            
+
             self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
             self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
-            
+
         def size_reduction(self, clu, qtd):
-            
+
             self.y = trans.int_size_reduc(self.X, self.y, [clu], qtd)
-            
+
             self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
             self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
-            
+
         def localization_change(self, clu, n_center):
-            
+
             self.X = trans.int_local(self.X, self.y, [clu], n_center, self.num_f)
-            
+
             self.next_clustering[self.last_t+1] = self.X, self.y, self.colors
             self.next_centers[self.last_t+1] = find_centroids(self.X, self.y, self.num_f)
-    
+        
+        
               
     #Args None, None
     #Ret None; plots graphs for all clusterings
@@ -143,8 +154,8 @@ class Evocluster:
                 plt.title("T_" + str(j))
                 plt.xlabel("x")
                 plt.ylabel("y")
-                plt.xlim(0, 40)
-                plt.ylim(0, 50)
+                plt.xlim(0, 1000)
+                plt.ylim(0, 1000)
                 plt.legend()
                 n_c = n_c + 1
             plt.show()
@@ -181,8 +192,7 @@ class Evocluster:
             
         return clusterings
         
-
-
+        
 #Args y, list
 #Ret dict; returns the associated colors for the first clustering 
 def att_colors(y):

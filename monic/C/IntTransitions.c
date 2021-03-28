@@ -82,7 +82,7 @@ const char *locTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float *
 	float mean_i = mean(Xi, size_ti, FEA);
 	float mean_j = mean(Xj, size_tj, FEA);
 
-	if(mean_i - mean_j > 3){
+	if(mean_i - mean_j > 30){
 		return "Localization";
 	}else{
 		return NULL;
@@ -130,9 +130,9 @@ const char *compTrans(int *clu_ti, int size_ti, int *clu_tj, int size_tj, float 
 	float std_i = stdev(Xi, size_ti, FEA);
 	float std_j = stdev(Xj, size_tj, FEA);
 
-	if (std_j < std_i - 0.05){
+	if (std_j < std_i - 20){
 		return "Compaction";
-	}else if(std_j > std_i + 0.05){
+	}else if(std_j > std_i + 20){
 		return "Difusion";
 	}else{
 		return NULL;

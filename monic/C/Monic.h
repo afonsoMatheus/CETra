@@ -6,6 +6,7 @@
 #define MONIC_H
 
 #include <string.h>
+#include <time.h>
 #include "General.h"
 #include "Util.h"
 #include "OverlapMatrix.h"
