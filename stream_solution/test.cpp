@@ -2,8 +2,6 @@
 #include <unordered_map>
 #include <vector>
 #include <tuple>
-#include <bits/stdc++.h>
-
 
 using namespace std;
 
@@ -22,6 +20,27 @@ unordered_map<T, U> makeHash(vector<T> v1, vector<U> v2){
 
 	for (int i = 0; i < v1.size(); ++i)
 		umap.insert({v1[i], v2[i]});
+
+	/*cout << "----Hash Table----" << endl; 
+	for(auto x : umap){
+		cout << x.first << ": " << x.second << endl;
+	}*/
+
+	return umap;
+
+}
+
+template <typename T, typename U , typename V>
+unordered_map<T, tuple<U, V> > makeHash(vector<T> v1, vector<U> v2, vector<V> v3){
+
+	if(v1.size() != v2.size() or v1.size() != v3.size()){
+		return unordered_map<T, tuple<U, V> >(); 
+	} 
+
+	unordered_map<T, tuple < U, V >> umap(v1.size());
+
+	for (int i = 0; i < v1.size(); ++i)
+		umap.insert({v1[i], make_tuple(v2[i],v3[i])});
 
 	/*cout << "----Hash Table----" << endl; 
 	for(auto x : umap){
@@ -71,28 +90,14 @@ unordered_map<T,U> clusterWeights(vector<T> sensors, vector<U> weights, clusteri
 
 }
 
-
-
-tuple<int,int,int>* makeTuple(vector<int> sen, vector<int> clu, vector<int> wei){
-
-	tuple<int,int,int> *t = new tuple<int,int,int>[sen.size()];
-
-	for (int i = 0; i < sen.size(); ++i){
-		t[i] = make_tuple(sen[i], clu[i], wei[i]);
-		cout << get<0>(t[i]) << " " << get<1>(t[i]) << " " << get<2>(t[i]) << endl;
-	}
-
-	return t;
-}
-
-overlaping clusterOverlap(clustering clus, unordered_map<int,int> senC, unordered_map<int,float> wei, int size, unordered_map<int,float> cluW){
+overlaping clusterOverlap(clustering clus, unordered_map<int, tuple<int,float>> clusE, unordered_map<int,float> cluW, int size){
 
 	unordered_map<int, vector<float>> intersec;
 
 	for (auto i : clus){
 		intersec[i.first] = vector<float>(size); //saber quantidade de grupos do agrupamento 2
 		for (auto x : i.second) {
-			intersec[i.first][senC[x]]+=wei[x];
+			intersec[i.first][get<0>(clusE[x])]+= get<1>(clusE[x]);
 		}
 	}
 
@@ -115,12 +120,10 @@ overlaping clusterOverlap(clustering clus, unordered_map<int,int> senC, unordere
 		for (auto x : i.second) cout <<  x << " ";
 		cout << endl;
 	}
+	cout << endl;
 
 	return intersec;
 }
-
-
-
 
 int main(int argc, char const *argv[]){
 	
@@ -128,30 +131,22 @@ int main(int argc, char const *argv[]){
 	vector<int> clusters1 = {0,0,0,1,1,1};
 	vector<float> weights1 = {1.0,1.0,1.0,1.0,1.0,1.0};
 
-	//tuple<int,int,int> *t = makeTuple(sensors1, clusters1, weights1);
-
-	/*for (int i = 0; i < 5; ++i){
-		cout << get<0>(t[i]) << " " << get<1>(t[i]) << " " << get<2>(t[i]) << endl;
-	}*/
-
 	clustering clus1 = storeClusters(clusters1, sensors1);
 
 	unordered_map<int,float> cluW = clusterWeights<int, float>(sensors1, weights1, clus1);
 	
 	////////////////////////////////////////////////////////////////
 
-	cout << endl << "/////// NEXT WINDOW ///////" << endl << endl;;
+	cout << endl << "///// NEXT WINDOW /////" << endl << endl;;
 
 	vector<int> sensors2 = {1,2,3,4,5,6};
 	vector<int> clusters2 = {0,0,1,1,2,2};
 	vector<float> weights2 = {0.8,0.8,0.8,0.8,0.8,0.8};
-
 	int size = 3;
 
-	unordered_map<int,int> senC = makeHash<int, int>(sensors2, clusters2);
-	unordered_map<int,float> wei = makeHash<int, float>(sensors2, weights2);
+	unordered_map<int, tuple<int, float>> clusE = makeHash<int, int, float>(sensors2, clusters2, weights2);
 
-	overlaping matrix = clusterOverlap(clus1, senC, wei, size, cluW);
+	overlaping matrix = clusterOverlap(clus1, clusE, cluW, size);
 
 	return 0;
 }
