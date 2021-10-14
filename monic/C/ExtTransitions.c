@@ -118,6 +118,12 @@ struct Transitions extTransitions(int ** clu_index_i, int ** clu_index_j, int *c
 				};
 
 
+			}else if(surv_cand != -2){
+
+				absors[a].ci = unique_ci[i];
+				absors[a].cj = unique_cj[surv_cand];
+				a++;
+
 			}else{
 				trans.deaths[trans.dea_size] = unique_ci[i];
 				trans.dea_size++;

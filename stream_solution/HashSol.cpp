@@ -33,11 +33,11 @@ unordered_map<T, tuple<U, V> > makeHash(vector<T> v1, vector<U> v2, vector<V> v3
 }
 
 template <typename T, typename U >
-unordered_map<T,U> clusterWeights(vector<T> sensors, vector<U> weights, clustering clus){
+unordered_map<T,U> clusterWeights(vector<T> sen, vector<U> wei, clustering clus){
 
 	unordered_map<T,U> cw;
 
-	unordered_map<T,U> sw = makeHash<T,U>(sensors, weights);
+	unordered_map<T,U> sw = makeHash<T,U>(sen, wei);
 
 	for (auto i : clus){
 		for(auto x : i.second) cw[i.first]+= sw[x];
@@ -72,15 +72,18 @@ clustering storeClusters(vector<int> clu, vector<int> sen){
 }
 
 
-overlaping clusterOverlap(clustering clus, unordered_map<int, tuple<int,float>> clusE, unordered_map<int,float> cluW, int size){
+overlaping clusterOverlap(clustering clus, unordered_map<int, tuple<int,float>> clusE, unordered_map<int,float> cluW, vector<int> clusters2){
 
 	unordered_map<int, vector<float>> intersec;
 
-	for (auto i : clus){
-		intersec[i.first] = vector<float>(size); //saber quantidade de grupos do agrupamento 2
-		for (auto x : i.second) {
-			intersec[i.first][get<0>(clusE[x])]+= get<1>(clusE[x]);
+	unordered_map<int,int> labels = useLabels(clusters2);
+	
+	for (auto c : clus){
+		intersec[c.first] = vector<float>(labels.size()); //saber quantidade de grupos do agrupamento 2
+		for (auto elem : c.second) {
+			intersec[c.first][labels[get<0>(clusE[elem])]]+= get<1>(clusE[elem]);
 		}
+
 	}
 
 	cout << "-----Intersection-----" << endl;
@@ -107,8 +110,27 @@ overlaping clusterOverlap(clustering clus, unordered_map<int, tuple<int,float>> 
 	return intersec;
 }
 
-template unordered_map<int, int> makeHash(vector<int> v1, vector<int> v2);
-template unordered_map<int, float> makeHash(vector<int> v1, vector<float> v2);
-template unordered_map<int, tuple<int, float> > makeHash(vector<int> v1, vector<int> v2, vector<float> v3);
-template unordered_map<int,float> clusterWeights(vector<int> sensors, vector<float> weights, clustering clus);
+unordered_map<int,int> useLabels(vector<int> labels){
+
+	unordered_map<int, int> lmap;
+
+
+	/*sort(clusters.begin(), clusters.end());
+	clusters.erase( unique( clusters.begin(), clusters.end() ), clusters.end() );
+*/
+	int i = 0;
+	for(auto x: labels){
+		lmap[x] = i;
+		i++;
+	}
+
+	return lmap;
+
+}
+
+
+template unordered_map<int, int> makeHash(vector<int>, vector<int>);
+template unordered_map<int, float> makeHash(vector<int>, vector<float>);
+template unordered_map<int, tuple<int, float> > makeHash(vector<int>, vector<int>, vector<float>);
+template unordered_map<int,float> clusterWeights(vector<int>, vector<float>, clustering);
 
