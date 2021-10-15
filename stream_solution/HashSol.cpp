@@ -72,16 +72,16 @@ clustering storeClusters(vector<int> clu, vector<int> sen){
 }
 
 
-overlaping clusterOverlap(clustering clus, unordered_map<int, tuple<int,float>> clusE, unordered_map<int,float> cluW, vector<int> clusters2){
+overlaping clusterOverlap(clustering clus, unordered_map<int, tuple<int,float>> clusE, unordered_map<int,float> cluW, vector<int> labels){
 
 	unordered_map<int, vector<float>> intersec;
 
-	unordered_map<int,int> labels = useLabels(clusters2);
+	unordered_map<int,int> lmap = useLabels(labels);
 	
 	for (auto c : clus){
 		intersec[c.first] = vector<float>(labels.size()); //saber quantidade de grupos do agrupamento 2
 		for (auto elem : c.second) {
-			intersec[c.first][labels[get<0>(clusE[elem])]]+= get<1>(clusE[elem]);
+			if(get<0>(clusE[elem]) != -1) intersec[c.first][lmap[get<0>(clusE[elem])]]+= get<1>(clusE[elem]);
 		}
 
 	}
@@ -92,6 +92,7 @@ overlaping clusterOverlap(clustering clus, unordered_map<int, tuple<int,float>> 
 		for (auto x : i.second) cout << x << " ";
 		cout << endl;
 	}
+	cout << endl;
 
 	for (auto i : intersec){
 		for (auto x = 0; x < i.second.size(); x++){
@@ -112,12 +113,10 @@ overlaping clusterOverlap(clustering clus, unordered_map<int, tuple<int,float>> 
 
 unordered_map<int,int> useLabels(vector<int> labels){
 
+	sort(labels.begin(),labels.end());
+
 	unordered_map<int, int> lmap;
 
-
-	/*sort(clusters.begin(), clusters.end());
-	clusters.erase( unique( clusters.begin(), clusters.end() ), clusters.end() );
-*/
 	int i = 0;
 	for(auto x: labels){
 		lmap[x] = i;

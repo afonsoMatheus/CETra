@@ -33,6 +33,8 @@ unordered_map<int,int> hashLabels(vector<int> labels){
 
 void extTransitions(overlaping matrix, vector<int> labels){
 
+	sort(labels.begin(),labels.end());
+
 	vector<int> deaths;
 	vector<int> tracked;
 	unordered_map<int, vector<int>> absors;
@@ -50,7 +52,7 @@ void extTransitions(overlaping matrix, vector<int> labels){
 
 			float mcell = X.second[Y];
 
-			if (mcell > 0.5){
+			if (mcell >= 0.5){
 				
 				if(surv_cand = -2){
 					surv_cand = lmap[Y];
@@ -65,12 +67,9 @@ void extTransitions(overlaping matrix, vector<int> labels){
 
 				}
 
-			}else if(mcell > 0.25){
+			}else if(mcell >= 0.25){
 
 				split_cand.insert(split_cand.end(), Y);
-
-				//TODO: Implementar função concatenate
-				//vector1.insert( vector1.end(), vector2.begin(), vector2.end() );
 
 			}
 
@@ -82,11 +81,11 @@ void extTransitions(overlaping matrix, vector<int> labels){
 
 		}else if(split_cand.empty() == false){
 
-			if(sumSplits(X.second, split_cand) > 0.5){
+			if(sumSplits(X.second, split_cand) >= 0.5){
 
 				cout << "Separações" << endl << X.first << " -> ";
 				for(auto x: split_cand) {
-					cout << lmap[x] << " ";
+					cout << lmap[x] << " (" << X.second[x] << ") ";
 					tracked.insert(tracked.end(), lmap[x]);
 				};
 				cout << endl <<  endl;
@@ -170,9 +169,9 @@ int main(int argc, char const *argv[]){
 	cout << endl << "///// NEXT WINDOW /////" << endl << endl;;
 
 	vector<int> sensors2 = {1,2,3,4,5,6,7,8};
-	vector<int> clusters2 = {0,0,1,1,1,1,2,2};
+	vector<int> clusters2 = {2,1,1,-1,0,-1,0,2};
 	vector<float> weights2 = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
-	vector<int> labels = {0,1,2};
+	vector<int> labels = {2,1,0};
 	
 	unordered_map<int, tuple<int, float>> clusE = makeHash<int, int, float>(sensors2, clusters2, weights2);
 
