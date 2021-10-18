@@ -1,7 +1,7 @@
 #include "HashSol.h"
 
 template <typename T, typename U >
-unordered_map<T, U> makeHash(vector<T> v1, vector<U> v2){
+unordered_map<T, U> makeHash(const vector<T> &v1, const vector<U> &v2){
 
 	if(v1.size() != v2.size()){
 		return unordered_map<T,U>(); 
@@ -17,7 +17,7 @@ unordered_map<T, U> makeHash(vector<T> v1, vector<U> v2){
 }
 
 template <typename T, typename U , typename V>
-unordered_map<T, tuple<U, V> > makeHash(vector<T> v1, vector<U> v2, vector<V> v3){
+unordered_map<T, tuple<U, V> > makeHash(const vector<T> &v1, const vector<U> &v2, const vector<V> &v3){
 
 	if(v1.size() != v2.size() or v1.size() != v3.size()){
 		return unordered_map<T, tuple<U, V> >(); 
@@ -33,24 +33,24 @@ unordered_map<T, tuple<U, V> > makeHash(vector<T> v1, vector<U> v2, vector<V> v3
 }
 
 template <typename T, typename U >
-unordered_map<T,U> clusterWeights(const vector<T> sen, const vector<U> wei, clustering clus){
+unordered_map<T,U> clusterWeights(const vector<T> &sen, const vector<U> &wei, const clustering &clus) {
 
 	unordered_map<T,U> cw;
 
 	unordered_map<T,U> sw = makeHash<T,U>(sen, wei);
 
-	for (auto i : clus){
+	for (const auto &i : clus){
 		for(auto x : i.second) cw[i.first]+= sw[x];
 	}
 	
 	cout << "----Cluster Weights----" << endl;
-	for(auto x : cw) cout << x.first << ": " << x.second << endl;
+	for(const auto &x : cw) cout << x.first << ": " << x.second << endl;
 
 	return cw;
 
 }
 
-clustering storeClusters(const vector<int> clu, const vector<int> sen){
+clustering storeClusters(const vector<int> &clu, const vector<int> &sen){
 
 	clustering clusters;
 
@@ -61,9 +61,9 @@ clustering storeClusters(const vector<int> clu, const vector<int> sen){
 
 
 	cout << "------Clustering------" << endl;
-	for (auto i : clusters){
+	for (const auto &i : clusters){
 		cout << i.first << ": "; 
-		for (auto x : i.second) cout << x << " ";
+		for (const auto &x : i.second) cout << x << " ";
 		cout << endl;
 	}
 
@@ -72,38 +72,38 @@ clustering storeClusters(const vector<int> clu, const vector<int> sen){
 }
 
 
-overlaping clusterOverlap(clustering clus, unordered_map<int, tuple<int,float>> clusE, unordered_map<int,float> cluW, const vector<int> labels){
+overlaping clusterOverlap(const clustering &clus, unordered_map<int, tuple<int,float>> &clusE, unordered_map<int,float> &cluW, vector<int> &labels){
 
 	unordered_map<int, vector<float>> intersec;
 
 	unordered_map<int,int> lmap = useLabels(labels);
 	
-	for (auto c : clus){
+	for (auto &c : clus){
 		intersec[c.first] = vector<float>(labels.size()); //saber quantidade de grupos do agrupamento 2
-		for (auto elem : c.second) {
+		for (auto &elem : c.second) {
 			if(get<0>(clusE[elem]) != -1) intersec[c.first][lmap[get<0>(clusE[elem])]]+= get<1>(clusE[elem]);
 		}
 
 	}
 
 	cout << "-----Intersection-----" << endl;
-	for (auto i : intersec){
+	for (const auto &i : intersec){
 		cout << i.first << ": "; 
-		for (auto x : i.second) cout << x << " ";
+		for (const auto &x : i.second) cout << x << " ";
 		cout << endl;
 	}
 	cout << endl;
 
-	for (auto i : intersec){
+	for (const auto &i : intersec){
 		for (auto x = 0; x < i.second.size(); x++){
 			intersec[i.first][x] =  intersec[i.first][x]/cluW[i.first];
 		}
 	}
 
 	cout << "-----Overlapping-----" << endl;
-	for (auto i : intersec){
+	for (const auto &i : intersec){
 		cout << i.first << ": "; 
-		for (auto x : i.second) cout <<  x << " ";
+		for (const auto &x : i.second) cout <<  x << " ";
 		cout << endl;
 	}
 	cout << endl;
@@ -111,14 +111,14 @@ overlaping clusterOverlap(clustering clus, unordered_map<int, tuple<int,float>> 
 	return intersec;
 }
 
-unordered_map<int,int> useLabels(vector<int> labels){
+unordered_map<int,int> useLabels(vector<int> &labels){
 
 	sort(labels.begin(),labels.end());
 
 	unordered_map<int, int> lmap;
 
 	int i = 0;
-	for(auto x: labels){
+	for(const auto &x: labels){
 		lmap[x] = i;
 		i++;
 	}
@@ -128,8 +128,8 @@ unordered_map<int,int> useLabels(vector<int> labels){
 }
 
 
-template unordered_map<int, int> makeHash(vector<int>, vector<int>);
-template unordered_map<int, float> makeHash(vector<int>, vector<float>);
-template unordered_map<int, tuple<int, float> > makeHash(vector<int>, vector<int>, vector<float>);
-template unordered_map<int,float> clusterWeights(vector<int>, vector<float>, clustering);
+template unordered_map<int, int> makeHash(const vector<int>&, const vector<int>&);
+template unordered_map<int, float> makeHash(const vector<int>&, const vector<float>&);
+template unordered_map<int, tuple<int, float> > makeHash(const vector<int>&, const vector<int>&, const vector<float>&);
+template unordered_map<int,float> clusterWeights(const vector<int> &, const vector<float>&, const clustering&);
 

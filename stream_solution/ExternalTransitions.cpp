@@ -5,11 +5,11 @@
 
 using namespace std;
 
-float sumSplits(vector<float> overlaps, vector<int> split_cand){
+float sumSplits(const vector<float> &overlaps, const vector<int> &split_cand){
 
 	float sum = 0;
 
-	for(auto x: split_cand){
+	for(const auto &x: split_cand){
 		sum+=overlaps[x];
 	}
 
@@ -17,12 +17,12 @@ float sumSplits(vector<float> overlaps, vector<int> split_cand){
 
 }
 
-unordered_map<int,int> hashLabels(vector<int> labels){
+unordered_map<int,int> hashLabels(const vector<int> &labels){
 
 	unordered_map<int, int> umap;
 
 	int i = 0;
-	for(auto x: labels){
+	for(const auto &x: labels){
 		umap[i] = x;
 		i++;
 	}
@@ -31,9 +31,7 @@ unordered_map<int,int> hashLabels(vector<int> labels){
 
 }
 
-void extTransitions(overlaping matrix, vector<int> labels){
-
-	sort(labels.begin(),labels.end());
+void extTransitions(overlaping &matrix, const vector<int> &labels){
 
 	vector<int> deaths;
 	vector<int> tracked;
@@ -41,7 +39,7 @@ void extTransitions(overlaping matrix, vector<int> labels){
 	unordered_map<int,int> lmap = hashLabels(labels);
 
 
-	for(auto X : matrix){
+	for(const auto &X : matrix){
 
 		vector<int> split_cand;
 
@@ -85,7 +83,7 @@ void extTransitions(overlaping matrix, vector<int> labels){
 			if(sumSplits(X.second, split_cand) >= 0.5){
 
 				cout << "Separações" << endl << X.first << " -> ";
-				for(auto x: split_cand) {
+				for(const auto x: split_cand) {
 					cout << lmap[x] << " (" << X.second[x] << ") ";
 					tracked.insert(tracked.end(), lmap[x]);
 				};
@@ -111,12 +109,12 @@ void extTransitions(overlaping matrix, vector<int> labels){
 
 	}
 
-	for(auto x: absors){
+	for(auto &x: absors){
 
 		if(absors[x.first].size() > 1){
 
 			cout << "Uniões" << endl;
-			for(auto y: x.second) cout << y << " ";
+			for(const auto y: x.second) cout << y << " ";
 			cout << "-> " << x.first << endl << endl;
 
 			tracked.insert(tracked.end(), x.first);
@@ -133,7 +131,7 @@ void extTransitions(overlaping matrix, vector<int> labels){
 	}
 
 	cout << "Mortes" << endl;
-	for(auto x : deaths){
+	for(const auto &x : deaths){
 		cout << x << " -> DEATH " << endl;
 	}
 	cout << endl;
@@ -158,7 +156,7 @@ void extTransitions(overlaping matrix, vector<int> labels){
 int main(int argc, char const *argv[]){
 	
 	const vector<int> sensors1 = {1,2,3,4,5,6,7,8};
-	const vector<int> clusters1 = {0,0,0,0,1,1,1,1,1};
+	const vector<int> clusters1 = {0,0,0,0,1,1,1,0};
 	const vector<float> weights1 = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
 
 	clustering clusR = storeClusters(clusters1, sensors1);
@@ -172,7 +170,7 @@ int main(int argc, char const *argv[]){
 	const vector<int> sensors2 = {1,2,3,4,5,6,7,8};
 	const vector<int> clusters2 = {3,3,4,4,3,3,4,4};
 	const vector<float> weights2 = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
-	const vector<int> labels = {3,4};
+	vector<int> labels = {4,3}; //precisa ser ordenado
 	
 	unordered_map<int, tuple<int, float>> clusE = makeHash<int, int, float>(sensors2, clusters2, weights2);
 

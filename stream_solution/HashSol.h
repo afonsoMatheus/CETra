@@ -9,23 +9,23 @@
 
 using namespace std;
 
-typedef unordered_map<int, vector<int>> clustering;
-typedef unordered_map<int, vector<float>> overlaping;
+using clustering = unordered_map<int, vector<int>>;
+using overlaping = unordered_map<int, vector<float>>;
 
 
 template <typename T, typename U >
-unordered_map<T, U> makeHash(vector<T>, vector<U>);
+unordered_map<T, U> makeHash(const vector<T>&, const vector<U>&);
 
 template <typename T, typename U , typename V>
-unordered_map<T, tuple<U, V> > makeHash(vector<T>, vector<U>, vector<V>);
+unordered_map<T, tuple<U, V> > makeHash(const vector<T>&, const vector<U>&, const vector<V>&);
 
 template <typename T, typename U >
-unordered_map<T,U> clusterWeights(const vector<T>, const vector<U>, clustering);
+unordered_map<T,U> clusterWeights(const vector<T>&, const vector<U>&, const clustering&);
 
-clustering storeClusters(const vector<int>, const vector<int>);
+clustering storeClusters(const vector<int>&, const vector<int>&);
 
-overlaping clusterOverlap(clustering, unordered_map<int, tuple<int,float>>, unordered_map<int,float>, const vector<int>);
+overlaping clusterOverlap(const clustering&, unordered_map<int, tuple<int,float>>&, unordered_map<int,float>&, vector<int>&);
 
-unordered_map<int,int> useLabels(vector<int>);
+unordered_map<int,int> useLabels(vector<int>&);
 
 #endif
