@@ -20,11 +20,11 @@ template <typename T, typename U , typename V>
 unordered_map<T, tuple<U, V> > makeHash(vector<T>, vector<U>, vector<V>);
 
 template <typename T, typename U >
-unordered_map<T,U> clusterWeights(vector<T>, vector<U>, clustering);
+unordered_map<T,U> clusterWeights(const vector<T>, const vector<U>, clustering);
 
-clustering storeClusters(vector<int>, vector<int>);
+clustering storeClusters(const vector<int>, const vector<int>);
 
-overlaping clusterOverlap(clustering, unordered_map<int, tuple<int,float>>, unordered_map<int,float>, vector<int>);
+overlaping clusterOverlap(clustering, unordered_map<int, tuple<int,float>>, unordered_map<int,float>, const vector<int>);
 
 unordered_map<int,int> useLabels(vector<int>);
 

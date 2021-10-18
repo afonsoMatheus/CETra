@@ -52,7 +52,7 @@ void extTransitions(overlaping matrix, vector<int> labels){
 
 			float mcell = X.second[Y];
 
-			if (mcell >= 0.5){
+			if (mcell > 0.5){
 				
 				if(surv_cand = -2){
 					surv_cand = lmap[Y];
@@ -63,7 +63,8 @@ void extTransitions(overlaping matrix, vector<int> labels){
 				
 				}else if(mcell == X.second[surv_cand]){
 
-					//TODO: Resolver problema de empate
+					//TODO: Resolver problema de empate por comp.
+					//de tamanho.
 
 				}
 
@@ -156,9 +157,9 @@ void extTransitions(overlaping matrix, vector<int> labels){
 
 int main(int argc, char const *argv[]){
 	
-	vector<int> sensors1 = {1,2,3,4,5,6,7,8};
-	vector<int> clusters1 = {0,0,0,0,1,1,1,1};
-	vector<float> weights1 = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
+	const vector<int> sensors1 = {1,2,3,4,5,6,7,8};
+	const vector<int> clusters1 = {0,0,0,0,1,1,1,1,1};
+	const vector<float> weights1 = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
 
 	clustering clusR = storeClusters(clusters1, sensors1);
 
@@ -168,10 +169,10 @@ int main(int argc, char const *argv[]){
 
 	cout << endl << "///// NEXT WINDOW /////" << endl << endl;;
 
-	vector<int> sensors2 = {1,2,3,4,5,6,7,8};
-	vector<int> clusters2 = {2,1,1,-1,0,-1,0,2};
-	vector<float> weights2 = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
-	vector<int> labels = {2,1,0};
+	const vector<int> sensors2 = {1,2,3,4,5,6,7,8};
+	const vector<int> clusters2 = {3,3,4,4,3,3,4,4};
+	const vector<float> weights2 = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
+	const vector<int> labels = {3,4};
 	
 	unordered_map<int, tuple<int, float>> clusE = makeHash<int, int, float>(sensors2, clusters2, weights2);
 

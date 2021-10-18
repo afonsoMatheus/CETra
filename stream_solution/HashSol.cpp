@@ -33,7 +33,7 @@ unordered_map<T, tuple<U, V> > makeHash(vector<T> v1, vector<U> v2, vector<V> v3
 }
 
 template <typename T, typename U >
-unordered_map<T,U> clusterWeights(vector<T> sen, vector<U> wei, clustering clus){
+unordered_map<T,U> clusterWeights(const vector<T> sen, const vector<U> wei, clustering clus){
 
 	unordered_map<T,U> cw;
 
@@ -50,13 +50,13 @@ unordered_map<T,U> clusterWeights(vector<T> sen, vector<U> wei, clustering clus)
 
 }
 
-clustering storeClusters(vector<int> clu, vector<int> sen){
+clustering storeClusters(const vector<int> clu, const vector<int> sen){
 
 	clustering clusters;
 
 	//pensar no tamanho dos vetores para cada cluster
 	for (int i = 0; i < sen.size(); ++i){
-		clusters[clu[i]].insert(clusters[clu[i]].end(), sen[i]); 
+		if(clu[i] != -1) clusters[clu[i]].insert(clusters[clu[i]].end(), sen[i]); 
 	}
 
 
@@ -72,7 +72,7 @@ clustering storeClusters(vector<int> clu, vector<int> sen){
 }
 
 
-overlaping clusterOverlap(clustering clus, unordered_map<int, tuple<int,float>> clusE, unordered_map<int,float> cluW, vector<int> labels){
+overlaping clusterOverlap(clustering clus, unordered_map<int, tuple<int,float>> clusE, unordered_map<int,float> cluW, const vector<int> labels){
 
 	unordered_map<int, vector<float>> intersec;
 
