@@ -1,9 +1,13 @@
 #include <iostream>
 #include "HashSol.h"
+#include "Transitions.cpp"
 #include <vector>
 #include <unordered_map>
-
+#include <algorithm>
+#include <set>
 using namespace std;
+
+using statistics = unordered_map<int ,tuple<float, float, float>>;
 
 float sumSplits(const vector<float> &overlaps, const vector<int> &split_cand){
 
@@ -33,11 +37,12 @@ unordered_map<int,int> hashLabels(const vector<int> &labels){
 
 void extTransitions(overlaping &matrix, const vector<int> &labels){
 
-	vector<int> deaths;
-	vector<int> tracked;
-	unordered_map<int, vector<int>> absors;
 	unordered_map<int,int> lmap = hashLabels(labels);
 
+	unordered_map<int, vector<int>> scands;
+	set<int> tracks;
+
+	Transitions trans;
 
 	for(const auto &X : matrix){
 
@@ -76,90 +81,99 @@ void extTransitions(overlaping &matrix, const vector<int> &labels){
 
 		if(surv_cand == -2 && split_cand.empty() == true){
 
-			deaths.insert(deaths.end(), X.first);
+			trans.deaths.insert(trans.deaths.end(), X.first);
 
 		}else if(split_cand.empty() == false){
 
 			if(sumSplits(X.second, split_cand) >= 0.5){
 
-				cout << "Separações" << endl << X.first << " -> ";
 				for(const auto x: split_cand) {
-					cout << lmap[x] << " (" << X.second[x] << ") ";
-					tracked.insert(tracked.end(), lmap[x]);
+					trans.splits[X.first].insert(trans.splits[X.first].end(), lmap[x]);
+
+					tracks.insert(lmap[x]);
 				};
 				cout << endl <<  endl;
 
 			
 			}else if(surv_cand != -2){
 
-				absors[surv_cand].insert(absors[surv_cand].end(), X.first);
-				tracked.insert(tracked.end(), lmap[surv_cand]);
-
+				scands[surv_cand].insert(scands[surv_cand].end(), X.first);
+								
 			}else{
 
-				deaths.insert(deaths.end(), X.first);
+				trans.deaths.insert(trans.deaths.end(), X.first);
 
 			}
 
 		}else{
 
-			absors[surv_cand].insert(absors[surv_cand].end(), X.first);
+			scands[surv_cand].insert(scands[surv_cand].end(), X.first);
 
 		}
 
 	}
 
-	for(auto &x: absors){
+	for(const auto &x: scands){
 
-		if(absors[x.first].size() > 1){
+		if(scands[x.first].size() == 1){
 
-			cout << "Uniões" << endl;
-			for(const auto y: x.second) cout << y << " ";
-			cout << "-> " << x.first << endl << endl;
+			trans.survs.insert(trans.survs.begin(), make_tuple(scands[x.first][0], x.first));
 
-			tracked.insert(tracked.end(), x.first);
-
+			tracks.insert(x.first);
+					
 		}else{
 
-			cout << "Sobreviventes" << endl; 
-			cout << absors[x.first][0] << " -> " << x.first  << endl;
-			cout << endl;
+			trans.absors[x.first] = x.second;
 
-			tracked.insert(tracked.end(), x.first);
-		}
+			tracks.insert(x.first);
+
+		} 
 
 	}
 
-	cout << "Mortes" << endl;
-	for(const auto &x : deaths){
-		cout << x << " -> DEATH " << endl;
-	}
-	cout << endl;
-
-	cout << "Nascimentos" << endl;
-	for(auto x = 0;  x < labels.size(); x++){
-		
-		for(auto y = 0; y < tracked.size(); y++){
-			
-			if(labels[x] == tracked[y])break;
-
-			if(y == tracked.size()-1) cout << "BIRTHS -> " << labels[x] << endl;
-		}	
-		
-	}
+	set_difference(labels.begin(), labels.end(), tracks.begin(), tracks.end(),
+        inserter(trans.births, trans.births.begin()));
 
 
+	cout << "---EXT TRANSITIONS---" << endl << endl; 
+
+	trans.showSurvs();
+
+	trans.showSplits();
+
+	trans.showAbsors();
+
+	trans.showDeaths();
+
+	trans.showBirths();
+
+	
 }
 
+statistics buildStatistics(const clustering &clusR){
+
+	statistics cluS;
+
+	for(const auto &x: clusR){
+		cluS[x.first] = make_tuple(x.second.size(), 0, 0);
+
+		cout << x.first << ": " << get<0>(cluS[x.first]) << endl; 
+	}
+
+	return cluS;
+
+}
 
 
 int main(int argc, char const *argv[]){
 	
 	const vector<int> sensors1 = {1,2,3,4,5,6,7,8};
-	const vector<int> clusters1 = {0,0,0,0,1,1,1,0};
+	const vector<int> clusters1 = {1,1,2,3,3,3,3,3};
 	const vector<float> weights1 = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
 
 	clustering clusR = storeClusters(clusters1, sensors1);
+
+	//statistics cluS = buildStatistics(clusR);
 
 	unordered_map<int,float> cluW = clusterWeights<int, float>(sensors1, weights1, clusR);
 	
@@ -168,9 +182,9 @@ int main(int argc, char const *argv[]){
 	cout << endl << "///// NEXT WINDOW /////" << endl << endl;;
 
 	const vector<int> sensors2 = {1,2,3,4,5,6,7,8};
-	const vector<int> clusters2 = {3,3,4,4,3,3,4,4};
+	const vector<int> clusters2 = {3,3,3,3,4,5,6,7};
 	const vector<float> weights2 = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
-	vector<int> labels = {4,3}; //precisa ser ordenado
+	vector<int> labels = {5,3,4,6,7}; //precisa ser ordenado
 	
 	unordered_map<int, tuple<int, float>> clusE = makeHash<int, int, float>(sensors2, clusters2, weights2);
 
