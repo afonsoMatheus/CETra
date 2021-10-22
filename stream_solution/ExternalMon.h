@@ -1,15 +1,16 @@
 #ifndef EXTMON_H
 #define EXTMON_H
 
+using namespace std;
+
+#include "Monitor.h"
+
 #include <iostream>
-#include "HashSol.h"
-#include "Transitions.h"
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
 #include <set>
 
-using namespace std;
 using statistics = unordered_map<int ,tuple<float, float, float>>;
 
 /////////////////////////////////////////////////////////////////

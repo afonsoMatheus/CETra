@@ -1,6 +1,5 @@
 #include "ExternalMon.h"
 
-
 Transitions extTransitions(const overlaping &matrix, const vector<int> &labels){
 
 	unordered_map<int,int> lmap = hashLabels(labels);

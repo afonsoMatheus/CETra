@@ -1,12 +1,12 @@
 #ifndef TRANSITIONS_H
-#define TRANSITIONS_H 
+#define TRANSITIONS_H
+
+using namespace std;
 
 #include <vector>
 #include <tuple>
 #include <unordered_map>
 #include <iostream>
-
-using namespace std;
 
 class Transitions{
 

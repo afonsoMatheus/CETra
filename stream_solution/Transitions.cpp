@@ -8,7 +8,7 @@ void Transitions::insertDeath(int D){
 	deaths.insert(deaths.end(), D);}
 
 void Transitions::insertSurv(tuple<int,int> S){
-	survs.insert(survs.end(), S);}
+	survs.insert(survs.begin(), S);}
 
 void Transitions::insertUnion(int C2, vector<int> C1){
 	unions[C2] = C1;}
