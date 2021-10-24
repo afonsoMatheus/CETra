@@ -6,14 +6,15 @@
 #include <tuple>
 #include <algorithm>
 #include <iostream>
+#include <set>
+#include "Transitions.h"
 
 using namespace std;
 
 using clustering = unordered_map<int, vector<int>>;
 using overlaping = unordered_map<int, vector<float>>;
+using statistics = unordered_map<int ,tuple<float, float, float>>;
 
-#include "Transitions.h"
-#include "ExternalMon.h"
 
 class Monitor{
 	
@@ -27,16 +28,25 @@ class Monitor{
 		
 		overlaping matrix;
 
-		unordered_map<int,int> useLabels();
+		Transitions TRANS;
 
+		unordered_map<int,int> useLabels();
 		void clusterOverlap();
 
 		template <typename T, typename U >
 		unordered_map<T, U> makeHash(const vector<T>&, const vector<U>&);
 
-	public:
+		//////////////////////////////////////////////////////////////////
 
-		Transitions TRANS;
+		Transitions extTransitions(const overlaping &, const vector<int> &);
+
+		float sumSplits(const vector<float> &, const vector<int> &);
+
+		unordered_map<int,int> hashLabels(const vector<int> &);
+
+		statistics buildStatistics(const clustering &);
+
+	public:
 
 		void storeClusters(const vector<int>&, const vector<int>&);
 
@@ -48,7 +58,13 @@ class Monitor{
 
 		void storeLabels(vector<int>);
 
-		void Run();	
+		void Run();
+
+		void showSurvs();
+		void showSplits();
+		void showUnions();
+		void showDeaths();
+		void showBirths();
 
 };
 

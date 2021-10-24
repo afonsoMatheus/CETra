@@ -24,7 +24,7 @@ int main(int argc, char const *argv[]){
 	vector<int> labels = {4,2,5}; //precisa ser ordenado
 	
 	mor.storeLabels(labels);
-
+	
 	mor.makeHash<int, int, float>(sensors2, clusters2, weights2);
 
 	mor.Run();
@@ -33,15 +33,15 @@ int main(int argc, char const *argv[]){
 
 	cout << "---EXT TRANSITIONS---" << endl << endl; 
 
-	mor.TRANS.showSurvs();
+	mor.showSurvs();
 
-	mor.TRANS.showSplits();
+	mor.showSplits();
 
-	mor.TRANS.showUnions();
+	mor.showUnions();
 
-	mor.TRANS.showDeaths();
+	mor.showDeaths();
 
-	mor.TRANS.showBirths();
+	mor.showBirths();
 
 	return 0;
 }
