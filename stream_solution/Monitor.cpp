@@ -1,13 +1,27 @@
 #include "Monitor.h"
 
-template <typename T, typename U >
-unordered_map<T, U> Monitor::makeHash(const vector<T> &v1, const vector<U> &v2){
+
+/*template <typename S, typename C, typename W >
+auto Monitor<S,C,W>::test() -> clustering{
+	cout << "OKKK" << endl;
+	return clusR;
+}
+*/
+
+/*template <typename S, typename C, typename W >
+typename Monitor<S,C,W>::clustering Monitor<S,C,W>::test(){
+	return clusR;
+}*/
+
+
+template <typename S, typename C, typename W >
+unordered_map<C, W> Monitor<S, C, W>::makeHash(const vector<C> &v1, const vector<W> &v2){
 
 	if(v1.size() != v2.size()){
-		return unordered_map<T,U>(); 
+		return unordered_map<C,W>(); 
 	} 
 
-	unordered_map<T,U> umap(v1.size());
+	unordered_map<C,W> umap(v1.size());
 
 	for (int i = 0; i < v1.size(); ++i)
 		umap.insert({v1[i], v2[i]});
@@ -16,12 +30,14 @@ unordered_map<T, U> Monitor::makeHash(const vector<T> &v1, const vector<U> &v2){
 
 }
 
-template <typename T, typename U , typename V>
-void Monitor::makeHash(const vector<T> &v1, const vector<U> &v2, const vector<V> &v3){
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::makeHash(const vector<S> &v1, const vector<C> &v2, const vector<W> &v3, const vector<C> &labels){
 
 	if(v1.size() != v2.size() or v1.size() != v3.size()){
 		
-	} 
+	}
+
+	storeLabels(labels); 
 
 	//unordered_map<T, tuple < U, V >> umap(v1.size());
 
@@ -30,10 +46,30 @@ void Monitor::makeHash(const vector<T> &v1, const vector<U> &v2, const vector<V>
 
 }
 
-template <typename T, typename U >
-void Monitor::clusterWeights(const vector<T> &sen, const vector<U> &wei) {
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::relClustering(const vector<S> &sen, const vector<C> &clu, const vector<W> &wei){
 
-	unordered_map<T,U> sw = makeHash<T,U>(sen, wei);
+	//pensar no tamanho dos vetores para cada cluster
+	for (int i = 0; i < sen.size(); ++i){
+		if(clu[i] != -1) clusR[clu[i]].insert(clusR[clu[i]].end(), sen[i]); 
+	}
+
+	clusterWeights(sen, wei);
+	//buildStatistics();
+
+	cout << "------Clustering------" << endl;
+	for (const auto &i : clusR){
+		cout << i.first << ": "; 
+		for (const auto &x : i.second) cout << x << " ";
+		cout << endl;
+	}
+
+}
+
+template <typename S, typename C, typename W >
+void Monitor<S, C, W>::clusterWeights(const vector<C> &sen, const vector<W> &wei) {
+
+	unordered_map<S,W> sw = makeHash(sen, wei);
 
 	for (const auto &i : clusR){
 		for(auto x : i.second) cluW[i.first]+= sw[x];
@@ -45,25 +81,8 @@ void Monitor::clusterWeights(const vector<T> &sen, const vector<U> &wei) {
 
 }
 
-void Monitor::storeClusters(const vector<int> &clu, const vector<int> &sen){
-
-	//pensar no tamanho dos vetores para cada cluster
-	for (int i = 0; i < sen.size(); ++i){
-		if(clu[i] != -1) clusR[clu[i]].insert(clusR[clu[i]].end(), sen[i]); 
-	}
-
-
-	cout << "------Clustering------" << endl;
-	for (const auto &i : clusR){
-		cout << i.first << ": "; 
-		for (const auto &x : i.second) cout << x << " ";
-		cout << endl;
-	}
-
-}
-
-
-void Monitor::clusterOverlap(){
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::clusterOverlap(){
 
 	unordered_map<int,int> lmap = useLabels();
 	
@@ -99,9 +118,10 @@ void Monitor::clusterOverlap(){
 
 }
 
-unordered_map<int,int> Monitor::useLabels(){
+template <typename S, typename C, typename W>
+unordered_map<C,int> Monitor<S, C, W>::useLabels(){
 
-	unordered_map<int, int> lmap;
+	unordered_map<C, int> lmap;
 
 	int i = 0;
 	for(const auto &x: labels){
@@ -113,7 +133,9 @@ unordered_map<int,int> Monitor::useLabels(){
 
 }
 
-void Monitor::storeLabels(vector<int> lab){
+
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::storeLabels(const vector<C> lab){
 
 	labels = lab;
 
@@ -121,14 +143,18 @@ void Monitor::storeLabels(vector<int> lab){
 
 }
 
-void Monitor::Run(){
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::checkEvolution(const vector<S>& sen, const vector<C>& clu, const vector<W>& wei, const vector<C> &labels){
+
+	makeHash(sen, clu, wei, labels);
 
 	clusterOverlap();
 
-	TRANS = extTransitions(matrix, labels);
+	TRANS = extTransitions();
 }
 
-Transitions Monitor::extTransitions(const overlaping &matrix, const vector<int> &labels){
+template <typename S, typename C, typename W>
+Transitions Monitor<S, C, W>::extTransitions(){
 
 	unordered_map<int,int> lmap = hashLabels(labels);
 
@@ -211,9 +237,10 @@ Transitions Monitor::extTransitions(const overlaping &matrix, const vector<int> 
 	
 }
 
-unordered_map<int,int> Monitor::hashLabels(const vector<int> &labels){
+template <typename S, typename C, typename W>
+unordered_map<int,C> Monitor<S, C, W>::hashLabels(const vector<C> &labels){
 
-	unordered_map<int, int> umap;
+	unordered_map<int, C> umap;
 
 	int i = 0;
 	for(const auto &x: labels){
@@ -225,9 +252,9 @@ unordered_map<int,int> Monitor::hashLabels(const vector<int> &labels){
 
 }
 
-statistics Monitor::buildStatistics(const clustering &clusR){
 
-	statistics cluS;
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::buildStatistics(){
 
 	for(const auto &x: clusR){
 		cluS[x.first] = make_tuple(x.second.size(), 0, 0);
@@ -235,13 +262,12 @@ statistics Monitor::buildStatistics(const clustering &clusR){
 		cout << x.first << ": " << get<0>(cluS[x.first]) << endl; 
 	}
 
-	return cluS;
-
 }
 
-float Monitor::sumSplits(const vector<float> &overlaps, const vector<int> &split_cand){
+template <typename S, typename C, typename W>
+W Monitor<S, C, W>::sumSplits(const vector<W> &overlaps, const vector<C> &split_cand){
 
-	float sum = 0;
+	W sum = 0;
 
 	for(const auto &x: split_cand){
 		sum+=overlaps[x];
@@ -250,17 +276,22 @@ float Monitor::sumSplits(const vector<float> &overlaps, const vector<int> &split
 	return sum;
 }
 
-void Monitor::showSurvs(){TRANS.showSurvs();}
-void Monitor::showSplits(){TRANS.showSplits();}
-void Monitor::showUnions(){TRANS.showUnions();}
-void Monitor::showDeaths(){TRANS.showDeaths();}
-void Monitor::showBirths(){TRANS.showBirths();}
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::showSurvs(){TRANS.showSurvs();}
+
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::showSplits(){TRANS.showSplits();}
+
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::showUnions(){TRANS.showUnions();}
+
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::showDeaths(){TRANS.showDeaths();}
+
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::showBirths(){TRANS.showBirths();}
 
 
+template class Monitor<int, int, float>;
 
-
-template unordered_map<int, int> Monitor::makeHash(const vector<int>&, const vector<int>&);
-template unordered_map<int, float> Monitor::makeHash(const vector<int>&, const vector<float>&);
-template void Monitor::makeHash(const vector<int>&, const vector<int>&, const vector<float>&);
-template void Monitor::clusterWeights(const vector<int> &, const vector<float>&);
 

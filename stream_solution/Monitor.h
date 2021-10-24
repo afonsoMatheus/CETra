@@ -11,62 +11,73 @@
 
 using namespace std;
 
-using clustering = unordered_map<int, vector<int>>;
-using overlaping = unordered_map<int, vector<float>>;
-using statistics = unordered_map<int ,tuple<float, float, float>>;
-
-
+template <typename S, typename C, typename W>
 class Monitor{
-	
+
+	using clustering = unordered_map<C, vector<S> >;
+	using overlaping = unordered_map<C, vector<W> >;
+	using statistics = unordered_map<C ,tuple<float, float, float> >;
+
 	private:
 
 		clustering clusR;
-		unordered_map<int,float> cluW;
-
-		vector<int> labels;
-		unordered_map<int, tuple<int, float>> clusE;
+		unordered_map<S,W> cluW;
+		statistics cluS;
+		
+		vector<C> labels;
+		unordered_map<S, tuple<C, W>> clusE;
 		
 		overlaping matrix;
 
 		Transitions TRANS;
 
-		unordered_map<int,int> useLabels();
-		void clusterOverlap();
+		void buildStatistics();
 
-		template <typename T, typename U >
-		unordered_map<T, U> makeHash(const vector<T>&, const vector<U>&);
+		void clusterWeights(const vector<C>&, const vector<W>&);
+
+		////////////////////////////////////////////////////////////////////
+
+		void storeLabels(const vector<C>);
+
+		void clusterOverlap();
+		unordered_map<C,int> useLabels();
+
+		unordered_map<C, W> makeHash(const vector<C>&, const vector<W>&);
+
+		void makeHash(const vector<S>&, const vector<C>&, const vector<W>&, const vector<C> &);
 
 		//////////////////////////////////////////////////////////////////
 
-		Transitions extTransitions(const overlaping &, const vector<int> &);
+		Transitions extTransitions();
 
-		float sumSplits(const vector<float> &, const vector<int> &);
+		W sumSplits(const vector<W> &, const vector<C> &);
 
-		unordered_map<int,int> hashLabels(const vector<int> &);
+		unordered_map<int,C> hashLabels(const vector<C> &);
 
-		statistics buildStatistics(const clustering &);
 
 	public:
 
-		void storeClusters(const vector<int>&, const vector<int>&);
+		void relClustering(const vector<S>&, const vector<C>&, const vector<W> &);
 
-		template <typename T, typename U >
-		void clusterWeights(const vector<T>&, const vector<U>&);
+		void checkEvolution(const vector<S>&, const vector<C>&, const vector<W>&, const vector<C> &);
 
-		template <typename T, typename U , typename V>
-		void makeHash(const vector<T>&, const vector<U>&, const vector<V>&);
-
-		void storeLabels(vector<int>);
-
-		void Run();
+		//////////////////////////////////////////////////////////////////
 
 		void showSurvs();
-		void showSplits();
-		void showUnions();
-		void showDeaths();
-		void showBirths();
 
+		void showSplits();
+
+		void showUnions();
+
+		void showDeaths();
+
+		void showBirths();
+		
+
+	
 };
+
+
 
 
 #endif
