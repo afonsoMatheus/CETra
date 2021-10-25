@@ -47,7 +47,7 @@ void Monitor<S, C, W>::makeHash(const vector<S> &v1, const vector<C> &v2, const 
 }
 
 template <typename S, typename C, typename W>
-void Monitor<S, C, W>::relClustering(const vector<S> &sen, const vector<C> &clu, const vector<W> &wei){
+void Monitor<S, C, W>::storeClustering(const vector<S> &sen, const vector<C> &clu, const vector<W> &wei, const vector<C> &labels){
 
 	//pensar no tamanho dos vetores para cada cluster
 	for (int i = 0; i < sen.size(); ++i){
@@ -55,7 +55,8 @@ void Monitor<S, C, W>::relClustering(const vector<S> &sen, const vector<C> &clu,
 	}
 
 	clusterWeights(sen, wei);
-	//buildStatistics();
+	
+	buildStatistics();
 
 	cout << "------Clustering------" << endl;
 	for (const auto &i : clusR){
@@ -247,7 +248,6 @@ unordered_map<int,C> Monitor<S, C, W>::hashLabels(const vector<C> &labels){
 		umap[i] = x;
 		i++;
 	}
-
 	return umap;
 
 }
@@ -256,10 +256,11 @@ unordered_map<int,C> Monitor<S, C, W>::hashLabels(const vector<C> &labels){
 template <typename S, typename C, typename W>
 void Monitor<S, C, W>::buildStatistics(){
 
+	cout << "------Statistics-------" << endl;
 	for(const auto &x: clusR){
-		cluS[x.first] = make_tuple(x.second.size(), 0, 0);
+		cluS[x.first].insert(cluS[x.first].end(),x.second.size());
 
-		cout << x.first << ": " << get<0>(cluS[x.first]) << endl; 
+		cout << x.first << ": " << x.second[0] << endl; 
 	}
 
 }
@@ -275,6 +276,43 @@ W Monitor<S, C, W>::sumSplits(const vector<W> &overlaps, const vector<C> &split_
 
 	return sum;
 }
+
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::execute(const vector<S> &sen, const vector<C> &clu, const vector<W> &wei, const vector<C> &labels){
+			
+	if(clusR.empty()){
+
+		storeClustering(sen, clu, wei, labels);
+
+	}else{
+
+		checkEvolution(sen, clu, wei, labels);
+	}
+
+}
+
+template <typename S, typename C, typename W>
+template <class T>
+void Monitor<S, C, W>::execute(const vector<S> &sen, const vector<C> &clu, const vector<W> &wei, const vector<C> &labels, initializer_list<T> list){
+
+	if(clusR.empty()){
+
+		storeClustering(sen, clu, wei, labels);
+
+	}else{
+
+		checkEvolution(sen, clu, wei, labels);
+	}
+
+    for( auto elem : list ){
+    	for(auto x : elem){
+    		cout << x << " ";
+    	}
+    	cout << endl;
+        
+    }
+}
+
 
 template <typename S, typename C, typename W>
 void Monitor<S, C, W>::showSurvs(){TRANS.showSurvs();}
@@ -294,4 +332,4 @@ void Monitor<S, C, W>::showBirths(){TRANS.showBirths();}
 
 template class Monitor<int, int, float>;
 
-
+template void Monitor<int,int,float>::execute(const vector<int>&, const vector<int>&, const vector<float>&, const vector<int>&, initializer_list<vector<float>> list);

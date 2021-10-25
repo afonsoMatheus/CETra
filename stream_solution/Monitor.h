@@ -7,16 +7,18 @@
 #include <algorithm>
 #include <iostream>
 #include <set>
+#include <initializer_list>
+
 #include "Transitions.h"
 
 using namespace std;
 
-template <typename S, typename C, typename W>
+template <typename S = int, typename C = int, typename W = float>
 class Monitor{
 
 	using clustering = unordered_map<C, vector<S> >;
 	using overlaping = unordered_map<C, vector<W> >;
-	using statistics = unordered_map<C ,tuple<float, float, float> >;
+	using statistics = unordered_map<C ,vector<float> >;
 
 	private:
 
@@ -31,6 +33,10 @@ class Monitor{
 
 		Transitions TRANS;
 
+		void storeClustering(const vector<S>&, const vector<C>&, const vector<W>&, const vector<C>&);
+
+		void checkEvolution(const vector<S>&, const vector<C>&, const vector<W>&, const vector<C>&);
+
 		void buildStatistics();
 
 		void clusterWeights(const vector<C>&, const vector<W>&);
@@ -44,22 +50,22 @@ class Monitor{
 
 		unordered_map<C, W> makeHash(const vector<C>&, const vector<W>&);
 
-		void makeHash(const vector<S>&, const vector<C>&, const vector<W>&, const vector<C> &);
+		void makeHash(const vector<S>&, const vector<C>&, const vector<W>&, const vector<C>&);
 
 		//////////////////////////////////////////////////////////////////
 
 		Transitions extTransitions();
 
-		W sumSplits(const vector<W> &, const vector<C> &);
+		W sumSplits(const vector<W>&, const vector<C>&);
 
-		unordered_map<int,C> hashLabels(const vector<C> &);
-
+		unordered_map<int,C> hashLabels(const vector<C>&);
 
 	public:
 
-		void relClustering(const vector<S>&, const vector<C>&, const vector<W> &);
+		void execute(const vector<S> &, const vector<C> &, const vector<W> &, const vector<C> &);
 
-		void checkEvolution(const vector<S>&, const vector<C>&, const vector<W>&, const vector<C> &);
+		template <class T>
+		void execute(const vector<S> &, const vector<C> &, const vector<W> &, const vector<C> &, initializer_list<T>);
 
 		//////////////////////////////////////////////////////////////////
 
@@ -72,12 +78,8 @@ class Monitor{
 		void showDeaths();
 
 		void showBirths();
-		
-
 	
 };
-
-
 
 
 #endif
