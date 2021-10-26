@@ -13,21 +13,26 @@
 
 using namespace std;
 
+using cluster_data = vector<vector<float>>;
+
+
 template <typename S = int, typename C = int, typename W = float>
 class Monitor{
 
 	using clustering = unordered_map<C, vector<S> >;
 	using overlaping = unordered_map<C, vector<W> >;
-	using statistics = unordered_map<C ,vector<float> >;
+	using statistics = unordered_map<C, cluster_data>;
+	
 
 	private:
 
 		clustering clusR;
 		unordered_map<S,W> cluW;
-		statistics cluS;
-		
+		statistics staR;
+
 		vector<C> labels;
 		unordered_map<S, tuple<C, W>> clusE;
+		statistics staE;
 		
 		overlaping matrix;
 
@@ -37,9 +42,14 @@ class Monitor{
 
 		void checkEvolution(const vector<S>&, const vector<C>&, const vector<W>&, const vector<C>&);
 
-		void buildStatistics();
+		template <class T>
+		void buildStatistics(const vector<C>& ,initializer_list<T>);
 
 		void clusterWeights(const vector<C>&, const vector<W>&);
+
+		void showStatistics();
+		
+		void intTransitions();
 
 		////////////////////////////////////////////////////////////////////
 

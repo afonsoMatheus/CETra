@@ -30,6 +30,8 @@ class Transitions{
 
 		void insertSurv(tuple<int,int> S);
 
+		vector<tuple<int,int>> getSurvs();
+
 		void insertUnion(int C2, vector<int> C1);
 
 		void insertSplits(int C1, int C2);

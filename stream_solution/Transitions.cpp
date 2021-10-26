@@ -10,6 +10,9 @@ void Transitions::insertDeath(int D){
 void Transitions::insertSurv(tuple<int,int> S){
 	survs.insert(survs.begin(), S);}
 
+vector<tuple<int,int>> Transitions::getSurvs(){
+	return survs;}
+
 void Transitions::insertUnion(int C2, vector<int> C1){
 	unions[C2] = C1;}
 
