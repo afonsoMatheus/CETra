@@ -25,10 +25,12 @@ int main(int argc, char const *argv[]){
 	vector<int> labels2 = {4,5,6}; //precisa ser ordenado
 
 	const cluster_data sizes2 = {{2},{2},{4}};
-	const cluster_data means2 = {{8,8},{4,4},{2,2}};
+	const cluster_data means2 = {{8,8},{4,4},{1,1}};
 	const cluster_data std2 = {{3,3.5},{4,4.5},{6,6.5}};
 
 	mor.execute(sensors2, clusters2, weights2, labels2,{sizes2, means2, std2});
+
+	mor.showStatistics();
 
 	////////////////////////////////////////////////////////////////
 

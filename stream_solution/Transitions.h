@@ -24,9 +24,13 @@ class Transitions{
 
 		Transitions();
 
+		void clear();
+
 		///////////////////////////////////////////
 
 		void insertDeath(int D);
+
+		vector<int> getDeaths();
 
 		void insertSurv(tuple<int,int> S);
 
@@ -34,9 +38,17 @@ class Transitions{
 
 		void insertUnion(int C2, vector<int> C1);
 
+		unordered_map<int, vector<int>> getUnions();
+
 		void insertSplits(int C1, int C2);
 
+		unordered_map<int, vector<int>> getSplits();
+
 		vector<int>& allocBirths();
+
+		vector<int> getBirths();
+
+		bool checkExt();
 
 		///////////////////////////////////////////
 

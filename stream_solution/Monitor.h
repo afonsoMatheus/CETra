@@ -46,10 +46,10 @@ class Monitor{
 		void buildStatistics(const vector<C>& ,initializer_list<T>);
 
 		void clusterWeights(const vector<C>&, const vector<W>&);
-
-		void showStatistics();
 		
 		void intTransitions();
+
+		void compare(const vector<float>&, const vector<float>&);
 
 		////////////////////////////////////////////////////////////////////
 
@@ -78,6 +78,8 @@ class Monitor{
 		void execute(const vector<S> &, const vector<C> &, const vector<W> &, const vector<C> &, initializer_list<T>);
 
 		//////////////////////////////////////////////////////////////////
+
+		void showStatistics();
 
 		void showSurvs();
 

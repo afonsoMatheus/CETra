@@ -1,19 +1,5 @@
 #include "Monitor.h"
 
-
-/*template <typename S, typename C, typename W >
-auto Monitor<S,C,W>::test() -> clustering{
-	cout << "OKKK" << endl;
-	return clusR;
-}
-*/
-
-/*template <typename S, typename C, typename W >
-typename Monitor<S,C,W>::clustering Monitor<S,C,W>::test(){
-	return clusR;
-}*/
-
-
 template <typename S, typename C, typename W >
 unordered_map<C, W> Monitor<S, C, W>::makeHash(const vector<C> &v1, const vector<W> &v2){
 
@@ -108,7 +94,7 @@ void Monitor<S, C, W>::clusterOverlap(){
 	cout << "-----Overlapping-----" << endl;
 	for (const auto &i : matrix){
 		cout << i.first << ": "; 
-		for (const auto &x : i.second) cout <<  x << " ";
+		for (const auto &x : i.second) cout << x*100 << " ";
 		cout << endl;
 	}
 	cout << endl;
@@ -138,18 +124,6 @@ void Monitor<S, C, W>::storeLabels(const vector<C> lab){
 
 	sort(labels.begin(),labels.end());
 
-}
-
-template <typename S, typename C, typename W>
-void Monitor<S, C, W>::checkEvolution(const vector<S>& sen, const vector<C>& clu, const vector<W>& wei, const vector<C> &labels){
-
-	makeHash(sen, clu, wei, labels);
-
-	clusterOverlap();
-
-	TRANS = extTransitions();
-
-	intTransitions();
 }
 
 template <typename S, typename C, typename W>
@@ -184,8 +158,9 @@ Transitions Monitor<S, C, W>::extTransitions(){
 				
 				}else if(mcell == X.second[surv_cand]){
 
-					//TODO: Resolver problema de empate por comp.
-					//de tamanho.
+					if(clusR[surv_cand].size() < clusR[lmap[Y]].size()){
+						surv_cand = lmap[Y];
+					}
 
 				}
 
@@ -237,25 +212,6 @@ Transitions Monitor<S, C, W>::extTransitions(){
 }
 
 template <typename S, typename C, typename W>
-void Monitor<S, C, W>::intTransitions(){
-
-	for(const auto &x: TRANS.getSurvs()){
-		for(int i = 0; i < staR[get<0>(x)].size(); i++){
-			//for(int j = 0; j < staR[get<0>(x)][i].size(); j++){
-
-				if(staR[get<0>(x)][i] < staE[get<1>(x)][i]){
-					cout << "Aumentou" << endl;
-				}else{
-					cout << "Diminuiu" << endl;
-				}
-			//}
-		}
-		
-	}
-
-}
-
-template <typename S, typename C, typename W>
 unordered_map<int,C> Monitor<S, C, W>::hashLabels(const vector<C> &labels){
 
 	unordered_map<int, C> umap;
@@ -268,7 +224,6 @@ unordered_map<int,C> Monitor<S, C, W>::hashLabels(const vector<C> &labels){
 	return umap;
 
 }
-
 
 template <typename S, typename C, typename W>
 W Monitor<S, C, W>::sumSplits(const vector<W> &overlaps, const vector<C> &split_cand){
@@ -283,37 +238,99 @@ W Monitor<S, C, W>::sumSplits(const vector<W> &overlaps, const vector<C> &split_
 }
 
 template <typename S, typename C, typename W>
-void Monitor<S, C, W>::execute(const vector<S> &sen, const vector<C> &clu, const vector<W> &wei, const vector<C> &labels){
+void Monitor<S, C, W>::intTransitions(){
+
+	for(const auto &x: TRANS.getSurvs()){
+		for(int i = 0; i < staR[get<0>(x)].size(); i++){
+			compare(staE[get<1>(x)][i], staR[get<0>(x)][i]);
+		}
+		
+	}
+
+}
+
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::compare(const vector<float> &v1, const vector<float> &v2){
+	for(int i = 0; i < v1.size(); i++){
+		//cout << ((v1[i]/v2[i]) - 1.0)*100 << " "; 
+	}
+	cout << endl;
+}
+
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::execute(const vector<S> &sen, const vector<C> &clu, const vector<W> &wei, const vector<C> &lab){
 			
 	if(clusR.empty()){
 
-		storeClustering(sen, clu, wei, labels);
+		storeClustering(sen, clu, wei, lab);
 
 	}else{
 
-		checkEvolution(sen, clu, wei, labels);
+		checkEvolution(sen, clu, wei, lab);
+
+		if(TRANS.checkExt()){
+
+			clusR.clear();
+			cluW.clear();
+
+			storeClustering(sen, clu, wei, lab);
+
+		}
+
+		clusE.clear();
+		labels.clear();
 	}
 
 }
 
 template <typename S, typename C, typename W>
 template <class T>
-void Monitor<S, C, W>::execute(const vector<S> &sen, const vector<C> &clu, const vector<W> &wei, const vector<C> &labels, initializer_list<T> list){
+void Monitor<S, C, W>::execute(const vector<S> &sen, const vector<C> &clu, const vector<W> &wei, const vector<C> &lab, initializer_list<T> list){
 
 	if(clusR.empty()){
 
-		storeClustering(sen, clu, wei, labels);
+		storeClustering(sen, clu, wei, lab);
 
-		buildStatistics(labels ,list);
+		buildStatistics(lab ,list);
 
 	}else{
 
-		buildStatistics(labels ,list);
+		buildStatistics(lab ,list);
 
-		checkEvolution(sen, clu, wei, labels);
+		checkEvolution(sen, clu, wei, lab);
+
+		if(TRANS.checkExt()){
+
+			clusR.clear();
+			cluW.clear();
+			staR.clear();
+
+			storeClustering(sen, clu, wei, lab);
+			buildStatistics(lab ,list);
+
+		}
+
+		clusE.clear();
+		staE.clear();
+		labels.clear();
+		TRANS.clear();
+
 	}
 
 }
+
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::checkEvolution(const vector<S>& sen, const vector<C>& clu, const vector<W>& wei, const vector<C> &labels){
+
+	makeHash(sen, clu, wei, labels);
+
+	clusterOverlap();
+
+	TRANS = extTransitions();
+
+	intTransitions();
+}
+
 
 template <typename S, typename C, typename W>
 template <class T>
@@ -338,8 +355,6 @@ void Monitor<S, C, W>::buildStatistics(const vector<C> &lab, initializer_list<T>
 		}
 
 	}
-
-	showStatistics();
 
 }
 
@@ -373,6 +388,8 @@ void Monitor<S, C, W>::showStatistics(){
 		}
 		cout << endl;
 	}
+
+	cout << endl;
 
 
 }
