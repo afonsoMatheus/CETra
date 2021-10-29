@@ -8,17 +8,18 @@ using namespace std;
 #include <unordered_map>
 #include <iostream>
 
+template <typename T>
 class Transitions{
 
 	private:
 		
-		vector<tuple<int,int>> survs;
+		vector<tuple<T,T>> survs;
 		
-		unordered_map<int, vector<int>> unions;
-		unordered_map<int, vector<int>> splits;
+		unordered_map<T, vector<T>> unions;
+		unordered_map<T, vector<T>> splits;
 
-		vector<int> deaths;
-		vector<int> births;
+		vector<T> deaths;
+		vector<T> births;
 
 	public:		
 
@@ -28,25 +29,25 @@ class Transitions{
 
 		///////////////////////////////////////////
 
-		void insertDeath(int D);
+		void insertDeath(T D);
 
-		vector<int> getDeaths();
+		vector<T> getDeaths();
 
-		void insertSurv(tuple<int,int> S);
+		void insertSurv(tuple<T,T> S);
 
-		vector<tuple<int,int>> getSurvs();
+		vector<tuple<T,T>> getSurvs();
 
-		void insertUnion(int C2, vector<int> C1);
+		void insertUnion(T C2, vector<T> C1);
 
-		unordered_map<int, vector<int>> getUnions();
+		unordered_map<T, vector<T>> getUnions();
 
-		void insertSplits(int C1, int C2);
+		void insertSplits(T C1, T C2);
 
-		unordered_map<int, vector<int>> getSplits();
+		unordered_map<T, vector<T>> getSplits();
 
-		vector<int>& allocBirths();
+		vector<T>& allocBirths();
 
-		vector<int> getBirths();
+		vector<T> getBirths();
 
 		bool checkExt();
 

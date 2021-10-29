@@ -8,26 +8,27 @@
 #include <iostream>
 #include <set>
 #include <initializer_list>
-
+#include <string>
+#include <queue>
 #include "Transitions.h"
 
 using namespace std;
-
-using cluster_data = vector<vector<float>>;
-
 
 template <typename S = int, typename C = int, typename W = float>
 class Monitor{
 
 	using clustering = unordered_map<C, vector<S> >;
 	using overlaping = unordered_map<C, vector<W> >;
-	using statistics = unordered_map<C, cluster_data>;
-	
+	using statistics = unordered_map<C, vector<float>>;
 
 	private:
 
+		int winSize;
+
+		vector<string> sta;
+
 		clustering clusR;
-		unordered_map<S,W> cluW;
+		unordered_map<C,W> cluW;
 		statistics staR;
 
 		vector<C> labels;
@@ -36,7 +37,10 @@ class Monitor{
 		
 		overlaping matrix;
 
-		Transitions TRANS;
+		Transitions<C> TRANS;
+
+		statistics temp;
+		queue<statistics> qSurvs;
 
 		void storeClustering(const vector<S>&, const vector<C>&, const vector<W>&, const vector<C>&);
 
@@ -45,11 +49,12 @@ class Monitor{
 		template <class T>
 		void buildStatistics(const vector<C>& ,initializer_list<T>);
 
-		void clusterWeights(const vector<C>&, const vector<W>&);
-		
+		void clusterWeights(const vector<S>&, const vector<W>&);
+		unordered_map<S, W> senWei(const vector<S>&, const vector<W>&);
+
 		void intTransitions();
 
-		void compare(const vector<float>&, const vector<float>&);
+		void compare(const float&, const float&);
 
 		////////////////////////////////////////////////////////////////////
 
@@ -58,19 +63,27 @@ class Monitor{
 		void clusterOverlap();
 		unordered_map<C,int> useLabels();
 
-		unordered_map<C, W> makeHash(const vector<C>&, const vector<W>&);
 
 		void makeHash(const vector<S>&, const vector<C>&, const vector<W>&, const vector<C>&);
 
 		//////////////////////////////////////////////////////////////////
 
-		Transitions extTransitions();
+		Transitions<C> extTransitions();
 
 		W sumSplits(const vector<W>&, const vector<C>&);
 
 		unordered_map<int,C> hashLabels(const vector<C>&);
 
 	public:
+
+		//Monitor();
+
+		Monitor(const int N = 5, const vector<string> names = {}){
+
+			winSize = N;
+			sta = names;
+
+		}
 
 		void execute(const vector<S> &, const vector<C> &, const vector<W> &, const vector<C> &);
 
@@ -80,6 +93,8 @@ class Monitor{
 		//////////////////////////////////////////////////////////////////
 
 		void showStatistics();
+
+		void showExtransitions();
 
 		void showSurvs();
 

@@ -1,40 +1,52 @@
 #include "Transitions.h"
 
-Transitions::Transitions(){};
+template <typename T>
+Transitions<T>::Transitions(){};
 
 ////////////////////////////////////////////////////////////////////
 
-void Transitions::insertDeath(int D){
+template <typename T>
+void Transitions<T>::insertDeath(T D){
 	deaths.insert(deaths.end(), D);}
 
-vector<int> Transitions::getDeaths(){
+template <typename T>
+vector<T> Transitions<T>::getDeaths(){
 	return deaths;}
 
-void Transitions::insertSurv(tuple<int,int> S){
+template <typename T>
+void Transitions<T>::insertSurv(tuple<T,T> S){
 	survs.insert(survs.begin(), S);}
 
-vector<tuple<int,int>> Transitions::getSurvs(){
+template <typename T>
+vector<tuple<T,T>> Transitions<T>::getSurvs(){
 	return survs;}
 
-void Transitions::insertUnion(int C2, vector<int> C1){
+template <typename T>
+void Transitions<T>::insertUnion(T C2, vector<T> C1){
 	unions[C2] = C1;}
 
-unordered_map<int, vector<int>> Transitions::getUnions(){
+template <typename T>
+unordered_map<T, vector<T>> Transitions<T>::getUnions(){
 	return unions;}
 
-void Transitions::insertSplits(int C1, int C2){
+template <typename T>
+void Transitions<T>::insertSplits(T C1, T C2){
 	splits[C1].insert(splits[C1].end(), C2);}
 
-unordered_map<int, vector<int>> Transitions::getSplits(){
+template <typename T>
+unordered_map<T, vector<T>> Transitions<T>::getSplits(){
 	return splits;}
 
-vector<int>& Transitions::allocBirths(){
+template <typename T>
+vector<T>& Transitions<T>::allocBirths(){
 	return births;}
 
-vector<int> Transitions::getBirths(){
+template <typename T>
+vector<T> Transitions<T>::getBirths(){
 	return births;}
 
-bool Transitions::checkExt(){
+template <typename T>
+bool Transitions<T>::checkExt(){
 
 	if(splits.empty() == false || unions.empty() == false ||
 		deaths.empty() == false || births.empty() == false){
@@ -48,8 +60,8 @@ bool Transitions::checkExt(){
 
 ////////////////////////////////////////////////////////////////////
 
-
-void Transitions::clear(){
+template <typename T>
+void Transitions<T>::clear(){
 	survs.clear();
 	births.clear();
 	deaths.clear();
@@ -57,13 +69,15 @@ void Transitions::clear(){
 	unions.clear();
 }
 
-void Transitions::showSurvs(){
+template <typename T>
+void Transitions<T>::showSurvs(){
 	cout << "Sobreviventes" << endl;
 	for(const auto &x : survs)cout << get<0>(x) << " -> " << get<1>(x)<< endl;
 	cout << endl;
 }
 
-void Transitions::showUnions(){
+template <typename T>
+void Transitions<T>::showUnions(){
 
 	cout << "Uniões" << endl;
 	for(const auto &x: unions){
@@ -73,13 +87,15 @@ void Transitions::showUnions(){
 	cout << endl;
 }
 
-void Transitions::showBirths(){
+template <typename T>
+void Transitions<T>::showBirths(){
 	cout << "Nascimentos" << endl;
 	for(const auto &x : births) cout << "BIRTHS -> " << x << endl;
 	cout << endl;
 }
 
-void Transitions::showSplits(){
+template <typename T>
+void Transitions<T>::showSplits(){
 	
 	cout << "Separações" << endl; 
 	for(const auto &x: splits){
@@ -90,8 +106,13 @@ void Transitions::showSplits(){
 	cout << endl;
 }
 
-void Transitions::showDeaths(){
+template <typename T>
+void Transitions<T>::showDeaths(){
 	cout << "Mortes" << endl;
 	for(const auto &x : deaths) cout << x << " -> DEATH " << endl;
 	cout << endl;
 }
+
+
+template class Transitions<int>;
+template class Transitions<char>;
