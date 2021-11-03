@@ -9,55 +9,21 @@ void Monitor<S, C, W>::execute(const vector<S> &sen, const vector<C> &clu, const
 
 	}else{
 
-		checkEvolution(sen, clu, wei, lab);
-
-		if(TRANS.checkExt()){
-
-			clusR.clear();
-			cluW.clear();
-
-			storeClustering(sen, clu, wei, lab);
-
-		}
-
-		clusE.clear();
-		labels.clear();
-	}
-
-}
-
-template <typename S, typename C, typename W>
-template <class T>
-void Monitor<S, C, W>::execute(const vector<S> &sen, const vector<C> &clu, const vector<W> &wei, const vector<C> &lab, initializer_list<T> list){
-
-	if(clusR.empty()){
-
-		storeClustering(sen, clu, wei, lab);
-
-		buildStatistics(lab ,list);
-
-	}else{
-
-		buildStatistics(lab ,list);
+		setSizes(sen, clu, lab);
 
 		checkEvolution(sen, clu, wei, lab);
 
 		if(TRANS.checkExt()){
 
-			clusR.clear();
-			cluW.clear();
-			staR.clear();
+			freeRef();
 
 			storeClustering(sen, clu, wei, lab);
-			buildStatistics(lab ,list);
+
+			staR = staE;
 
 		}
 
-		clusE.clear();
-		staE.clear();
-		labels.clear();
-		//TRANS.clear();
-
+		freeEvo();
 	}
 
 }
@@ -114,31 +80,7 @@ unordered_map<S, W> Monitor<S, C, W>::senWei(const vector<S> &sen, const vector<
 
 }
 
-template <typename S, typename C, typename W>
-template <class T>
-void Monitor<S, C, W>::buildStatistics(const vector<C> &lab, initializer_list<T> list){
 
-	if(staR.empty()){
-
-		for(auto s: list){
-			int i = 0;
-			for(auto x: s){
-				staR[lab[i]].insert(staR[lab[i]].end(), x);
-				i++;}		 
-		}
-
-	}else{
-
-		for(const auto x: list){
-			int i = 0;
-			for(const auto y: x){
-				staE[lab[i]].insert(staE[lab[i]].end(), y);
-				i++;}		 
-		}
-
-	}
-
-}
 
 template <typename S, typename C, typename W>
 void Monitor<S, C, W>::showStatistics(){
@@ -168,33 +110,46 @@ void Monitor<S, C, W>::showStatistics(){
 
 }
 
+template <typename S, typename C, typename W>
+void Monitor<S, C, W>::setSizes(const vector<S> &sen, const vector<C> &clu, const vector<C> &labels){
+
+	for (auto &x: labels){
+		staE[x].insert(staE[x].end(), 0); 
+	}
+
+	for (int i = 0; i < sen.size(); ++i){
+		if(clu[i] != -1) staE[clu[i]][0] += 1; 
+	}
+
+}
+
 /////////////////////////////////////////////////////////////
 
 template <typename S, typename C, typename W>
 void Monitor<S, C, W>::checkEvolution(const vector<S>& sen, const vector<C>& clu, const vector<W>& wei, const vector<C> &labels){
 
-	makeHash(sen, clu, wei, labels);
+	clusterOverlap(sen, clu, wei, labels);
 
-	clusterOverlap();
-
-	TRANS = extTransitions();
-
-	showExtransitions();
+	extTransitions();
 
 	intTransitions();
 }
 
 template <typename S, typename C, typename W>
-void Monitor<S, C, W>::makeHash(const vector<S> &v1, const vector<C> &v2, const vector<W> &v3, const vector<C> &labels){
+auto Monitor<S,C,W>::makeHash(const vector<S> &sen, const vector<C> &clu, const vector<W> &wei, const vector<C> &labels) -> search_table{
 
-	if(v1.size() != v2.size() or v1.size() != v3.size()){
+	if(sen.size() != clu.size() or sen.size() != wei.size()){
 		
 	}
 
+	search_table clusE;
+
 	storeLabels(labels); 
 
-	for (int i = 0; i < v1.size(); ++i)
-		clusE.insert({v1[i], make_tuple(v2[i],v3[i])});
+	for (int i = 0; i < sen.size(); ++i)
+		clusE.insert({sen[i], make_tuple(clu[i],wei[i])});
+
+	return clusE;
 
 }
 
@@ -203,7 +158,7 @@ void Monitor<S, C, W>::storeLabels(const vector<C> lab){
 
 	labels = lab;
 
-	sort(labels.begin(),labels.end());
+	//sort(labels.begin(),labels.end());
 
 }
 
@@ -211,7 +166,9 @@ void Monitor<S, C, W>::storeLabels(const vector<C> lab){
 
 
 template <typename S, typename C, typename W>
-void Monitor<S, C, W>::clusterOverlap(){
+void Monitor<S, C, W>::clusterOverlap(const vector<S> &sen, const vector<C> &clu, const vector<W> &wei, const vector<C> &labels){
+
+	search_table clusE = makeHash(sen, clu, wei, labels);
 
 	unordered_map<C,int> lmap = useLabels();
 	
@@ -265,14 +222,12 @@ unordered_map<C,int> Monitor<S, C, W>::useLabels(){
 /////////////////////////////////////////////////////////////
 
 template <typename S, typename C, typename W>
-Transitions<C> Monitor<S, C, W>::extTransitions(){
+void Monitor<S, C, W>::extTransitions(){
 
 	unordered_map<int,C> lmap = hashLabels(labels);
 
 	unordered_map<C, vector<C>> scands;
 	set<C> tracks;
-
-	Transitions<C> TRANS;
 
 	for(const auto &X : matrix){
 
@@ -345,7 +300,7 @@ Transitions<C> Monitor<S, C, W>::extTransitions(){
 	set_difference(labels.begin(), labels.end(), tracks.begin(), tracks.end(),
         inserter(TRANS.allocBirths(), TRANS.allocBirths().begin()));
 	
-	return TRANS;
+	showExtransitions();
 	
 }
 
@@ -396,35 +351,90 @@ void Monitor<S, C, W>::showExtransitions(){
 template <typename S, typename C, typename W>
 void Monitor<S, C, W>::intTransitions(){
 
+	statistics inter;
+	unordered_map<C, ext_statistic> exter;
+
 	cout << "****INT TRANSITIONS****" << endl;
 	for(const auto &x: TRANS.getSurvs()){
-		cout << get<0>(x) << ": ";
+
+		exter[get<0>(x)] = ext_statistic(matrix[get<0>(x)], get<1>(x));
+
+		//exter[get<0>(x)] = matrix[get<0>(x)];
+		//exter[get<0>(x)].insert(exter[get<0>(x)].end(), (float) get<1>(x));
 
 		for(int i = 0; i < staR[get<0>(x)].size(); i++){
-			//cout << sta[i] << " = ";
-			compare(staE[get<1>(x)][i], staR[get<0>(x)][i]);
-			temp[get<0>(x)].insert(temp[get<0>(x)].end(), staE[get<1>(x)][i]/staR[get<0>(x)][i]);
+			inter[get<0>(x)].insert(inter[get<0>(x)].end(), staE[get<1>(x)][i]/staR[get<0>(x)][i]);
 		}
-
-		cout << endl;
 	}
 
 	if(qSurvs.size() < winSize){
-		qSurvs.push(temp);
+		qSurvs.push_back(inter);
+		qTrans.push_back(exter);
+
 	}else{
-		qSurvs.pop();
-		qSurvs.push(temp);
+		
+		qSurvs.pop_front();
+		qTrans.pop_front();
+
+		qSurvs.push_back(inter);
+		qTrans.push_back(exter);
 	}
 
-	temp.clear();
+	seeQueue();
+	seeExQueue();
 	
-	cout << endl;
+}
+
+template <typename S, typename C, typename W>
+void Monitor<S,C,W>::seeQueue(){
+
+	for(const auto &x: qSurvs){
+		cout << "----------" << endl;
+		for(const auto &z: x){
+			cout << z.first << ": ";
+			for(const auto &y: z.second){
+				cout << y << " ";
+			}
+			cout << endl;
+		}
+	}
 
 }
 
 template <typename S, typename C, typename W>
-void Monitor<S, C, W>::compare(const float &v1, const float &v2){
-	cout << (v1/v2) << " "; 
+void Monitor<S,C,W>::seeExQueue(){
+
+	for(const auto &x: qTrans){
+		cout << "----------" << endl;
+		for(const auto &z: x){
+			cout << z.first << " -- ";
+			for(const auto &y: z.second.values){
+				cout << y << " ";
+			}
+			cout << "--> " << z.second.c2 << endl;
+		}
+	}
+
+}
+
+template <typename S, typename C, typename W>
+void Monitor<S,C,W>::freeEvo(){
+
+	labels.clear();
+	staE.clear();
+	TRANS.clear();
+	matrix.clear();
+
+}
+
+template <typename S, typename C, typename W>
+void Monitor<S,C,W>::freeRef(){
+
+	clusR.clear();
+	cluW.clear();
+	staR.clear();
+	//qSurvs = {};
+
 }
 
 /////////////////////////////////////////////////////////////
@@ -448,13 +458,5 @@ void Monitor<S, C, W>::showBirths(){TRANS.showBirths();}
 
 template class Monitor<int, int, float>;
 template class Monitor<char, int, float>;
+template class Monitor<int, char, float>;
 template class Monitor<char, char, float>;
-
-template void Monitor<int, int, float>::execute(const vector<int>&, const vector<int>&, const vector<float>&, const vector<int>&, initializer_list<vector<float>> list);
-template void Monitor<int, int, float>::buildStatistics(const vector<int>&, initializer_list<vector<float>> list);
-
-template void Monitor<char, char, float>::execute(const vector<char>&, const vector<char>&, const vector<float>&, const vector<char>&, initializer_list<vector<float>> list);
-template void Monitor<char, char, float>::buildStatistics(const vector<char>&, initializer_list<vector<float>> list);
-
-template void Monitor<char, int, float>::execute(const vector<char>&, const vector<int>&, const vector<float>&, const vector<int>&, initializer_list<vector<float>> list);
-template void Monitor<char, int, float>::buildStatistics(const vector<int>&, initializer_list<vector<float>> list);
