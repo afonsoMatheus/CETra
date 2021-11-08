@@ -5,6 +5,7 @@ using namespace std;
 
 #include <vector>
 #include <tuple>
+#include <string>
 #include <unordered_map>
 #include <iostream>
 
@@ -20,6 +21,8 @@ class Transitions{
 
 		vector<T> deaths;
 		vector<T> births;
+
+		unordered_map<T, vector<int>> interC;
 
 	public:		
 
@@ -49,7 +52,13 @@ class Transitions{
 
 		vector<T> getBirths();
 
-		bool checkExt();
+		void insertInterC(T C1, int sta);
+
+		unordered_map<T, vector<int>> getInterC();
+
+		bool checkExtChange();
+
+		bool checkIntChange();
 
 		///////////////////////////////////////////
 
@@ -62,6 +71,8 @@ class Transitions{
 		void showSurvs();
 
 		void showUnions();
+
+		void showInterC(const vector<string>&);
 
 };
 

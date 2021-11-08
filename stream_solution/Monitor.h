@@ -7,26 +7,14 @@
 #include <algorithm>
 #include <iostream>
 #include <set>
-#include <initializer_list>
-#include <string>
+#include <array>
 #include <deque>
 #include <exception>
+#include <cmath>
+#include <string>
 #include "Transitions.h"
 
 using namespace std;
-
-struct int_statistic{
-
-	vector<float> values;
-	float lim;
-
-	int_statistic(vector<float> v, int l = 5){
-
-		values = v;
-		lim = l;
-	}
-
-};
 
 template <typename S = int, typename C = int>
 class Monitor{
@@ -40,6 +28,7 @@ class Monitor{
 
 		int winSize;
 		vector<float> limits;
+		vector<string> names;
 
 		clustering clusR;
 		unordered_map<C,float> cluW;
@@ -54,9 +43,9 @@ class Monitor{
 		deque<statistics> qTrans;
 		deque<statistics> qSurvs;
 
-		void storeClustering(const vector<S>&, const vector<C>&, const vector<float>&, const vector<C>&);
+		void storeClustering(const vector<S>&, const vector<C>&, const vector<float>&);
 
-		void checkEvolution(const vector<S>&, const vector<C>&, const vector<float>&, const vector<C>&);
+		void checkEvolution(const vector<S>&, const vector<C>&, const vector<float>&);
 
 		template <class T>
 		void buildStatistics(const vector<S> & ,const vector<C> &, const vector<C> &, initializer_list<T>);
@@ -68,12 +57,12 @@ class Monitor{
 
 		////////////////////////////////////////////////////////////////////
 
-		void storeLabels(const vector<C>);
+		void storeEvoLabels(const vector<C>&);
 
-		void clusterOverlap(const vector<S>&, const vector<C>&, const vector<float>&, const vector<C>&);
+		void clusterOverlap(const vector<S>&, const vector<C>&, const vector<float>&);
 		unordered_map<C,int> useLabels();
 
-		search_table makeHash(const vector<S>&, const vector<C>&, const vector<float>&, const vector<C>&);
+		search_table makeHash(const vector<S>&, const vector<C>&, const vector<float>&);
 
 		//////////////////////////////////////////////////////////////////
 
@@ -83,21 +72,23 @@ class Monitor{
 
 		unordered_map<int,C> hashLabels(const vector<C>&);
 
-		void setSizes(const vector<S> &, const vector<C> &, const vector<C> &);
+		void setSizes(const vector<S> &, const vector<C> &);
 
 		template <class T>
 		void storeRefStatistics(const vector<C> &, initializer_list<T>);
 
 		template <class T>
-		void storeEvoStatistics(const vector<S> &, const vector<C> &, const vector<C> &, initializer_list<T> );
+		void storeEvoStatistics(const vector<S> &, const vector<C> &, initializer_list<T> );
 
 		void freeRef();
 
 		void freeEvo();
 
-		void seeQueue();
+		void seeIntQueue();
 
 		void seeExQueue();
+
+		void checkIntTrans();
 
 
 	public:
@@ -107,21 +98,24 @@ class Monitor{
 			winSize = N;
 			limits = lim;
 			limits.insert(limits.begin(), 0.5);
+			names.insert(names.begin(), "Sizes");
 
 		}
 
-		void execute(const vector<S> &, const vector<C> &, const vector<float> &, const vector<C> &);
+		void execute(const vector<S>&, const vector<C> &, const vector<float> &, const vector<C> &);
 
 		template <class T>
-		void execute(const vector<S> &, const vector<C> &, const vector<float> &, const vector<C> &, initializer_list<T> );
+		void execute(const vector<S>&, const vector<C> &, const vector<float> &, const vector<C> &, initializer_list<T> );
 
 		//////////////////////////////////////////////////////////////////
 
 		void setSizeLimit(const float&);
 
+		void setStaNames(const vector<string>&);
+
 		void showStatistics();
 
-		void showExtransitions();
+		void showTransitions();
 
 		void showSurvs();
 
@@ -132,6 +126,8 @@ class Monitor{
 		void showDeaths();
 
 		void showBirths();
+
+		void showInterC(const vector<string>);
 	
 };
 
@@ -151,21 +147,29 @@ void Monitor<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vec
 
 		if(clusR.empty()){
 
-			storeClustering(sen, clu, wei, lab);
+			storeClustering(sen, clu, wei);
 			
 			storeRefStatistics(lab, list);
 
 		}else{
+
+			cout << endl << "///// NEXT WINDOW /////" << endl << endl;
+
+			storeEvoLabels(lab);
 			
-			storeEvoStatistics(sen, clu, lab, list);
+			storeEvoStatistics(sen, clu, list);
 
-			checkEvolution(sen, clu, wei, lab);
+			checkEvolution(sen, clu, wei);
 
-			if(TRANS.checkExt()){
+			if(!TRANS.getSurvs().empty()) showSurvs();
+
+			if(TRANS.checkExtChange() || TRANS.checkIntChange()){
+
+				showTransitions();
 
 				freeRef();
 
-				storeClustering(sen, clu, wei, lab);
+				storeClustering(sen, clu, wei);
 
 				staR = staE;
 
@@ -188,18 +192,18 @@ template <class T>
 void Monitor<S,C>::storeRefStatistics(const vector<C> &lab, initializer_list<T> list){
 
 	//inserindo tamanhos como estatistica
-	for (auto &x: clusR){
+	for (const auto &x: clusR){
 		staR[x.first].insert(staR[x.first].end(), x.second.size()); 
 	}
 
-	for(auto s: list){
+	for(auto &s: list){
 		int i = 0;
 
-		if(s.values.size() != lab.size()){
+		if(s.size() != lab.size()){
 			throw invalid_argument("The labels/statistics arrays are not the same size!");
 		}
 
-		for(auto x: s.values){
+		for(const auto &x: s){
 			staR[lab[i]].insert(staR[lab[i]].end(), x);
 			i++;
 		}		 
@@ -209,19 +213,19 @@ void Monitor<S,C>::storeRefStatistics(const vector<C> &lab, initializer_list<T> 
 
 template <typename S, typename C>
 template <class T>
-void Monitor<S,C>::storeEvoStatistics(const vector<S> &sen, const vector<C> &clu, const vector<C> &lab, initializer_list<T> list){
+void Monitor<S,C>::storeEvoStatistics(const vector<S> &sen, const vector<C> &clu, initializer_list<T> list){
 
-	setSizes(sen, clu, lab);
+	setSizes(sen, clu);
 
-	for(auto s: list){
+	for(const auto &s: list){
 		int i = 0;
 
-		if(s.values.size() != lab.size()){
+		if(s.size() != labels.size()){
 			throw invalid_argument("The labels/statistics arrays are not the same size!");
 		}
 
-		for(auto x: s.values){
-			staE[lab[i]].insert(staE[lab[i]].end(), x);
+		for(const auto &x: s){
+			staE[labels[i]].insert(staE[labels[i]].end(), x);
 			i++;
 		}		 
 	}		

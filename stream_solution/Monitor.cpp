@@ -11,19 +11,21 @@ void Monitor<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const ve
 
 		if(clusR.empty()){
 
-			storeClustering(sen, clu, wei, lab);
+			storeClustering(sen, clu, wei);
 
 		}else{
 
-			setSizes(sen, clu, lab);
+			setSizes(sen, clu);
 
-			checkEvolution(sen, clu, wei, lab);
+			storeEvoLabels(lab);
 
-			if(TRANS.checkExt()){
+			checkEvolution(sen, clu, wei);
+
+			if(TRANS.checkExtChange()){
 
 				freeRef();
 
-				storeClustering(sen, clu, wei, lab);
+				storeClustering(sen, clu, wei);
 
 				staR = staE;
 
@@ -50,7 +52,7 @@ void Monitor<S,C>::setSizeLimit(const float& sl){
 /////////////////////////////////////////////////////////////
 
 template <typename S, typename C>
-void Monitor<S, C>::storeClustering(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei, const vector<C> &labels){
+void Monitor<S, C>::storeClustering(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei){
 
 	//pensar no tamanho dos vetores para cada cluster
 	for (int i = 0; i < sen.size(); ++i){
@@ -126,7 +128,7 @@ void Monitor<S, C>::showStatistics(){
 }
 
 template <typename S, typename C>
-void Monitor<S, C>::setSizes(const vector<S> &sen, const vector<C> &clu, const vector<C> &labels){
+void Monitor<S, C>::setSizes(const vector<S> &sen, const vector<C> &clu){
 
 	for (auto &x: labels){
 	 	staE[x].insert(staE[x].end(), 0); 
@@ -141,9 +143,9 @@ void Monitor<S, C>::setSizes(const vector<S> &sen, const vector<C> &clu, const v
 /////////////////////////////////////////////////////////////
 
 template <typename S, typename C>
-void Monitor<S, C>::checkEvolution(const vector<S>& sen, const vector<C>& clu, const vector<float>& wei, const vector<C> &labels){
+void Monitor<S, C>::checkEvolution(const vector<S>& sen, const vector<C>& clu, const vector<float>& wei){
 
-	clusterOverlap(sen, clu, wei, labels);
+	clusterOverlap(sen, clu, wei);
 
 	extTransitions();
 
@@ -151,11 +153,9 @@ void Monitor<S, C>::checkEvolution(const vector<S>& sen, const vector<C>& clu, c
 }
 
 template <typename S, typename C>
-auto Monitor<S,C>::makeHash(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei, const vector<C> &labels) -> search_table{
+auto Monitor<S,C>::makeHash(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei) -> search_table{
 
-	search_table clusE;
-
-	storeLabels(labels); 
+	search_table clusE; 
 
 	for (int i = 0; i < sen.size(); ++i)
 		clusE.insert({sen[i], make_tuple(clu[i],wei[i])});
@@ -165,9 +165,13 @@ auto Monitor<S,C>::makeHash(const vector<S> &sen, const vector<C> &clu, const ve
 }
 
 template <typename S, typename C>
-void Monitor<S, C>::storeLabels(const vector<C> lab){
+void Monitor<S, C>::storeEvoLabels(const vector<C> &lab){
 
-	labels = lab;
+	if(labels.empty()){
+		labels = lab;
+	}else if(labels != lab && labels.size() == lab.size()){
+		throw invalid_argument("Labels changed after the first evolution!");
+	}
 
 	//sort(labels.begin(),labels.end());
 
@@ -177,9 +181,9 @@ void Monitor<S, C>::storeLabels(const vector<C> lab){
 
 
 template <typename S, typename C>
-void Monitor<S, C>::clusterOverlap(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei, const vector<C> &labels){
+void Monitor<S, C>::clusterOverlap(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei){
 
-	search_table clusE = makeHash(sen, clu, wei, labels);
+	search_table clusE = makeHash(sen, clu, wei);
 
 	unordered_map<C,int> lmap = useLabels();
 	
@@ -191,13 +195,13 @@ void Monitor<S, C>::clusterOverlap(const vector<S> &sen, const vector<C> &clu, c
 
 	}
 
-	cout << "-----Intersection-----" << endl;
+	/*cout << "-----Intersection-----" << endl;
 	for (const auto &i : matrix){
 		cout << i.first << ": "; 
 		for (const auto &x : i.second) cout << x << " ";
 		cout << endl;
 	}
-	cout << endl;
+	cout << endl;*/
 
 	for (const auto &i : matrix){
 		for (auto x = 0; x < i.second.size(); x++){
@@ -205,13 +209,13 @@ void Monitor<S, C>::clusterOverlap(const vector<S> &sen, const vector<C> &clu, c
 		}
 	}
 
-	cout << "-----Overlapping-----" << endl;
+	/*cout << "-----Overlapping-----" << endl;
 	for (const auto &i : matrix){
 		cout << i.first << ": "; 
 		for (const auto &x : i.second) cout << x*100 << " ";
 		cout << endl;
 	}
-	cout << endl;
+	cout << endl;*/
 
 }
 
@@ -311,8 +315,6 @@ void Monitor<S, C>::extTransitions(){
 	set_difference(labels.begin(), labels.end(), tracks.begin(), tracks.end(),
         inserter(TRANS.allocBirths(), TRANS.allocBirths().begin()));
 	
-	showExtransitions();
-	
 }
 
 template <typename S, typename C>
@@ -342,19 +344,30 @@ float Monitor<S, C>::sumSplits(const vector<float> &overlaps, const vector<C> &s
 }
 
 template <typename S, typename C>
-void Monitor<S, C>::showExtransitions(){
+void Monitor<S, C>::showTransitions(){
 
-	cout << "****EXT TRANSITIONS****" << endl << endl; 
+	if(TRANS.checkExtChange()){
 
-	showSurvs();
+		cout << "****EXT TRANSITIONS****" << endl; 
 
-	showSplits();
+		if(!TRANS.getSplits().empty()) showSplits();
 
-	showUnions();
+		if(!TRANS.getUnions().empty()) showUnions();
 
-	showDeaths();
+		if(!TRANS.getDeaths().empty()) showDeaths();
 
-	showBirths();
+		if(!TRANS.getBirths().empty()) showBirths();
+
+	}
+
+	if(TRANS.checkIntChange()){
+
+		cout << "****INT TRANSITIONS****" << endl;
+
+		if(!TRANS.getInterC().empty()) showInterC(names);
+
+	}
+	
 }
 
 /////////////////////////////////////////////////////////////
@@ -365,7 +378,6 @@ void Monitor<S, C>::intTransitions(){
 	statistics inter;
 	statistics exter;
 
-	cout << "****INT TRANSITIONS****" << endl;
 	for(const auto &x: TRANS.getSurvs()){
 
 		exter[get<0>(x)] = matrix[get<0>(x)];
@@ -388,13 +400,48 @@ void Monitor<S, C>::intTransitions(){
 		qTrans.push_back(exter);
 	}
 
-	seeQueue();
-	seeExQueue();
+	//seeIntQueue();
+	//seeExQueue();
+
+	if(qSurvs.size() == winSize) checkIntTrans();
 	
 }
 
 template <typename S, typename C>
-void Monitor<S,C>::seeQueue(){
+void Monitor<S,C>::checkIntTrans(){
+
+	if(qSurvs.size() < winSize) return;
+
+	unordered_map<C, vector<int>> counts;
+
+	for(const auto &x: clusR){
+		for(int i = 0; i < limits.size(); i++) counts[x.first].insert(counts[x.first].end(), 0);
+	} 
+
+	for(const auto &cluS: qSurvs){
+		for(const auto &clu: cluS){
+			for(int i = 0; i < clu.second.size(); i++){
+				if(fabs(clu.second[i]-1) > limits[i]){
+					counts[clu.first][i]+=1;
+				}
+			}
+		}	
+	}
+
+	for(const auto &x: counts){
+		int i = 0;
+		for(const auto &y: x.second){
+			if(y == qSurvs.size()) {
+				TRANS.insertInterC(x.first, i);
+			}
+			i++;
+		}
+	}
+
+}
+
+template <typename S, typename C>
+void Monitor<S,C>::seeIntQueue(){
 
 	for(const auto &x: qSurvs){
 		cout << "----------" << endl;
@@ -441,7 +488,15 @@ void Monitor<S,C>::freeRef(){
 	clusR.clear();
 	cluW.clear();
 	staR.clear();
-	//qSurvs = {};
+	labels.clear();
+	qSurvs = {};
+
+}
+
+template <typename S, typename C>
+void Monitor<S,C>::setStaNames(const vector<string>& nam){
+
+	for(const auto &x: nam) names.insert(names.end(), x);
 
 }
 
@@ -462,6 +517,9 @@ void Monitor<S, C>::showDeaths(){TRANS.showDeaths();}
 
 template <typename S, typename C>
 void Monitor<S, C>::showBirths(){TRANS.showBirths();}
+
+template <typename S, typename C>
+void Monitor<S, C>::showInterC(const vector<string> nam){TRANS.showInterC(nam);}
 
 
 template class Monitor<int, int>;

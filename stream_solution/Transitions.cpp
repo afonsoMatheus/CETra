@@ -46,13 +46,33 @@ vector<T> Transitions<T>::getBirths(){
 	return births;}
 
 template <typename T>
-bool Transitions<T>::checkExt(){
+void Transitions<T>::insertInterC(T C1, int sta){
+	interC[C1].insert(interC[C1].end(), sta);
+}
+
+template <typename T>
+unordered_map<T, vector<int>> Transitions<T>::getInterC(){
+	return interC;
+}
+
+template <typename T>
+bool Transitions<T>::checkExtChange(){
 
 	if(splits.empty() == false || unions.empty() == false ||
 		deaths.empty() == false || births.empty() == false){
 
 		return true;
 	}
+
+	return false;
+
+}
+
+
+template <typename T>
+bool Transitions<T>::checkIntChange(){
+
+	if(interC.empty() == false) return true;
 
 	return false;
 
@@ -67,6 +87,7 @@ void Transitions<T>::clear(){
 	deaths.clear();
 	splits.clear();
 	unions.clear();
+	interC.clear();
 }
 
 template <typename T>
@@ -111,6 +132,18 @@ void Transitions<T>::showDeaths(){
 	cout << "Mortes" << endl;
 	for(const auto &x : deaths) cout << x << " -> DEATH " << endl;
 	cout << endl;
+}
+
+template <typename T>
+void Transitions<T>::showInterC(const vector<string>& nam){
+	
+	for (const auto &x: interC){
+		cout << x.first << ": ";
+		for(const auto &y: x.second){
+			cout << nam[y] << " ";
+		} 
+		cout << endl;	
+	} 
 }
 
 
