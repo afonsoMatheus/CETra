@@ -15,13 +15,17 @@ void Monitor<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const ve
 
 		}else{
 
-			setSizes(sen, clu);
-
 			storeEvoLabels(lab);
+
+			setSizes(sen, clu);
 
 			checkEvolution(sen, clu, wei);
 
-			if(TRANS.checkExtChange()){
+			if(!TRANS.getSurvs().empty()) showSurvs();
+
+			if(TRANS.checkExtChange() || TRANS.checkIntChange()){
+
+				showTransitions();
 
 				freeRef();
 
@@ -43,16 +47,27 @@ void Monitor<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const ve
 }
 
 template <typename S, typename C>
-void Monitor<S,C>::setSizeLimit(const float& sl){
+void Monitor<S,C>::configSizeLimit(const float& sl){
+	limits[0] = sl;}
 
-	limits[0] = sl;
+template <typename S, typename C>
+void Monitor<S,C>::configStaNames(const vector<string>& nam){
+	for(const auto &x: nam) names.insert(names.end(), x);}
 
-}
+template <typename S, typename C>
+void Monitor<S,C>::configNewLimit(const float& ln){
+	new_limit = ln;}
+
+template <typename S, typename C>
+void Monitor<S,C>::configFailLimit(const float& lf){
+	fail_limit = lf;}
 
 /////////////////////////////////////////////////////////////
 
 template <typename S, typename C>
 void Monitor<S, C>::storeClustering(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei){
+
+	sizeR = sen.size();
 
 	//pensar no tamanho dos vetores para cada cluster
 	for (int i = 0; i < sen.size(); ++i){
@@ -130,12 +145,30 @@ void Monitor<S, C>::showStatistics(){
 template <typename S, typename C>
 void Monitor<S, C>::setSizes(const vector<S> &sen, const vector<C> &clu){
 
+	int fails = 0;
+
+	if(sizeR > sen.size()){
+		throw invalid_argument("The current size is shorter than the size of the ref clustering");
+	}else{
+		TRANS.setNewRatio((float) (sen.size() - sizeR)/sizeR);
+	}
+
 	for (auto &x: labels){
 	 	staE[x].insert(staE[x].end(), 0); 
 	}
 
-	for (int i = 0; i < sen.size(); ++i){
-		if(clu[i] != -1) staE[clu[i]][0] += 1; 
+	for (int i = 0; i < sizeR; ++i){
+		if(clu[i] != -1){
+			staE[clu[i]][0] += 1;
+		}else{
+			fails++;
+		} 
+	}
+
+	TRANS.setFailRatio((float) fails/sizeR);
+
+	if(TRANS.getFailRatio() > fail_limit){
+		throw domain_error("Too many failing samples!");
 	}
 
 }
@@ -153,11 +186,11 @@ void Monitor<S, C>::checkEvolution(const vector<S>& sen, const vector<C>& clu, c
 }
 
 template <typename S, typename C>
-auto Monitor<S,C>::makeHash(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei) -> search_table{
+auto Monitor<S,C>::makeSearchTable(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei) -> search_table{
 
 	search_table clusE; 
 
-	for (int i = 0; i < sen.size(); ++i)
+	for (int i = 0; i < sizeR; ++i)
 		clusE.insert({sen[i], make_tuple(clu[i],wei[i])});
 
 	return clusE;
@@ -183,7 +216,7 @@ void Monitor<S, C>::storeEvoLabels(const vector<C> &lab){
 template <typename S, typename C>
 void Monitor<S, C>::clusterOverlap(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei){
 
-	search_table clusE = makeHash(sen, clu, wei);
+	search_table clusE = makeSearchTable(sen, clu, wei);
 
 	unordered_map<C,int> lmap = useLabels();
 	
@@ -348,7 +381,7 @@ void Monitor<S, C>::showTransitions(){
 
 	if(TRANS.checkExtChange()){
 
-		cout << "****EXT TRANSITIONS****" << endl; 
+		cout << "+ EXT TRANSITIONS" << endl << endl; 
 
 		if(!TRANS.getSplits().empty()) showSplits();
 
@@ -362,11 +395,15 @@ void Monitor<S, C>::showTransitions(){
 
 	if(TRANS.checkIntChange()){
 
-		cout << "****INT TRANSITIONS****" << endl;
+		cout << "+ INT TRANSITIONS" << endl << endl;
 
 		if(!TRANS.getInterC().empty()) showInterC(names);
 
+		cout << endl;
+
 	}
+
+
 	
 }
 
@@ -475,7 +512,6 @@ void Monitor<S,C>::seeExQueue(){
 template <typename S, typename C>
 void Monitor<S,C>::freeEvo(){
 
-	labels.clear();
 	staE.clear();
 	TRANS.clear();
 	matrix.clear();
@@ -485,6 +521,7 @@ void Monitor<S,C>::freeEvo(){
 template <typename S, typename C>
 void Monitor<S,C>::freeRef(){
 
+	sizeR = 0;
 	clusR.clear();
 	cluW.clear();
 	staR.clear();
@@ -493,12 +530,7 @@ void Monitor<S,C>::freeRef(){
 
 }
 
-template <typename S, typename C>
-void Monitor<S,C>::setStaNames(const vector<string>& nam){
 
-	for(const auto &x: nam) names.insert(names.end(), x);
-
-}
 
 /////////////////////////////////////////////////////////////
 

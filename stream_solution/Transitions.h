@@ -13,6 +13,9 @@ template <typename T>
 class Transitions{
 
 	private:
+
+		float new_ratio = 0;
+		float fail_ratio = 0;
 		
 		vector<tuple<T,T>> survs;
 		
@@ -31,6 +34,14 @@ class Transitions{
 		void clear();
 
 		///////////////////////////////////////////
+
+		void setNewRatio(float N);
+
+		float getNewRatio();
+
+		void setFailRatio(float N);
+
+		float getFailRatio();
 
 		void insertDeath(T D);
 
@@ -59,6 +70,8 @@ class Transitions{
 		bool checkExtChange();
 
 		bool checkIntChange();
+
+		bool checkNewRatio(float &);
 
 		///////////////////////////////////////////
 

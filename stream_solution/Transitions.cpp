@@ -6,6 +6,26 @@ Transitions<T>::Transitions(){};
 ////////////////////////////////////////////////////////////////////
 
 template <typename T>
+void Transitions<T>::setNewRatio(float N){
+	new_ratio = N;
+}
+
+template <typename T>
+float Transitions<T>::getNewRatio(){
+	return new_ratio;
+}
+
+template <typename T>
+void Transitions<T>::setFailRatio(float N){
+	fail_ratio = N;
+}
+
+template <typename T>
+float Transitions<T>::getFailRatio(){
+	return fail_ratio;
+}
+
+template <typename T>
 void Transitions<T>::insertDeath(T D){
 	deaths.insert(deaths.end(), D);}
 
@@ -78,6 +98,16 @@ bool Transitions<T>::checkIntChange(){
 
 }
 
+template <typename T>
+bool Transitions<T>::checkNewRatio(float& lim){
+
+	if(new_ratio > lim){
+		return true;
+	}
+
+	return false;
+}
+
 ////////////////////////////////////////////////////////////////////
 
 template <typename T>
@@ -88,6 +118,8 @@ void Transitions<T>::clear(){
 	splits.clear();
 	unions.clear();
 	interC.clear();
+	new_ratio = 0;
+	fail_ratio = 0;
 }
 
 template <typename T>
