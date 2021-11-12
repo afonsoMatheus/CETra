@@ -16,12 +16,13 @@ class Transitions{
 
 		float new_ratio = 0;
 		float fail_ratio = 0;
-		
+
+		vector<T> news_clu;
+		//vector<T> fails_clu;
+
 		vector<tuple<T,T>> survs;
-		
 		unordered_map<T, vector<T>> unions;
 		unordered_map<T, vector<T>> splits;
-
 		vector<T> deaths;
 		vector<T> births;
 
@@ -32,6 +33,22 @@ class Transitions{
 		Transitions();
 
 		void clear();
+
+		void setNovelClusters(T N){
+			news_clu.insert(news_clu.end(), N);
+		}
+
+		vector<T> getNovelClusters(){
+			return news_clu;
+		}
+
+		/*void setFailClusters(T N){
+			fails_clu.insert(news_clu.end(), N);
+		}
+
+		vector<T> getFailClusters(){
+			return fails_clu;
+		}*/
 
 		///////////////////////////////////////////
 
@@ -72,6 +89,16 @@ class Transitions{
 		bool checkIntChange();
 
 		bool checkNewRatio(float &);
+
+		bool checkNovelClusters(){
+			if(news_clu.empty() == false) return true;
+			return false;
+		}
+
+	/*	bool checkFailClusters(){
+			if(fails_clu.empty() == false) return true;
+			return false;
+		}*/
 
 		///////////////////////////////////////////
 

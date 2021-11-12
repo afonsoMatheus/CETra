@@ -15,23 +15,38 @@ void Monitor<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const ve
 
 		}else{
 
+			cout << endl << "///// NEXT WINDOW /////" << endl << endl;
+
 			storeEvoLabels(lab);
 
-			setSizes(sen, clu);
+			settingSizeStatistics(sen, clu);
 
-			checkEvolution(sen, clu, wei);
+			if(TRANS.checkNewRatio(new_limit)){
 
-			if(!TRANS.getSurvs().empty()) showSurvs();
-
-			if(TRANS.checkExtChange() || TRANS.checkIntChange()){
-
-				showTransitions();
+				cout << "====TOO MANY NEW SAMPLES====" << endl;
+				cout << "===UPDATING REF CLUSTERING===" << endl << endl;
 
 				freeRef();
-
 				storeClustering(sen, clu, wei);
-
 				staR = staE;
+			
+			}else{
+
+				checkEvolution(sen, clu, wei);
+
+				if(!TRANS.getSurvs().empty()) showSurvs();
+
+				if(TRANS.checkExtChange() || TRANS.checkIntChange()){
+
+					showTransitions();
+
+					freeRef();
+
+					storeClustering(sen, clu, wei);
+
+					staR = staE;
+
+				}
 
 			}
 
@@ -61,6 +76,14 @@ void Monitor<S,C>::configNewLimit(const float& ln){
 template <typename S, typename C>
 void Monitor<S,C>::configFailLimit(const float& lf){
 	fail_limit = lf;}
+
+template <typename S, typename C>
+void Monitor<S,C>::configSurvLimit(const float& ls){
+	surv_limit = ls;}
+
+template <typename S, typename C>
+void Monitor<S,C>::configSplitLimit(const float& ls){
+	split_limit = ls;}
 
 /////////////////////////////////////////////////////////////
 
@@ -143,9 +166,11 @@ void Monitor<S, C>::showStatistics(){
 }
 
 template <typename S, typename C>
-void Monitor<S, C>::setSizes(const vector<S> &sen, const vector<C> &clu){
+void Monitor<S, C>::settingSizeStatistics(const vector<S> &sen, const vector<C> &clu){
 
 	int fails = 0;
+	//unordered_map<C,int> failClu;
+	unordered_map<C,int> newClu;
 
 	if(sizeR > sen.size()){
 		throw invalid_argument("The current size is shorter than the size of the ref clustering");
@@ -153,23 +178,48 @@ void Monitor<S, C>::setSizes(const vector<S> &sen, const vector<C> &clu){
 		TRANS.setNewRatio((float) (sen.size() - sizeR)/sizeR);
 	}
 
-	for (auto &x: labels){
-	 	staE[x].insert(staE[x].end(), 0); 
+	for (const auto &x: labels){
+	 	staE[x].insert(staE[x].end(), 0);
+	 	//failClu[x] = 0;
+	 	newClu[x] = 0; 
 	}
 
-	for (int i = 0; i < sizeR; ++i){
-		if(clu[i] != -1){
-			staE[clu[i]][0] += 1;
+	for (int i = 0; i < sen.size(); ++i){
+
+		if(i < sizeR){
+
+			if(clu[i] != -1){
+				staE[clu[i]][0] += 1;
+			}else{
+				//failClu[clu[i]] += 1;
+				fails++;
+			}
+
 		}else{
-			fails++;
+
+			if(clu[i] != -1) newClu[clu[i]] +=1;
 		} 
 	}
 
 	TRANS.setFailRatio((float) fails/sizeR);
 
 	if(TRANS.getFailRatio() > fail_limit){
-		throw domain_error("Too many failing samples!");
+		throw length_error("Too many failing samples!");
 	}
+
+	/*for(auto &x: failClu){
+
+		cout << x.first << " " << staE[x.first][0] << endl;
+		if( (float) x.second/staE[x.first][0] > limits[0]){
+			TRANS.setFailClusters(x.first);
+		}
+	}*/
+
+	for(auto &x: newClu){
+		if( (float) x.second > (1+ limits[0]) * staE[x.first][0]){
+			TRANS.setNovelClusters(x.first);
+		}
+	}	
 
 }
 
@@ -191,7 +241,7 @@ auto Monitor<S,C>::makeSearchTable(const vector<S> &sen, const vector<C> &clu, c
 	search_table clusE; 
 
 	for (int i = 0; i < sizeR; ++i)
-		clusE.insert({sen[i], make_tuple(clu[i],wei[i])});
+		clusE[sen[i]] = make_tuple(clu[i],wei[i]);
 
 	return clusE;
 
@@ -199,11 +249,11 @@ auto Monitor<S,C>::makeSearchTable(const vector<S> &sen, const vector<C> &clu, c
 
 template <typename S, typename C>
 void Monitor<S, C>::storeEvoLabels(const vector<C> &lab){
-
-	if(labels.empty()){
+	
+	if(is_sorted(lab.begin(),lab.end())){
 		labels = lab;
-	}else if(labels != lab && labels.size() == lab.size()){
-		throw invalid_argument("Labels changed after the first evolution!");
+	}else{
+		throw invalid_argument("Labels are not ordered! Make sure labels and statistics order matchs!");
 	}
 
 	//sort(labels.begin(),labels.end());
@@ -228,7 +278,7 @@ void Monitor<S, C>::clusterOverlap(const vector<S> &sen, const vector<C> &clu, c
 
 	}
 
-	/*cout << "-----Intersection-----" << endl;
+/*	cout << "-----Intersection-----" << endl;
 	for (const auto &i : matrix){
 		cout << i.first << ": "; 
 		for (const auto &x : i.second) cout << x << " ";
@@ -288,7 +338,7 @@ void Monitor<S, C>::extTransitions(){
 
 			float mcell = X.second[Y];
 
-			if (mcell > 0.5){
+			if (mcell > surv_limit){
 				
 				if(surv_cand = -2){
 					surv_cand = lmap[Y];
@@ -305,7 +355,7 @@ void Monitor<S, C>::extTransitions(){
 
 				}
 
-			}else if(mcell >= 0.25) split_cand.insert(split_cand.end(), Y);
+			}else if(mcell >= split_limit) split_cand.insert(split_cand.end(), Y);
 
 		}
 
@@ -515,6 +565,7 @@ void Monitor<S,C>::freeEvo(){
 	staE.clear();
 	TRANS.clear();
 	matrix.clear();
+	labels.clear();
 
 }
 
@@ -525,7 +576,6 @@ void Monitor<S,C>::freeRef(){
 	clusR.clear();
 	cluW.clear();
 	staR.clear();
-	labels.clear();
 	qSurvs = {};
 
 }

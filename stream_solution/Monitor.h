@@ -31,15 +31,16 @@ class Monitor{
 		vector<string> names;
 		float new_limit;
 		float fail_limit;
+		float surv_limit;
+		float split_limit;
 
 		int sizeR;
 		clustering clusR;
 		unordered_map<C,float> cluW;
 		statistics staR;
-		
+
 		vector<C> labels;
 		statistics staE;
-		
 		overlaping matrix;
 
 		Transitions<C> TRANS;
@@ -75,7 +76,7 @@ class Monitor{
 
 		unordered_map<int,C> hashLabels(const vector<C>&);
 
-		void setSizes(const vector<S> &, const vector<C> &);
+		void settingSizeStatistics(const vector<S> &, const vector<C> &);
 
 		template <class T>
 		void storeRefStatistics(const vector<C> &, initializer_list<T>);
@@ -107,6 +108,9 @@ class Monitor{
 			new_limit = 0.5;
 			fail_limit = 0.5;
 
+			surv_limit = 0.5;
+			split_limit = surv_limit/2;
+
 		}
 
 		void execute(const vector<S>&, const vector<C> &, const vector<float> &, const vector<C> &);
@@ -124,6 +128,10 @@ class Monitor{
 
 		void configFailLimit(const float&);
 
+		void configSurvLimit(const float&);
+
+		void configSplitLimit(const float&);
+
 		void showStatistics();
 
 		void showTransitions();
@@ -138,7 +146,45 @@ class Monitor{
 
 		void showBirths();
 
-		void showInterC(const vector<string>);
+		void showInterC(vector<string>);
+
+		bool checkNovFailChanges(){
+
+			//TRANS.checkFailClusters();
+
+			if(TRANS.checkNewRatio(new_limit) || TRANS.checkNovelClusters()){
+
+				return true;
+			}
+
+			return false;
+		}
+
+		void showNovFailChanges(){
+
+			if(TRANS.checkNewRatio(new_limit)){
+
+				cout << "====TOO MANY NEW SAMPLES IN INPUT====" << endl;
+
+			}
+
+			if(TRANS.checkNovelClusters()){
+				cout << "Too many new samples in clusters: ";
+				for(const auto &x: TRANS.getNovelClusters()){
+					cout << x << " ";
+				}
+				cout << endl << endl;
+			}
+
+			/*if(TRANS.checkFailClusters()){
+				cout << "Too many fail samples in clusters: ";
+				for(const auto &x: TRANS.getFailClusters()){
+					cout << x << " ";
+				}
+				cout << endl << endl;
+			}	*/		
+
+		}
 	
 };
 
@@ -152,12 +198,18 @@ void Monitor<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vec
 		throw invalid_argument("The sensors/clusters/weights arrays are not the same size!");
 	}
 
-	if (list.size() + 1 != limits.size()){
-		throw invalid_argument("The limits/statistics arrays are not the same size!");
+	if (list.size() + 1 < limits.size()){
+		throw invalid_argument("The limits array size is greater than the input statistics list!");
 	}
-
+	
 	if(names.size() > list.size() + 1){
 		throw invalid_argument("The amount of statistics names surpasses the statistics list!");
+	}
+
+	if(limits.size() < list.size() + 1){
+		for(auto i = limits.size(); i < list.size() + 1; i++){
+			limits.insert(limits.end(), 0.5);
+		}
 	}
 
 	if(names.size() < list.size() + 1){
@@ -176,21 +228,24 @@ void Monitor<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vec
 
 	}else{
 
-		cout << endl << "///// NEXT WINDOW /////" << endl << endl;
+		cout << endl << "/////////////// NEXT WINDOW ///////////////" << endl << endl;
 
 		storeEvoLabels(lab);
 		
 		storeEvoStatistics(sen, clu, list);
 
-		if(TRANS.checkNewRatio(new_limit)){
+		if(checkNovFailChanges()){
 
-			cout << "====TOO MANY NEW SAMPLES====" << endl;
-			cout << "===UPDATING REF CLUSTERING===" << endl << endl;
+			cout << "=== NOVELTY DETECTED ===" << endl << endl;
+
+			showNovFailChanges();
+
+			cout << "### UPD REF CLUSTERING ###" << endl << endl;
 
 			freeRef();
 			storeClustering(sen, clu, wei);
 			staR = staE;
-		
+
 		}else{
 
 			checkEvolution(sen, clu, wei);
@@ -199,16 +254,14 @@ void Monitor<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vec
 
 			if(TRANS.checkExtChange() || TRANS.checkIntChange()){
 
-				cout << "====TRANS DETECTED====" << endl << endl;
+				cout << "=== TRANS DETECTED ===" << endl << endl;
 
 				showTransitions();
 
+				cout << "### UPD REF CLUSTERING ###" << endl << endl;
+
 				freeRef();
-
-				cout << "### NEW REF CLUSTERING ###" << endl << endl;
-
 				storeClustering(sen, clu, wei);
-
 				staR = staE;
 
 			}
@@ -224,7 +277,7 @@ void Monitor<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vec
 
 		throw -1;
 
-	}catch(domain_error& e){
+	}catch(length_error& e){
 
 		cerr << e.what() << endl;
 
@@ -260,7 +313,7 @@ template <typename S, typename C>
 template <class T>
 void Monitor<S,C>::storeEvoStatistics(const vector<S> &sen, const vector<C> &clu, initializer_list<T> list){
 
-	setSizes(sen, clu);
+	settingSizeStatistics(sen, clu);
 
 	for(const auto &s: list){
 		int i = 0;

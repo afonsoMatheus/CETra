@@ -124,7 +124,7 @@ void Transitions<T>::clear(){
 
 template <typename T>
 void Transitions<T>::showSurvs(){
-	cout << "Sobreviventes" << endl;
+	cout << "- Sobreviventes" << endl;
 	for(const auto &x : survs)cout << get<0>(x) << " -> " << get<1>(x)<< endl;
 	cout << endl;
 }
@@ -132,7 +132,7 @@ void Transitions<T>::showSurvs(){
 template <typename T>
 void Transitions<T>::showUnions(){
 
-	cout << "Uniões" << endl;
+	cout << "- Uniões" << endl;
 	for(const auto &x: unions){
 		for(const auto &y: x.second) cout << y << " ";
 		cout << "-> " << x.first << endl;		
@@ -142,7 +142,7 @@ void Transitions<T>::showUnions(){
 
 template <typename T>
 void Transitions<T>::showBirths(){
-	cout << "Nascimentos" << endl;
+	cout << "- Nascimentos" << endl;
 	for(const auto &x : births) cout << "BIRTHS -> " << x << endl;
 	cout << endl;
 }
@@ -150,7 +150,7 @@ void Transitions<T>::showBirths(){
 template <typename T>
 void Transitions<T>::showSplits(){
 	
-	cout << "Separações" << endl; 
+	cout << "- Separações" << endl; 
 	for(const auto &x: splits){
 		cout << x.first << " -> ";
 		for(const auto &y: x.second)cout << y << " ";
@@ -161,14 +161,14 @@ void Transitions<T>::showSplits(){
 
 template <typename T>
 void Transitions<T>::showDeaths(){
-	cout << "Mortes" << endl;
+	cout << "- Mortes" << endl;
 	for(const auto &x : deaths) cout << x << " -> DEATH " << endl;
 	cout << endl;
 }
 
 template <typename T>
 void Transitions<T>::showInterC(const vector<string>& nam){
-	
+
 	for (const auto &x: interC){
 		cout << x.first << ": ";
 		for(const auto &y: x.second){
