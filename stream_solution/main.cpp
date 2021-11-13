@@ -3,9 +3,7 @@
 int main(int argc, char const *argv[]){
 
 	Monitor<int, int> mor(3,{0.4,0.4});
-	mor.configSizeLimit(0.6);
-	//mor.configNewLimit(0.3);
-	mor.configFailLimit(0.5);
+	mor.configSizeLimit(0.5);
 	mor.configStaNames({"Mean", "Std"});
 
 	try{
@@ -23,9 +21,9 @@ int main(int argc, char const *argv[]){
 	
 	////////////////////////////////////////////////////////////////
 
-	const vector<int> sensors2 = {1,2,3,4,5,6,7,8,9,10};
-	const vector<int> clusters2 = {0,0,1,1,-1,2,2,2,2,2};
-	const vector<float> weights2 = {1.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,1.0,1.0};
+	const vector<int> sensors2 = {1,2,3,4,6,12,11,9,10};
+	const vector<int> clusters2 = {0,0,1,1,2,2,2,2,2};
+	const vector<float> weights2 = {1.0,1.0,1.0,0.0,1.0,1.0,1.0,1.0,1.0};
 	const vector<int> labels2 = {0,1,2}; //precisa ser ordenado
 	
 	vector<float> means2 = {20,10,15};

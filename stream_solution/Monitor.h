@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <iostream>
 #include <set>
+#include <unordered_set>
 #include <array>
 #include <deque>
 #include <exception>
@@ -29,20 +30,22 @@ class Monitor{
 		int winSize;
 		vector<float> limits;
 		vector<string> names;
-		float new_limit;
-		float fail_limit;
 		float surv_limit;
 		float split_limit;
 
-		int sizeR;
+		float sizeR;
 		clustering clusR;
 		unordered_map<C,float> cluW;
 		statistics staR;
 
+		float sizeE;
 		vector<C> labels;
 		statistics staE;
 		overlaping matrix;
 
+		clustering failS;
+		clustering newS;
+		
 		Transitions<C> TRANS;
 		deque<statistics> qTrans;
 		deque<statistics> qSurvs;
@@ -57,7 +60,6 @@ class Monitor{
 		void clusterWeights(const vector<S>&, const vector<float>&);
 		unordered_map<S, float> senWei(const vector<S>&, const vector<float>&);
 
-		void intTransitions();
 
 		////////////////////////////////////////////////////////////////////
 
@@ -66,7 +68,7 @@ class Monitor{
 		void clusterOverlap(const vector<S>&, const vector<C>&, const vector<float>&);
 		unordered_map<C,int> useLabels();
 
-		search_table makeSearchTable(const vector<S>&, const vector<C>&, const vector<float>&);
+		search_table makeSearchTable(const vector<S>&, const vector<C>&, const vector<float>&, unordered_set<S>&);
 
 		//////////////////////////////////////////////////////////////////
 
@@ -88,11 +90,50 @@ class Monitor{
 
 		void freeEvo();
 
+		void intTransitions();
+
 		void seeIntQueue();
 
 		void seeExQueue();
 
 		void checkIntTrans();
+
+		void checkSizeTransition(){
+
+			for(const auto &x: failS){
+				//float clim = limits[0]*(staR[x.first][0]/sizeR);
+				//cout << clim << " " << x.second.size() << " " <<  staE[x.first][0] *clim << endl;
+				if(x.second.size() > staR[x.first][0] * limits[0]){
+					cout << "PORAAAAAA" << endl;
+				}
+			}
+
+			for(const auto &x: newS){
+				//float clim = limits[0]*(staE[x.first][0]/sizeE);
+				cout << " " << x.second.size() << " " <<  staE[x.first][0] *limits[0] << endl;
+				if(x.second.size() > staE[x.first][0] * limits[0]){
+					cout << "PORAAAAAA" << endl;
+				}
+			}
+
+		}
+
+		void showTrackStatistics(){
+
+			cout << "Faulty sensors" << endl;
+			for(const auto &x: failS){
+				cout << x.first << ": ";
+				for(const auto &y: x.second) cout << y << " ";
+				cout << endl;
+			}
+
+			cout << "New sensors" << endl;
+			for(const auto &x: newS){
+				cout << x.first << ": ";
+				for(const auto &y: x.second) cout << y << " ";
+				cout << endl;
+			}
+		}
 
 	public:
 
@@ -104,9 +145,6 @@ class Monitor{
 			limits.insert(limits.begin(), 0.5);
 
 			names.insert(names.begin(), "Sizes");
-
-			new_limit = 0.5;
-			fail_limit = 0.5;
 
 			surv_limit = 0.5;
 			split_limit = surv_limit/2;
@@ -123,10 +161,6 @@ class Monitor{
 		void configSizeLimit(const float&);
 
 		void configStaNames(const vector<string>&);
-
-		void configNewLimit(const float&);
-
-		void configFailLimit(const float&);
 
 		void configSurvLimit(const float&);
 
@@ -147,44 +181,6 @@ class Monitor{
 		void showBirths();
 
 		void showInterC(vector<string>);
-
-		bool checkNovFailChanges(){
-
-			//TRANS.checkFailClusters();
-
-			if(TRANS.checkNewRatio(new_limit) || TRANS.checkNovelClusters()){
-
-				return true;
-			}
-
-			return false;
-		}
-
-		void showNovFailChanges(){
-
-			if(TRANS.checkNewRatio(new_limit)){
-
-				cout << "====TOO MANY NEW SAMPLES IN INPUT====" << endl;
-
-			}
-
-			if(TRANS.checkNovelClusters()){
-				cout << "Too many new samples in clusters: ";
-				for(const auto &x: TRANS.getNovelClusters()){
-					cout << x << " ";
-				}
-				cout << endl << endl;
-			}
-
-			/*if(TRANS.checkFailClusters()){
-				cout << "Too many fail samples in clusters: ";
-				for(const auto &x: TRANS.getFailClusters()){
-					cout << x << " ";
-				}
-				cout << endl << endl;
-			}	*/		
-
-		}
 	
 };
 
@@ -194,61 +190,51 @@ void Monitor<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vec
 
 	try{
 
-	if(sen.size() != clu.size() or sen.size() != wei.size()){
-		throw invalid_argument("The sensors/clusters/weights arrays are not the same size!");
-	}
-
-	if (list.size() + 1 < limits.size()){
-		throw invalid_argument("The limits array size is greater than the input statistics list!");
-	}
-	
-	if(names.size() > list.size() + 1){
-		throw invalid_argument("The amount of statistics names surpasses the statistics list!");
-	}
-
-	if(limits.size() < list.size() + 1){
-		for(auto i = limits.size(); i < list.size() + 1; i++){
-			limits.insert(limits.end(), 0.5);
+		if(sen.size() != clu.size() or sen.size() != wei.size()){
+			throw invalid_argument("The sensors/clusters/weights arrays are not the same size!");
 		}
-	}
 
-	if(names.size() < list.size() + 1){
-		int j = 1;
-		for(auto i = names.size(); i < list.size() + 1; i++){
-			names.insert(names.end(), "Sta_" + to_string(j));
-			j++;
+		if (list.size() + 1 < limits.size()){
+			throw invalid_argument("The limits array size is greater than the input statistics list!");
 		}
-	}
-
-	if(clusR.empty()){
-
-		storeClustering(sen, clu, wei);
 		
-		storeRefStatistics(lab, list);
+		if(names.size() > list.size() + 1){
+			throw invalid_argument("The amount of statistics names surpasses the statistics list!");
+		}
 
-	}else{
+		if(limits.size() < list.size() + 1){
+			for(auto i = limits.size(); i < list.size() + 1; i++){
+				limits.insert(limits.end(), 0.5);
+			}
+		}
 
-		cout << endl << "/////////////// NEXT WINDOW ///////////////" << endl << endl;
+		if(names.size() < list.size() + 1){
+			int j = 1;
+			for(auto i = names.size(); i < list.size() + 1; i++){
+				names.insert(names.end(), "Sta_" + to_string(j));
+				j++;
+			}
+		}
 
-		storeEvoLabels(lab);
-		
-		storeEvoStatistics(sen, clu, list);
+		if(clusR.empty()){
 
-		if(checkNovFailChanges()){
-
-			cout << "=== NOVELTY DETECTED ===" << endl << endl;
-
-			showNovFailChanges();
-
-			cout << "### UPD REF CLUSTERING ###" << endl << endl;
-
-			freeRef();
 			storeClustering(sen, clu, wei);
-			staR = staE;
+			
+			storeRefStatistics(lab, list);
 
 		}else{
 
+			sizeE = sen.size();
+
+			cout << endl << "/////////////// NEXT WINDOW ///////////////" << endl << endl;
+
+			storeEvoLabels(lab);
+			
+			storeEvoStatistics(sen, clu, list);
+
 			checkEvolution(sen, clu, wei);
+
+			showTrackStatistics();
 
 			if(!TRANS.getSurvs().empty()) showSurvs();
 
@@ -266,10 +252,8 @@ void Monitor<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vec
 
 			}
 
+			freeEvo();
 		}
-
-		freeEvo();
-	}
 
 	}catch(invalid_argument& e){
 
@@ -313,7 +297,7 @@ template <typename S, typename C>
 template <class T>
 void Monitor<S,C>::storeEvoStatistics(const vector<S> &sen, const vector<C> &clu, initializer_list<T> list){
 
-	settingSizeStatistics(sen, clu);
+	//settingSizeStatistics(sen, clu);
 
 	for(const auto &s: list){
 		int i = 0;
@@ -323,6 +307,11 @@ void Monitor<S,C>::storeEvoStatistics(const vector<S> &sen, const vector<C> &clu
 		}
 
 		for(const auto &x: s){
+
+			//setting size space first
+			if(staE.find(labels[i]) == staE.end())
+				staE[labels[i]].insert(staE[labels[i]].end(), 0);
+
 			staE[labels[i]].insert(staE[labels[i]].end(), x);
 			i++;
 		}		 
