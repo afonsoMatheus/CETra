@@ -17,22 +17,22 @@ int main(int argc, char const *argv[]){
 	const vector<float> means1 = {10,20};
 	const vector<float> std1 = {10,20};
 
-	mor.execute(sensors1, clusters1, weights1);
-	//mor.execute(sensors1, clusters1, weights1, {means1, std1});
+	//mor.execute(sensors1, clusters1, weights1);
+	mor.execute(sensors1, clusters1, weights1, {means1, std1});
 	
 	////////////////////////////////////////////////////////////////
 
-	const vector<int> sensors2 = {1,5,6,7,8,9,10,11,12,13,14};
-	const vector<int> clusters2 = {1,3,3,3,3,3,3,3,3,3,3};
-	const vector<float> weights2 = {1.0,1.0,1.0,1.0,1.0,1.0, 1.0,1.0,1.0,1.0,1.0};
+	const vector<int> sensors2 = {1,2,3,4,5,6,7,8,9,10,11};
+	const vector<int> clusters2 = {1,1,1,1,2,2,2,2,3,3,3};
+	const vector<float> weights2 = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
 	
-	vector<float> means2 = {10,10,10};
-	vector<float> std2 = {10,10,10};
+	vector<float> means2 = {10,20,10};
+	vector<float> std2 = {10,20,10};
 
 	int i = 0;
 	while(i < 1){
-		mor.execute(sensors2, clusters2, weights2);
-		//mor.execute(sensors2, clusters2, weights2, {means2, std2});
+		//mor.execute(sensors2, clusters2, weights2);
+		mor.execute(sensors2, clusters2, weights2, {means2, std2});
 		//means2 = {40,10,15};
 		//std2 = {20,5,15};
 
