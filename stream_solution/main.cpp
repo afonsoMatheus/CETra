@@ -1,8 +1,8 @@
-#include "Monitor.h"
+#include "TraCES.h"
 
 int main(int argc, char const *argv[]){
 
-	Monitor<int, int> mor(3,{0.4,0.4});
+	TraCES<int, int> mor;
 	mor.configSizeLimit(0.4);
 	mor.configStaNames({"Mean", "Std"});
 	//mor.configSurvLimit(0.4);
@@ -38,8 +38,6 @@ int main(int argc, char const *argv[]){
 
 		i++;
 	}
-
-	//mor.showStatistics();
 
 	////////////////////////////////////////////////////////////////
 
