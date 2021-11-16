@@ -1,3 +1,13 @@
+/* Author: Afonso Matheus                                                     */
+/* Date: 2021                                                                 */
+/* Ver. Beta                                                                  */
+//----------------------------------------------------------------------------//
+//                                                                            //                                                                          //
+// Script that contains the implementation of Transitions class used by the   // 
+// TraCES algorithm.                                                          //
+//                                                                            //
+//----------------------------------------------------------------------------//
+
 #ifndef TRANSITIONS_H
 #define TRANSITIONS_H
 
@@ -22,7 +32,11 @@ class Transitions{
 
 		unordered_map<T, vector<int>> interC;
 
-	public:		
+		vector<T> faild;
+		vector<T> newb;
+		vector<tuple<T,T>> news;	
+
+	public:	
 
 		Transitions();
 
@@ -54,6 +68,18 @@ class Transitions{
 
 		unordered_map<T, vector<int>> getInterC();
 
+		void insertFDeath(const T&);
+
+		vector<T> getFDeaths();
+
+		void insertNBirth(const T&);
+
+		vector<T> getNBirths();
+
+		void insertNSurv(const tuple<T,T>&);
+
+		vector<tuple<T,T>> getNSurvs();
+
 		///////////////// CHECKERS /////////////////
 
 		bool checkExtChange();
@@ -64,15 +90,21 @@ class Transitions{
 
 		void showDeaths();
 
+		void showFDeaths();
+
 		void showSplits();
 
 		void showBirths();
+
+		void showNBirths();
 
 		void showSurvs();
 
 		void showUnions();
 
 		void showInterC(const vector<string>&);
+
+		void showNStatistic();
 
 };
 
@@ -151,6 +183,36 @@ unordered_map<T, vector<int>> Transitions<T>::getInterC(){
 	return interC;
 }
 
+template <typename T>
+void Transitions<T>::insertFDeath(const T& C){
+	faild.insert(faild.end(), C);
+}
+
+template <typename T>
+vector<T> Transitions<T>::getFDeaths(){
+	return faild;
+}
+
+template <typename T>
+void Transitions<T>::insertNBirth(const T& C){
+	newb.insert(newb.end(), C);
+}
+
+template <typename T>
+vector<T> Transitions<T>::getNBirths(){
+	return newb;
+}
+
+template <typename T>
+void Transitions<T>::insertNSurv(const tuple<T,T>& S){
+	news.insert(news.begin(), S);
+}
+
+template <typename T>
+vector<tuple<T,T>> Transitions<T>::getNSurvs(){
+	return news;
+}
+
 ///////////////// CHECKERS /////////////////
 
 template <typename T>
@@ -195,6 +257,23 @@ void Transitions<T>::showBirths(){
 	cout << endl;
 }
 
+/*
+*	Func: 		
+*		showNBirths()
+*	Args: 
+*		None. 
+*	Ret:
+*		None, show if birth was caused by new sensors.
+*/
+template <typename T>
+void Transitions<T>::showNBirths(){
+
+	for(const auto &x: newb){
+		cout << x << " is birth by new sensors" << endl;
+	}
+	cout<<endl;
+}
+
 template <typename T>
 void Transitions<T>::showSplits(){
 	
@@ -214,6 +293,23 @@ void Transitions<T>::showDeaths(){
 	cout << endl;
 }
 
+/*
+*	Func: 		
+*		showFDeaths()
+*	Args: 
+*		None. 
+*	Ret:
+*		None, show if death was caused by missing sensors.
+*/
+template <typename T>
+void Transitions<T>::showFDeaths(){
+
+	for(const auto &x: faild){
+		cout << x << " is dead by missing sensors" << endl;
+	}
+	cout<<endl;
+}
+
 template <typename T>
 void Transitions<T>::showInterC(const vector<string>& nam){
 
@@ -226,5 +322,21 @@ void Transitions<T>::showInterC(const vector<string>& nam){
 	} 
 }
 
+/*
+*	Func: 		
+*		showNStatistic()
+*	Args: 
+*		None. 
+*	Ret:
+*		None, show a significant size increase by new sensors in a survive.
+*/
+template <typename T>
+void Transitions<T>::showNStatistic(){
+
+	for(const auto &x : news){
+		cout << "Too much new sensors between ref cluster " << get<0>(x) << " and evo cluster " << get<1>(x) << endl; 
+	}
+
+}
 
 #endif

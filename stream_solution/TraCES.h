@@ -4,7 +4,7 @@
 //----------------------------------------------------------------------------//
 //                                                                            //                                                                          //
 // Script that contains the implementation of cluster's transiction detection // 
-// between clusterings made by both conventional and data streams alghoritms  //
+// between clusterings made by both conventional and data streams algorithms. //
 //                                                                            //
 //----------------------------------------------------------------------------//
 
@@ -115,11 +115,17 @@ class TraCES{
 
 		unordered_map<int,C> hashLabels();
 
+		void checkFailDeath(const C &);
+
+		void checkNewBirth();
+
 		//------------- Int. Transitions -------------//
 		
 		void intTransitions();
 
 		void checkIntTrans();
+
+		void checkNewStatistic(const C &, const C &);
 
 		//--------------- Visualization ---------------//
 
@@ -856,6 +862,8 @@ void TraCES<S, C>::extTransitions(){
 
 			TRANS.insertDeath(X.first);
 
+			checkFailDeath(X.first);
+
 		}else if(split_cand.empty() == false){
 
 			float split_weis = sumSplits(X.second, split_cand);
@@ -892,6 +900,8 @@ void TraCES<S, C>::extTransitions(){
 
 	set_difference(evoLabels.begin(), evoLabels.end(), tracks.begin(), tracks.end(),
         inserter(TRANS.allocBirths(), TRANS.allocBirths().begin()));
+
+	checkNewBirth();
 
 }
 
@@ -937,6 +947,44 @@ float TraCES<S, C>::sumSplits(const vector<float> &overlaps, const vector<C> &sp
 	}
 
 	return sum;
+}
+
+
+/*
+*	Func: 		
+*		checkFailDeath(const C &)
+*	Args: 
+*		A dying cluster. 
+*	Ret:
+*		None, identifies if a cluster is dead because of missing sensors.
+*/
+template <typename S, typename C>
+void TraCES<S, C>::checkFailDeath(const C &clu){
+
+	if(failS.find(clu) != failS.end()){
+		if(failS[clu].size()/staR[clu][0] > surv_limit)
+			TRANS.insertFDeath(clu);
+		
+	}
+}
+
+/*
+*	Func: 		
+*		checkNewBirth();
+*	Args: 
+*		None. 
+*	Ret:
+*		None, identifies if a new cluster emerged because of new sensors.
+*/
+template <typename S, typename C>
+void TraCES<S, C>::checkNewBirth(){
+
+	for(const auto &x: TRANS.getBirths()){
+		if(newS.find(x) != newS.end()){
+			if(newS[x].size()/staE[x][0] > surv_limit)
+				TRANS.insertNBirth(x);
+		}
+	}
 }
 
 //------------------------------- Int. Transitions Implementations -------------------------------//
@@ -986,9 +1034,11 @@ template <typename S, typename C>
 void TraCES<S,C>::checkIntTrans(){
 
 	unordered_map<C, vector<int>> counts;
+	unordered_map<C, C> saux;
 
-	for(const auto &x: clusR){
-		for(int i = 0; i < limits.size(); i++) counts[x.first].insert(counts[x.first].end(), 0);
+	for(const auto &x: TRANS.getSurvs()){
+		counts[get<0>(x)] = vector<int>(limits.size());
+		saux[get<0>(x)] = get<1>(x);
 	} 
 
 	for(const auto &cluS: staQueue){
@@ -1006,9 +1056,19 @@ void TraCES<S,C>::checkIntTrans(){
 		for(const auto &y: x.second){
 			if(y == staQueue.size()) {
 				TRANS.insertInterC(x.first, i);
+				checkNewStatistic(x.first, saux[x.first]);
 			}
 			i++;
 		}
+	}
+
+}
+
+template <typename S, typename C>
+void TraCES<S,C>::checkNewStatistic(const C &cr, const C &ce){
+
+	if(newS[ce].size() > staR[cr][0] * limits[0]){
+		TRANS.insertNSurv(make_tuple(cr,ce));
 	}
 
 }
@@ -1166,25 +1226,15 @@ void TraCES<S, C>::showTransitions(){
 
 		if(!TRANS.getUnions().empty()) TRANS.showUnions();
 
-		if(!TRANS.getDeaths().empty()) TRANS.showDeaths();
-
-		for(const auto &x: TRANS.getDeaths()){
-			if(failS.find(x) != failS.end()){
-				if(failS[x].size()/staR[x][0] > surv_limit)
-					cout << x << " is dead by missing sensors" << endl;
-			}
+		if(!TRANS.getDeaths().empty()){ 
+			TRANS.showDeaths();
+			TRANS.showFDeaths();
 		}
-		cout<<endl;
 
-		if(!TRANS.getBirths().empty()) TRANS.showBirths();
-
-		for(const auto &x: TRANS.getBirths()){
-			if(newS.find(x) != newS.end()){
-				if(newS[x].size()/staE[x][0] > surv_limit)
-					cout << x << " is birth by new sensors" << endl;
-			}
+		if(!TRANS.getBirths().empty()){
+			TRANS.showBirths();
+			TRANS.showNBirths();
 		}
-		cout<<endl;
 
 	}
 
@@ -1192,7 +1242,10 @@ void TraCES<S, C>::showTransitions(){
 
 		cout << "+ INT TRANSITIONS" << endl << endl;
 
-		if(!TRANS.getInterC().empty()) TRANS.showInterC(names);
+		if(!TRANS.getInterC().empty()) {
+			TRANS.showInterC(names);
+			TRANS.showNStatistic();
+		}
 
 		cout << endl;
 	}
