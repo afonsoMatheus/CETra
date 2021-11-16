@@ -49,14 +49,14 @@ class TraCES{
 		float surv_limit;
 		float split_limit;
 
-		/* Referencial Clustering variables */
+		/* Referential Clustering variables */
 
 		clustering clusR;
 		unordered_map<C,float> refW;
 		statistics staR;
 		int starSize = 0;
 
-		/* Evolutional Clustering variables */
+		/* Evolutionary Clustering variables */
 
 		//clustering clusE;
 		//unordered_map<C,float> evoW;
@@ -204,7 +204,7 @@ TraCES<S, C>::TraCES(const int N, const vector<float> lim){
 *		Array with the clustering clusters labels,
 *		Array with the clustering weights values.
 *	Ret:
-*		None, executes the transiction detection alghoritm with only the size 
+*		None, executes the transitions detection algorithm with only the size 
 *		internal statistic. 
 *
 */
@@ -214,21 +214,17 @@ void TraCES<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const vec
 	try{
 
 		/* The method must not be executed if the sensors/clusters/weights arrays don't have the same sizes */
-
 		if(sen.size() != clu.size() or sen.size() != wei.size()){
 			throw invalid_argument("The sensors/clusters/weights arrays are not the same size!");
 		}
 
-		/* Command for first execution, when there is no referencial clustering */
-
+		/* Command for first execution, when there is no referential clustering */
 		if(clusR.empty()){
 
-			/* Storing the current cluestering and it's clusters weights */
-
+			/* Storing the current clustering and it's clusters weights */
 			storeClustering(sen, clu, wei);
 
 			/* Storing the clusters sizes and the total tracked internal statistics*/
-
 			for (const auto &x: clusR) staR[x.first].insert(staR[x.first].end(), x.second.size());
 			starSize = 1;
 
@@ -239,35 +235,28 @@ void TraCES<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const vec
 			cout << endl << "///// NEXT WINDOW /////" << endl << endl;
 
 			/* Getting all necessary evolutionary clustering variables, including the evolved clusters sizes */
-
 			getEvoInformation(sen, clu, wei);
 
-			/* Monitoring the trasintions between the current referencial clustering and the current evolutionary clustering */
-
+			/* Monitoring the transitions between the current referential clustering and the current evolutionary clustering */
 			trackTransitions();
 
 			/* Showing survived clusters, if any */
-
 			if(!TRANS.getSurvs().empty()) TRANS.showSurvs();
 
 			/* Verifing if there was any detected internal or external transitions */
-
 			if(TRANS.checkExtChange() || TRANS.checkIntChange()){
 
 				cout << "=== TRANS DETECTED ===" << endl << endl;
 
 				/* Showing the detected internal or/and external transitions */
-
 				showTransitions();
 
 				cout << "### UPD REF CLUSTERING ###" << endl << endl;
 
-				/* Freeing the referencial clustering variables */
-
+				/* Freeing the referential clustering variables */
 				freeRef();
 
-				/* Updating the referencial clustering variables with the current evolutionary clustering */
-
+				/* Updating the referential clustering variables with the current evolutionary clustering */
 				storeClustering(sen, clu, wei);
 
 				/*clusR = clusE;
@@ -279,7 +268,6 @@ void TraCES<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const vec
 			}
 
 			/* Freeing the evolutionary clustering variables */
-
 			freeEvo();
 		}
 
@@ -301,10 +289,10 @@ void TraCES<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const vec
 *		Array with the clustering sensors labels, 
 *		Array with the clustering clusters labels,
 *		Array with the clustering weights values,
-*		List with the desired internal clusters statistiscs.
+*		List with the desired internal clusters statistics.
 *	Ret:
-*		None, executes the transiction detection alghoritm with the desired
-*		internal clusters statistiscs.  
+*		None, executes the transition detection algorithm with the desired
+*		internal clusters statistics.  
 *
 */
 template <typename S, typename C>
@@ -314,31 +302,26 @@ void TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vect
 	try{
 
 		/* The method must not be executed if the sensors/clusters/weights arrays don't have the same sizes */
-
 		if(sen.size() != clu.size() or sen.size() != wei.size()){
 			throw invalid_argument("The sensors/clusters/weights arrays are not the same size!");
 		}
 
 		/* The method must not be executed if the internal statistics size changed since last execution! */
-
 		if(starSize > 0 && starSize != list.size()){
 			throw invalid_argument("The internal statistics size changed since last execution!");
 		}
 
-		/* The method must not be executed if the inputed limits are more numerous than the inputed statistics */
-
+		/* The method must not be executed if the inputted limits are more numerous than the inputted statistics */
 		if (list.size() + 1 < limits.size()){
 			throw invalid_argument("The limits array size is greater than the input statistics list!");
 		}
 
-		/* The method must not be executed if the inputed statistics names are more numerous than the inputed statistics */
-		
+		/* The method must not be executed if the inputted statistics names are more numerous than the inputted statistics */
 		if(names.size() > list.size() + 1){
 			throw invalid_argument("The amount of statistics names surpasses the statistics list!");
 		}
 
 		/* Inserting default limits for missing statistics limits in input */
-
 		if(limits.size() < list.size() + 1){
 			for(auto i = limits.size(); i < list.size() + 1; i++){
 				limits.insert(limits.end(), 0.5);
@@ -346,7 +329,6 @@ void TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vect
 		}
 
 		/* Inserting default statistics names for missing statistics names in input */
-
 		if(names.size() < list.size() + 1){
 			int j = 1;
 			for(auto i = names.size(); i < list.size() + 1; i++){
@@ -355,16 +337,13 @@ void TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vect
 			}
 		}
 
-		/* Command for first execution, when there is no referencial clustering */
-
+		/* Command for first execution, when there is no referential clustering */
 		if(clusR.empty()){
 
-			/* Storing the current cluestering and it's clusters weights */
-
+			/* Storing the current clustering and it's clusters weights */
 			storeClustering(sen, clu, wei);
 
-			/* Storing the clusters sizes plus the internal statistics inputed */
-			
+			/* Storing the clusters sizes plus the internal statistics inputted */
 			storeRefStatistics(list);
 
 			showRefClustering();
@@ -374,39 +353,31 @@ void TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vect
 			cout << endl << "/////////////// NEXT WINDOW ///////////////" << endl << endl;
 
 			/* Getting all necessary evolutionary clustering variables, including the evolved clusters sizes */
-
 			getEvoInformation(sen, clu, wei);
 
-			/* Storing the internal statistics inputed */
-			
+			/* Storing the internal statistics inputted */
 			storeEvoStatistics(list);
 
-			/* Monitoring the trasintions between the current referencial clustering and the current evolutionary clustering */
-
+			/* Monitoring the transitions between the current referential clustering and the current evolutionary clustering */
 			trackTransitions();
 
 			/* Showing survived clusters, if any */
-
 			if(!TRANS.getSurvs().empty()) TRANS.showSurvs();
 
-			/* Verifing if there was any detected internal or external transitions */
-
+			/* Verifying if there was any detected internal or external transitions */
 			if(TRANS.checkExtChange() || TRANS.checkIntChange()){
 
 				cout << "=== TRANS DETECTED ===" << endl << endl;
 
 				/* Showing the detected internal or/and external transitions */
-
 				showTransitions();
 
 				cout << "### UPD REF CLUSTERING ###" << endl << endl;
 
-				/* Freeing the referencial clustering variables */
-
+				/* Freeing the referential clustering variables */
 				freeRef();
 
-				/* Updating the referencial clustering variables with the current evolutionary clustering */
-
+				/* Updating the referential clustering variables with the current evolutionary clustering */
 				storeClustering(sen, clu, wei);
 				//clusR = clusE;
 				//refW = evoW;
@@ -417,7 +388,6 @@ void TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vect
 			}
 
 			/* Freeing the evolutionary clustering variables */
-
 			freeEvo();
 		}
 
@@ -475,8 +445,7 @@ void TraCES<S,C>::configStaNames(const vector<string>& nam){
 template <typename S, typename C>
 void TraCES<S,C>::configSurvLimit(const float& ls){
 	if(ls < split_limit){
-		cerr << "The survival limit must be higher than the current split limit" << endl;
-		return;
+		throw invalid_argument("The survival limit must be higher than the current split limit");
 	}
 
 	surv_limit = ls;
@@ -495,8 +464,7 @@ template <typename S, typename C>
 void TraCES<S,C>::configSplitLimit(const float& ls){
 	
 	if(ls >= surv_limit){
-		cerr << "The split limit must be lower than the current survival limit" << endl;
-		return;
+		throw invalid_argument("The split limit must be lower than the current survival limit");
 	} 
 
 	split_limit = ls;
@@ -512,7 +480,7 @@ void TraCES<S,C>::configSplitLimit(const float& ls){
 *		Array with the clustering clusters labels,
 *		Array with the clustering weights values.
 *	Ret:
-*		None, stores the referencial clustering and it's clusters weights in an internal
+*		None, stores the referential clustering and it's clusters weights in an internal
 *		hash table each. 
 */
 template <typename S, typename C>
@@ -532,30 +500,27 @@ void TraCES<S, C>::storeClustering(const vector<S> &sen, const vector<C> &clu, c
 *	Args: 
 *		List with all the internal statistics. 
 *	Ret:
-*		None, stores the inputed referencial clusters internal statistics in a hash table. 
+*		None, stores the inputted referential clusters internal statistics in a hash table. 
 */
 template <typename S, typename C>
 template <class T>
 void TraCES<S,C>::storeRefStatistics(initializer_list<T> list){
 
-	/* The set structure helps to detect the clustering labels maintaning ordering */
+	/* The set structure helps to detect the clustering labels maintaining ordering */
 
 	set<C> ref_labels;
 
-	/* Storing referencial clustering clusters's sizes */
-
+	/* Storing referential clustering cluster's sizes */
 	for (const auto &x: clusR){
 		if(ref_labels.find(x.first) == ref_labels.end()) ref_labels.insert(x.first);
 		staR[x.first].insert(staR[x.first].end(), x.second.size()); 
 	}
 
-	/* Storing referencial clustering clusters's internal statistics */
-
+	/* Storing referential clustering cluster's internal statistics */
 	for(auto &s: list){
 		auto itr = ref_labels.begin();
 
 		/* Abort if the detected labels size are different from the inputed statistics size */
-
 		if(s.size() != ref_labels.size()){
 			throw invalid_argument("The labels/statistics arrays are not the same size!");
 		}
@@ -567,7 +532,6 @@ void TraCES<S,C>::storeRefStatistics(initializer_list<T> list){
 	}
 
 	/* Storing internal statistics size for future verification */
-
 	starSize = list.size();		
 
 }
@@ -578,7 +542,7 @@ void TraCES<S,C>::storeRefStatistics(initializer_list<T> list){
 *	Args: 
 *		None 
 *	Ret:
-*		None, empty the referencial clusterings variabels. 
+*		None, empty the referential clustering variables. 
 */
 template <typename S, typename C>
 void TraCES<S,C>::freeRef(){
@@ -601,7 +565,7 @@ void TraCES<S,C>::freeRef(){
 *		Array with the clustering weights values,
 *	Ret:
 *		None, build all the necessary evolutionary information, such as the evolutionary labels,
-*		the search table and the clusters size internal statistics. 
+*		the search table and the clusters size internal statistic. 
 */
 template <typename S, typename C>
 void TraCES<S,C>::getEvoInformation(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei){
@@ -611,23 +575,19 @@ void TraCES<S,C>::getEvoInformation(const vector<S> &sen, const vector<C> &clu, 
 		//clusE[clu[i]].insert(clusE[clu[i]].end(), sen[i]);
 		//evoW[clu[i]] += wei[i];
 
-		/* Getting evolutionay clustering cluster's labels */
-
+		/* Getting evolutionary clustering cluster's labels */
 		if(evoLabels.find(clu[i]) == evoLabels.end()) 
 			evoLabels.insert(clu[i]);
 
-		/* Building evolutionay clustering search table */
-
+		/* Building evolutionary clustering search table */
 		evoTable[sen[i]] = make_tuple(clu[i],wei[i]);
 
-		/* Building evolutionay clustering cluster's sizes */
-
+		/* Building evolutionary clustering cluster's sizes */
 		if(staE.find(clu[i]) == staE.end())
 			staE[clu[i]].insert(staE[clu[i]].end(), 0);
 		staE[clu[i]][0] += 1;
 
-		/* Copying evolutionay clustering sensors in an auxiliar structure for new sensor detection */
-
+		/* Copying evolutionary clustering sensors in an auxiliary structure for new sensor detection */
 		ns.insert(sen[i]);
 	}
 
@@ -640,19 +600,17 @@ void TraCES<S,C>::getEvoInformation(const vector<S> &sen, const vector<C> &clu, 
 *	Args: 
 *		List with all the internal statistics.
 *	Ret:
-*		None, stores the inputed evolutionary clusters internal statistics in a hash table. 
+*		None, stores the inputted evolutionary clusters internal statistics in a hash table. 
 */
 template <typename S, typename C>
 template <class T>
 void TraCES<S,C>::storeEvoStatistics(initializer_list<T> list){
 
-	/* Storing evolutionary clustering clusters's internal statistics */
-
+	/* Storing evolutionary clustering cluster's internal statistics */
 	for(const auto &s: list){
 		auto itr = evoLabels.begin();
 
-		/* Abort if the previously detected evo labels size are different from the inputed statistics size */
-
+		/* Abort if the previously detected evo labels size are different from the inputted statistics size */
 		if(s.size() != evoLabels.size()){
 			throw invalid_argument("The labels/statistics arrays are not the same size!");
 		}
@@ -670,7 +628,7 @@ void TraCES<S,C>::storeEvoStatistics(initializer_list<T> list){
 *	Args: 
 *		None. 
 *	Ret:
-*		None, empty the evolutionary clusterings variabels. 
+*		None, empty the evolutionary clustering variables. 
 */
 template <typename S, typename C>
 void TraCES<S,C>::freeEvo(){
@@ -699,26 +657,23 @@ void TraCES<S,C>::freeEvo(){
 *	Args: 
 *		None. 
 *	Ret:
-*		None, executes the detection mechanism between currents referencial 
-*		and evolutionary clusterings. 
+*		None, executes the detection mechanism between currents referential 
+*		and evolutionary clustering. 
 */
 template <typename S, typename C>
 void TraCES<S, C>::trackTransitions(){
 
-	/* Building overlap matrix between ref and evo clusterings */
-
+	/* Building overlap matrix between ref and evo clustering */
 	clusterOverlap();
 
 	//showTrackStatistics();
 
 	/* Detecting external transitions */
-
 	extTransitions();
 
 	//showTrackStatistics();
 
 	/* Detecting internal transitions for surviving clusters */
-
 	if(!TRANS.getSurvs().empty())
 		intTransitions();
 }
@@ -729,8 +684,8 @@ void TraCES<S, C>::trackTransitions(){
 *	Args: 
 *		None. 
 *	Ret:
-*		None, builds the overlapping matrix between currents referencial 
-*		and evolutionary clusterings, and builds fail/new sensors information. 
+*		None, builds the overlapping matrix between currents referential 
+*		and evolutionary clustering, and builds fail/new sensors information. 
 */
 template <typename S, typename C>
 void TraCES<S, C>::clusterOverlap(){
@@ -740,7 +695,6 @@ void TraCES<S, C>::clusterOverlap(){
 	for (auto &c : clusR){
 
 		/* Each ref cluster has intersection with all the evo clusters */
-		
 		matrix[c.first] = vector<float>(evoLabels.size());
 		
 		for (auto &elem : c.second) {
@@ -748,24 +702,20 @@ void TraCES<S, C>::clusterOverlap(){
 			if(evoTable.find(elem) != evoTable.end()){
 
 				/* Adding the tracked evo sensors weights to the matching index */
-				
 				matrix[c.first][lmap[get<0>(evoTable[elem])]]+= get<1>(evoTable[elem]);
 
-				/* Removing tracked evo sensor from the auxiliar set */
-
+				/* Removing tracked evo sensor from the auxiliary set */
 				ns.erase(elem);
 
 			}else{
 
 				/* Storing the missing ref sensor alongside it's ref cluster */
-
 				failS[c.first].insert(failS[c.first].end(),elem);
 			};
 		}
 	}
 
 	/* Adding the not tracked evo sensors in the new sensor structure alongside it's evo cluster */
-
 	for(const auto &x: ns){
 		newS[get<0>(evoTable[x])].insert(newS[get<0>(evoTable[x])].end(), x);
 	}
@@ -773,7 +723,6 @@ void TraCES<S, C>::clusterOverlap(){
 	//showIntersection();
 
 	/* Updating the matrix with the overlapping between the intersections and the ref clusters weights */
-
 	for (const auto &i : matrix){
 		for (auto x = 0; x < i.second.size(); x++){
 			matrix[i.first][x] =  matrix[i.first][x]/refW[i.first];
@@ -813,8 +762,8 @@ unordered_map<C,int> TraCES<S, C>::useLabels(){
 *	Args: 
 *		None. 
 *	Ret:
-*		None, detects external transitions between the currents referencial and evolutionary
-*		clusterings.
+*		None, detects external transitions between the currents referential and evolutionary
+*		clustering.
 */
 template <typename S, typename C>
 void TraCES<S, C>::extTransitions(){
@@ -830,6 +779,7 @@ void TraCES<S, C>::extTransitions(){
 
 		C split_union = (C) -2;
 		C surv_cand = (C) -2;
+		int lab_cand = -2;
 
 		for (int Y = 0; Y < X.second.size(); Y++){
 
@@ -839,19 +789,22 @@ void TraCES<S, C>::extTransitions(){
 				
 				if(surv_cand = (C) -2){
 					surv_cand = lmap[Y];
+					lab_cand = Y;
 				
 				}else if(mcell > X.second[surv_cand]){
 
 					surv_cand = lmap[Y];
+					lab_cand = Y;
 				
 				}else if(mcell == X.second[surv_cand]){
 
 					if(clusR[surv_cand].size() < clusR[lmap[Y]].size()){
 						surv_cand = lmap[Y];
+						lab_cand = Y;
 					}
 				}
 
-			}else if(mcell > split_limit) {
+			}else if(mcell >= split_limit) {
 				
 				split_cand.insert(split_cand.end(), Y);
 			}
@@ -868,7 +821,7 @@ void TraCES<S, C>::extTransitions(){
 
 			float split_weis = sumSplits(X.second, split_cand);
 
-			if(split_weis > surv_limit && split_weis > X.second[surv_cand]){
+			if(split_weis >= surv_limit && split_weis > X.second[lab_cand]){
 
 				for(const auto x: split_cand) {
 					
@@ -931,16 +884,16 @@ unordered_map<int,C> TraCES<S, C>::hashLabels(){
 *	Func: 		
 *		sumSplits(const vector<float>, const vector<C>)
 *	Args: 
-*		Array with a referencial cluster overlaps,
+*		Array with a referential cluster overlaps,
 *		Array with evolutionary clusters labels that are split candidates 
-*			to a referencial clustering.  
+*			to a referential clustering.  
 *	Ret:
-*		Float, the overlaps sum of a referencial clustering split candidates.
+*		Float, the overlaps sum of a referential clustering split candidates.
 */
 template <typename S, typename C>
 float TraCES<S, C>::sumSplits(const vector<float> &overlaps, const vector<C> &split_cand){
 
-	float sum = 0;
+	float sum = 0.0;
 
 	for(const auto &x: split_cand){
 		sum+=overlaps[x];
@@ -995,7 +948,7 @@ void TraCES<S, C>::checkNewBirth(){
 *	Args: 
 *		None. 
 *	Ret:
-*		None, compares the internal statistics of the survived referencial clusters 
+*		None, compares the internal statistics of the survived referential clusters 
 *		with the corresponding evolutionary cluster and put it in a queue.		
 */
 template <typename S, typename C>
@@ -1027,7 +980,7 @@ void TraCES<S, C>::intTransitions(){
 *		None. 
 *	Ret:
 *		None, checks if the internal statistics changes matches the 
-*		entire window size to identify an internal transiction.
+*		entire window size to identify an internal transition.
 */
 template <typename S, typename C>
 void TraCES<S,C>::checkIntTrans(){
@@ -1078,7 +1031,7 @@ void TraCES<S,C>::checkNewStatistic(const C &cr, const C &ce){
 *	Args: 
 *		None. 
 *	Ret:
-*		None, show referencial clustering and it's clusters weights.
+*		None, show referential clustering and it's clusters weights.
 */
 template <typename S, typename C>
 void TraCES<S, C>::showRefClustering(){
@@ -1156,7 +1109,7 @@ void TraCES<S,C>::showIntersection(){
 *	Args: 
 *		None. 
 *	Ret:
-*		None, show overlappings.
+*		None, show overlapping.
 */
 template <typename S, typename C>
 void TraCES<S,C>::showOverlaping(){

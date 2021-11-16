@@ -11,11 +11,11 @@ int main(int argc, char const *argv[]){
 	try{
 	
 	const vector<int> sensors1 = {1,2,3,4,5,6,7,8};
-	const vector<int> clusters1 = {0,0,0,0,2,2,2,2};
+	const vector<int> clusters1 = {0,0,0,0,0,0,0,0};
 	const vector<float> weights1 = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
 		
-	const vector<float> means1 = {10,20};
-	const vector<float> std1 = {10,20};
+	const vector<float> means1 = {10};
+	const vector<float> std1 = {10};
 
 	//mor.execute(sensors1, clusters1, weights1);
 	mor.execute(sensors1, clusters1, weights1, {means1, std1});
@@ -23,11 +23,11 @@ int main(int argc, char const *argv[]){
 	////////////////////////////////////////////////////////////////
 
 	const vector<int> sensors2 = {1,2,3,4,5,6,7,8,9,10,11,12};
-	const vector<int> clusters2 = {1,1,1,1,1,2,2,2,2,2,2,2};
+	const vector<int> clusters2 = {1,1,3,2,2,2,2,3,3,3,3,3};
 	const vector<float> weights2 = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
 	
-	vector<float> means2 = {10,20};
-	vector<float> std2 = {10,20};
+	vector<float> means2 = {10,20,10};
+	vector<float> std2 = {10,20,10};
 
 	int i = 0;
 	while(i < 1){

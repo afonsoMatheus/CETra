@@ -174,7 +174,7 @@ void Transitions<T>::insertDeath(const T& cr){
 *	Args: 
 *		None. 
 *	Ret:
-*		Array, array with the detecteds deads cluster.
+*		Array, array with the detected dead clusters.
 */
 template <typename T>
 vector<T> Transitions<T>::getDeaths(){
@@ -185,7 +185,7 @@ vector<T> Transitions<T>::getDeaths(){
 *	Func: 		
 *		insertSurv(const T&, const T&)
 *	Args: 
-*		A survived referencial cluster,
+*		A survived referential cluster,
 *		The corresponding evolutionary cluster. 
 *	Ret:
 *		None, inserts a survive in the survives hash table.
@@ -201,7 +201,7 @@ void Transitions<T>::insertSurv(const T& cr, const T& ce){
 *	Args: 
 *		None. 
 *	Ret:
-*		Hash Table, hash tables with the detecteds survives.
+*		Hash Table, hash tables with the detected survives.
 */
 template <typename T>
 unordered_map<T, T> Transitions<T>::getSurvs(){
@@ -213,7 +213,7 @@ unordered_map<T, T> Transitions<T>::getSurvs(){
 *		insertUnion(const T&, const vector<T>&)
 *	Args: 
 *		An evolutionary cluster,
-*		Arrays with the correspondings referencial clusters. 
+*		Arrays with the corresponding referential clusters. 
 *	Ret:
 *		None, inserts an union in the unions hash table.
 */
@@ -228,7 +228,7 @@ void Transitions<T>::insertUnion( const T& ce, const vector<T>& crs){
 *	Args: 
 *		None. 
 *	Ret:
-*		Hash Table, hash tables with the detecteds unions.
+*		Hash Table, hash tables with the detected unions.
 */
 template <typename T>
 unordered_map<T, vector<T>> Transitions<T>::getUnions(){
@@ -239,7 +239,7 @@ unordered_map<T, vector<T>> Transitions<T>::getUnions(){
 *	Func: 		
 *		insertSplits(const T&, const T&)
 *	Args: 
-*		A referencial cluster,
+*		A referential cluster,
 *		An evolutionary cluster. 
 *	Ret:
 *		None, inserts a split part in the splits hash table.
@@ -255,7 +255,7 @@ void Transitions<T>::insertSplits(const T& cr, const T& ce){
 *	Args: 
 *		None. 
 *	Ret:
-*		Hash Table, hash tables with the detecteds splits.
+*		Hash Table, hash tables with the detected splits.
 */
 template <typename T>
 unordered_map<T, vector<T>> Transitions<T>::getSplits(){
@@ -292,7 +292,7 @@ vector<T> Transitions<T>::getBirths(){
 *	Func: 		
 *		insertInterC(const T&, const int&)
 *	Args: 
-*		A referencial cluster,
+*		A referential cluster,
 *		An index of the corresponding statistic.
 *	Ret:
 *		None, inserts a statistic index in a hash table.
