@@ -892,7 +892,7 @@ void TraCES<S, C>::extTransitions(){
 
 		if(scands[y.first].size() > 1) TRANS.insertUnion(y.first, y.second);
 
-		else TRANS.insertSurv(make_tuple(scands[y.first][0], y.first));
+		else TRANS.insertSurv(scands[y.first][0], y.first);;
 
 		tracks.insert(y.first);
 
@@ -989,7 +989,6 @@ void TraCES<S, C>::checkNewBirth(){
 
 //------------------------------- Int. Transitions Implementations -------------------------------//
 
-
 /*
 *	Func: 		
 *		intTransitions()
@@ -1005,8 +1004,8 @@ void TraCES<S, C>::intTransitions(){
 	statistics inter;
 
 	for(const auto &x: TRANS.getSurvs()){
-		for(int i = 0; i < staR[get<0>(x)].size(); i++){
-			inter[get<0>(x)].insert(inter[get<0>(x)].end(), staE[get<1>(x)][i]/staR[get<0>(x)][i]);
+		for(int i = 0; i < staR[x.first].size(); i++){
+			inter[x.first].insert(inter[x.first].end(), staE[x.second][i]/staR[x.first][i]);
 		}
 	}
 
@@ -1034,11 +1033,9 @@ template <typename S, typename C>
 void TraCES<S,C>::checkIntTrans(){
 
 	unordered_map<C, vector<int>> counts;
-	unordered_map<C, C> saux;
 
 	for(const auto &x: TRANS.getSurvs()){
-		counts[get<0>(x)] = vector<int>(limits.size());
-		saux[get<0>(x)] = get<1>(x);
+		counts[x.first] = vector<int>(limits.size());
 	} 
 
 	for(const auto &cluS: staQueue){
@@ -1056,7 +1053,7 @@ void TraCES<S,C>::checkIntTrans(){
 		for(const auto &y: x.second){
 			if(y == staQueue.size()) {
 				TRANS.insertInterC(x.first, i);
-				checkNewStatistic(x.first, saux[x.first]);
+				checkNewStatistic(x.first, TRANS.getSurvs()[x.first]);
 			}
 			i++;
 		}
@@ -1068,7 +1065,7 @@ template <typename S, typename C>
 void TraCES<S,C>::checkNewStatistic(const C &cr, const C &ce){
 
 	if(newS[ce].size() > staR[cr][0] * limits[0]){
-		TRANS.insertNSurv(make_tuple(cr,ce));
+		TRANS.insertNSurv(cr, ce);
 	}
 
 }
