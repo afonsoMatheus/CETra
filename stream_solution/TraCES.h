@@ -3,7 +3,7 @@
 /* Ver. Beta                                                                  */
 //----------------------------------------------------------------------------//
 //                                                                            //                                                                          //
-// Script that contains the implementation of cluster's transiction detection // 
+// Script that contains the implementation of cluster's transition detection  // 
 // between clusterings made by both conventional and data streams algorithms. //
 //                                                                            //
 //----------------------------------------------------------------------------//
@@ -31,7 +31,6 @@ template <typename S = int, typename C = int>
 class TraCES{
 
 	/* Nicknames for code simplification */
-
 	using clustering = unordered_map<C, vector<S> >;
 	using overlaping = unordered_map<C, vector<float> >;
 	using search_table = unordered_map<S, tuple<C, float>>;
@@ -42,7 +41,6 @@ class TraCES{
 		/**************************** VARIABLES ****************************/
 
 		/* Constructor variables */
-		
 		int winSize;
 		vector<float> limits;
 		vector<string> names;
@@ -50,32 +48,27 @@ class TraCES{
 		float split_limit;
 
 		/* Referential Clustering variables */
-
 		clustering clusR;
 		unordered_map<C,float> refW;
 		statistics staR;
 		int starSize = 0;
 
 		/* Evolutionary Clustering variables */
-
 		//clustering clusE;
 		//unordered_map<C,float> evoW;
 		statistics staE;
 		set<C> evoLabels;
 
 		/* Tracking variables */
-
 		search_table evoTable;
 		overlaping matrix;
 
 		/* Fail/New sensors variables */
-
 		unordered_map<C, vector<S>> failS;
 		unordered_set<S> ns;
 		unordered_map<C, vector<S>> newS;
 
 		/* Transitions variables */
-		
 		Transitions<C> TRANS;
 		deque<statistics> staQueue;
 
@@ -145,14 +138,14 @@ class TraCES{
 
 	public:
 
-		TraCES(const int = 3, const vector<float> = {});
+		TraCES(const int = 3);
 
 		//----------- Execution -----------//
 
-		void execute(const vector<S>&, const vector<C> &, const vector<float> &);
+		Transitions<C> execute(const vector<S>&, const vector<C> &, const vector<float> &);
 
 		template <class T>
-		void execute(const vector<S>&, const vector<C> &, const vector<float> &, initializer_list<T>);
+		Transitions<C> execute(const vector<S>&, const vector<C> &, const vector<float> &, initializer_list<T>);
 
 		//---------- User Configs ----------//
 
@@ -160,12 +153,13 @@ class TraCES{
 
 		void configStaNames(const vector<string>&);
 
+		void configStaLimits(const vector<float>&);
+
 		void configSurvLimit(const float&);
 
 		void configSplitLimit(const float&);
 	
 };
-
 
 /************************** IMPLEMENTATIONS **************************/
 
@@ -181,11 +175,10 @@ class TraCES{
 *
 */
 template <typename S, typename C>
-TraCES<S, C>::TraCES(const int N, const vector<float> lim){
+TraCES<S, C>::TraCES(const int N){
 
 	winSize = N;
 
-	limits = lim;
 	limits.insert(limits.begin(), 0.5);
 
 	names.insert(names.begin(), "Sizes");
@@ -204,18 +197,18 @@ TraCES<S, C>::TraCES(const int N, const vector<float> lim){
 *		Array with the clustering clusters labels,
 *		Array with the clustering weights values.
 *	Ret:
-*		None, executes the transitions detection algorithm with only the size 
-*		internal statistic. 
+*		Transitions class, executes the transitions detection algorithm with only the size 
+*		internal statistic and returns it. 
 *
 */
 template <typename S, typename C>
-void TraCES<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei){
+Transitions<C> TraCES<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei){
 	
 	try{
 
 		/* The method must not be executed if the sensors/clusters/weights arrays don't have the same sizes */
 		if(sen.size() != clu.size() or sen.size() != wei.size()){
-			throw invalid_argument("The sensors/clusters/weights arrays are not the same size!");
+			throw invalid_argument("ERROR: The sensors/clusters/weights arrays are not the same size!");
 		}
 
 		/* Command for first execution, when there is no referential clustering */
@@ -232,6 +225,8 @@ void TraCES<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const vec
 
 		}else{
 
+			TRANS.clear();
+
 			cout << endl << "///// NEXT WINDOW /////" << endl << endl;
 
 			/* Getting all necessary evolutionary clustering variables, including the evolved clusters sizes */
@@ -243,7 +238,7 @@ void TraCES<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const vec
 			/* Showing survived clusters, if any */
 			if(!TRANS.getSurvs().empty()) TRANS.showSurvs();
 
-			/* Verifing if there was any detected internal or external transitions */
+			/* Verifying if there was any detected internal or external transitions */
 			if(TRANS.checkExtChange() || TRANS.checkIntChange()){
 
 				cout << "=== TRANS DETECTED ===" << endl << endl;
@@ -271,6 +266,8 @@ void TraCES<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const vec
 			freeEvo();
 		}
 
+		return TRANS;
+
 	}catch(invalid_argument& e){
 
 		cerr << e.what() << endl;
@@ -291,34 +288,34 @@ void TraCES<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const vec
 *		Array with the clustering weights values,
 *		List with the desired internal clusters statistics.
 *	Ret:
-*		None, executes the transition detection algorithm with the desired
-*		internal clusters statistics.  
+*		Transitions class, executes the transition detection algorithm with the desired
+*		internal clusters statistics and returns it.  
 *
 */
 template <typename S, typename C>
 template <class T>
-void TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei, initializer_list<T> list){
+Transitions<C> TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei, initializer_list<T> list){
 
 	try{
 
 		/* The method must not be executed if the sensors/clusters/weights arrays don't have the same sizes */
 		if(sen.size() != clu.size() or sen.size() != wei.size()){
-			throw invalid_argument("The sensors/clusters/weights arrays are not the same size!");
+			throw invalid_argument("ERROR: The sensors/clusters/weights arrays are not the same size!");
 		}
 
 		/* The method must not be executed if the internal statistics size changed since last execution! */
 		if(starSize > 0 && starSize != list.size()){
-			throw invalid_argument("The internal statistics size changed since last execution!");
+			throw invalid_argument("ERROR: The internal statistics size changed since last execution!");
 		}
 
 		/* The method must not be executed if the inputted limits are more numerous than the inputted statistics */
 		if (list.size() + 1 < limits.size()){
-			throw invalid_argument("The limits array size is greater than the input statistics list!");
+			throw invalid_argument("ERROR: The limits array size is greater than the input statistics list!");
 		}
 
 		/* The method must not be executed if the inputted statistics names are more numerous than the inputted statistics */
 		if(names.size() > list.size() + 1){
-			throw invalid_argument("The amount of statistics names surpasses the statistics list!");
+			throw invalid_argument("ERROR: The amount of statistics names surpasses the statistics list!");
 		}
 
 		/* Inserting default limits for missing statistics limits in input */
@@ -349,6 +346,9 @@ void TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vect
 			showRefClustering();
 
 		}else{
+
+			TRANS.clear();
+			TRANS.insertInterN(names);
 
 			cout << endl << "/////////////// NEXT WINDOW ///////////////" << endl << endl;
 
@@ -396,12 +396,9 @@ void TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vect
 		cerr << e.what() << endl;
 
 		throw -1;
-
-	}catch(length_error& e){
-
-		cerr << e.what() << endl;
-
 	}
+
+	return TRANS;
 
 }
 
@@ -417,6 +414,8 @@ void TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vect
 */
 template <typename S, typename C>
 void TraCES<S,C>::configSizeLimit(const float& sl){
+	if(sl < 0.0 || sl > 1.0) 
+		throw invalid_argument("ERROR: The size limit must be between 0.0 and 1.0");
 	limits[0] = sl;
 }
 
@@ -424,7 +423,7 @@ void TraCES<S,C>::configSizeLimit(const float& sl){
 *	Func: 		
 *		configStaNames(const vector<string>&)
 *	Args: 
-*		Array with the user defined arrays name. 
+*		Array with the user defined statistics names. 
 *	Ret:
 *		None, updates the names in the internal statistics names array.  
 */
@@ -432,6 +431,22 @@ template <typename S, typename C>
 void TraCES<S,C>::configStaNames(const vector<string>& nam){
 	for(const auto &x: nam) 
 		names.insert(names.end(), x);
+}
+
+/*
+*	Func: 		
+*		configStaLimits(const vector<float>&)
+*	Args: 
+*		Array with the user defined statistics limits. 
+*	Ret:
+*		None, updates the limits in the internal statistics limits array.  
+*/
+template <typename S, typename C>
+void TraCES<S,C>::configStaLimits(const vector<float>& lims){
+	for(const auto &x: lims){
+		if(x < 0.0 || x > 1.0) throw invalid_argument("ERROR: The limits must be between 0.0 and 1.0"); 
+		limits.insert(limits.end(), x);
+	}
 }
 
 /*
@@ -444,10 +459,10 @@ void TraCES<S,C>::configStaNames(const vector<string>& nam){
 */
 template <typename S, typename C>
 void TraCES<S,C>::configSurvLimit(const float& ls){
-	if(ls < split_limit){
-		throw invalid_argument("The survival limit must be higher than the current split limit");
-	}
-
+	if(ls < 0.0 || ls > 1.0) 
+		throw invalid_argument("ERROR: The survival limit must be between 0.0 and 1.0");
+	if(ls < split_limit)
+		throw invalid_argument("ERROR: The survival limit must be higher than the current split limit: "+ to_string(split_limit));
 	surv_limit = ls;
 }
 
@@ -462,11 +477,11 @@ void TraCES<S,C>::configSurvLimit(const float& ls){
 */
 template <typename S, typename C>
 void TraCES<S,C>::configSplitLimit(const float& ls){
-	
+	if(ls < 0.0 || ls > 1.0) 
+		throw invalid_argument("ERROR: The split limit must be between 0.0 and 1.0");
 	if(ls >= surv_limit){
-		throw invalid_argument("The split limit must be lower than the current survival limit");
+		throw invalid_argument("ERROR: The split limit must be lower than the current survival limit: " + to_string(surv_limit));
 	} 
-
 	split_limit = ls;
 }
 
@@ -522,7 +537,7 @@ void TraCES<S,C>::storeRefStatistics(initializer_list<T> list){
 
 		/* Abort if the detected labels size are different from the inputed statistics size */
 		if(s.size() != ref_labels.size()){
-			throw invalid_argument("The labels/statistics arrays are not the same size!");
+			throw invalid_argument("ERROR: The labels/statistics arrays are not the same size!");
 		}
 
 		for(const auto &x: s){
@@ -612,7 +627,7 @@ void TraCES<S,C>::storeEvoStatistics(initializer_list<T> list){
 
 		/* Abort if the previously detected evo labels size are different from the inputted statistics size */
 		if(s.size() != evoLabels.size()){
-			throw invalid_argument("The labels/statistics arrays are not the same size!");
+			throw invalid_argument("ERROR: The labels/statistics arrays are not the same size!");
 		}
 
 		for(const auto &x: s){
@@ -643,9 +658,7 @@ void TraCES<S,C>::freeEvo(){
 
 	failS.clear();
 	ns.clear();
-	newS.clear();
-
-	TRANS.clear();	
+	newS.clear();	
 	
 }
 
@@ -1172,30 +1185,24 @@ void TraCES<S, C>::showTransitions(){
 
 		cout << "+ EXT TRANSITIONS" << endl << endl; 
 
-		if(!TRANS.getSplits().empty()) TRANS.showSplits();
+		TRANS.showSplits();
 
-		if(!TRANS.getUnions().empty()) TRANS.showUnions();
-
-		if(!TRANS.getDeaths().empty()){ 
-			TRANS.showDeaths();
-			TRANS.showFDeaths();
-		}
-
-		if(!TRANS.getBirths().empty()){
-			TRANS.showBirths();
-			TRANS.showNBirths();
-		}
-
+		TRANS.showUnions();
+		 
+		TRANS.showDeaths();
+		TRANS.showFDeaths();
+		
+		TRANS.showBirths();
+		TRANS.showNBirths();
+		
 	}
 
 	if(TRANS.checkIntChange()){
 
 		cout << "+ INT TRANSITIONS" << endl << endl;
 
-		if(!TRANS.getInterC().empty()) {
-			TRANS.showInterC(names);
-			TRANS.showNStatistic();
-		}
+		TRANS.showInterC();
+		TRANS.showNStatistic();
 
 		cout << endl;
 	}

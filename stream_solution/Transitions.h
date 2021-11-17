@@ -27,7 +27,6 @@ class Transitions{
 		/**************************** VARIABLES ****************************/
 
 		/* External variables */
-
 		unordered_map<T, T> survs;
 		unordered_map<T, vector<T>> unions;
 		unordered_map<T, vector<T>> splits;
@@ -35,11 +34,10 @@ class Transitions{
 		vector<T> births;
 
 		/* Internal variable */
-
 		unordered_map<T, vector<int>> interC;
+		vector<string> interN;
 
 		/* Fail/New samples variables */
-
 		vector<T> faild;
 		vector<T> newb;
 		unordered_map<T, T> news;	
@@ -74,9 +72,9 @@ class Transitions{
 
 		vector<T> getBirths();
 
-		void insertInterC(const T&, const int&);
-
 		unordered_map<T, vector<int>> getInterC();
+
+		void insertInterN(const vector<string>&);
 
 		void insertFDeath(const T&);
 
@@ -89,6 +87,8 @@ class Transitions{
 		void insertNSurv(const T&, const T&);
 
 		unordered_map<T, T> getNSurvs();
+
+		void insertInterC(const T&, const int&);
 
 		//------------- Checkers -------------//
 
@@ -112,7 +112,7 @@ class Transitions{
 
 		void showUnions();
 
-		void showInterC(const vector<string>&);
+		void showInterC();
 
 		void showNStatistic();
 
@@ -147,6 +147,7 @@ void Transitions<T>::clear(){
 	splits.clear();
 	unions.clear();
 	interC.clear();
+	interN.clear();
 	faild.clear();
 	newb.clear();
 	news.clear();
@@ -317,6 +318,19 @@ unordered_map<T, vector<int>> Transitions<T>::getInterC(){
 
 /*
 *	Func: 		
+*		insertInterN(const vector<string>&)
+*	Args: 
+*		Array with the internal statistics names. 
+*	Ret:
+*		None, assign the statistics names.
+*/
+template <typename T>
+void Transitions<T>::insertInterN(const vector<string> & nams){
+	interN = nams;
+}
+
+/*
+*	Func: 		
 *		insertFDeath(const T&)
 *	Args: 
 *		A dead cluster. 
@@ -439,6 +453,9 @@ bool Transitions<T>::checkIntChange(){
 */
 template <typename T>
 void Transitions<T>::showSurvs(){
+	
+	if(survs.empty()) return;
+
 	cout << "- Sobreviventes" << endl;
 	for(const auto &x : survs)cout << get<0>(x) << " -> " << get<1>(x)<< endl;
 	cout << endl;
@@ -454,6 +471,8 @@ void Transitions<T>::showSurvs(){
 */
 template <typename T>
 void Transitions<T>::showUnions(){
+
+	if(unions.empty()) return;
 
 	cout << "- Uniões" << endl;
 	for(const auto &x: unions){
@@ -473,6 +492,8 @@ void Transitions<T>::showUnions(){
 */
 template <typename T>
 void Transitions<T>::showSplits(){
+
+	if(splits.empty()) return;
 	
 	cout << "- Separações" << endl; 
 	for(const auto &x: splits){
@@ -493,6 +514,9 @@ void Transitions<T>::showSplits(){
 */
 template <typename T>
 void Transitions<T>::showDeaths(){
+
+	if(deaths.empty()) return;
+
 	cout << "- Mortes" << endl;
 	for(const auto &x : deaths) cout << x << " -> DEATH " << endl;
 	cout << endl;
@@ -508,6 +532,8 @@ void Transitions<T>::showDeaths(){
 */
 template <typename T>
 void Transitions<T>::showFDeaths(){
+
+	if(faild.empty()) return;
 
 	for(const auto &x: faild){
 		cout << x << " is dead by missing sensors" << endl;
@@ -525,6 +551,9 @@ void Transitions<T>::showFDeaths(){
 */
 template <typename T>
 void Transitions<T>::showBirths(){
+
+	if(births.empty()) return;
+
 	cout << "- Nascimentos" << endl;
 	for(const auto &x : births) cout << "BIRTHS -> " << x << endl;
 	cout << endl;
@@ -541,6 +570,8 @@ void Transitions<T>::showBirths(){
 template <typename T>
 void Transitions<T>::showNBirths(){
 
+	if(newb.empty()) return;
+
 	for(const auto &x: newb){
 		cout << x << " is birth by new sensors" << endl;
 	}
@@ -551,17 +582,19 @@ void Transitions<T>::showNBirths(){
 *	Func: 		
 *		showInterC(const vector<string>&)
 *	Args: 
-*		Array with the statistics names.
+*		None.
 *	Ret:
 *		None, show detected internal statistics.
 */
 template <typename T>
-void Transitions<T>::showInterC(const vector<string>& nam){
+void Transitions<T>::showInterC(){
+
+	if(interC.empty()) return;
 
 	for (const auto &x: interC){
 		cout << x.first << " -> " << survs[x.first] << ": ";
 		for(const auto &y: x.second){
-			cout << nam[y] << " ";
+			cout << interN[y] << " ";
 		} 
 		cout << endl;	
 	} 
