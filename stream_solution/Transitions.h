@@ -22,9 +22,17 @@ using namespace std;
 template <typename T>
 class Transitions{
 
+	/* Nickname */
+	using overlaping = unordered_map<T, vector<float>>;
+	using statistics = unordered_map<T, vector<float>>;
+
 	private:
 
 		/**************************** VARIABLES ****************************/
+
+		/* Overlapping matrix */
+		overlaping ext_matrix;
+		statistics int_matrix;
 
 		/* External variables */
 		unordered_map<T, T> survs;
@@ -51,6 +59,14 @@ class Transitions{
 		void clear();
 
 		//------------- Get / Set -------------//
+
+		void insertExtMatrix(const overlaping&);
+
+		overlaping getExtMatrix();
+
+		void insertIntMatrix(const statistics&);
+
+		statistics getIntMatrix();
 
 		void insertDeath(const T&);
 
@@ -97,6 +113,8 @@ class Transitions{
 		bool checkIntChange();
 
 		//---------- Visualization ----------//
+
+		void showTransitions();
 
 		void showDeaths();
 
@@ -155,6 +173,58 @@ void Transitions<T>::clear(){
 }
 
 //------------------ Get / Set ------------------//
+
+/*
+*	Func: 		
+*		insertExtMatrix(const overlaping&)
+*	Args: 
+*		A overlapping matrix. 
+*	Ret:
+*		None, inserts the transitions overlapping matrix.
+*/
+template <typename T>
+void Transitions<T>::insertExtMatrix(const overlaping& mat){
+	ext_matrix = mat;
+}
+
+/*
+*	Func: 		
+*		getExtMatrix()
+*	Args: 
+*		None. 
+*	Ret:
+*		None, returns the transitions overlapping matrix.
+*/
+template <typename T>
+auto Transitions<T>::getExtMatrix() -> overlaping{
+	return ext_matrix;
+}
+
+/*
+*	Func: 		
+*		insertIntMatrix(const statistics&)
+*	Args: 
+*		A statistics matrix. 
+*	Ret:
+*		None, inserts the transitions statistics matrix.
+*/
+template <typename T>
+void Transitions<T>::insertIntMatrix(const statistics& mat){
+	int_matrix = mat;
+}
+
+/*
+*	Func: 		
+*		insertIntMatrix(const statistics&)
+*	Args: 
+*		A statistics matrix. 
+*	Ret:
+*		None, inserts the transitions statistics matrix.
+*/
+template <typename T>
+auto Transitions<T>::getIntMatrix() -> statistics{
+	return int_matrix;
+}
 
 /*
 *	Func: 		
@@ -442,6 +512,44 @@ bool Transitions<T>::checkIntChange(){
 }
 
 //--------------- Visualization ---------------//
+
+/*
+*	Func: 		
+*		showTransitions()
+*	Args: 
+*		None. 
+*	Ret:
+*		None, show external and internal transitions, if any.
+*/
+template <typename T>
+void Transitions<T>::showTransitions(){
+	
+	if(checkExtChange()){
+
+		cout << "+ EXT TRANSITIONS" << endl << endl; 
+
+		showSplits();
+
+		showUnions();
+		 
+		showDeaths();
+		showFDeaths();
+		
+		showBirths();
+		showNBirths();
+		
+	}
+
+	if(checkIntChange()){
+
+		cout << "+ INT TRANSITIONS" << endl << endl;
+
+		showInterC();
+		showNStatistic();
+
+		cout << endl;
+	}
+}
 
 /*
 *	Func: 		

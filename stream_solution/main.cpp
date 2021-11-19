@@ -4,21 +4,19 @@ int main(int argc, char const *argv[]){
 
 	TraCES<int, int> mor(1);
 	mor.configSizeLimit(0.4);
-	mor.configStaNames({"Mean", "Std"});
-	mor.configStaLimits({0.4,0.5});
+	mor.configNewIntStatistic(0.5, "Mean");
+	mor.configNewIntStatistic(0.5, "Std");
 	//mor.configSurvLimit(0.5);
 	//mor.configSplitLimit(0.25);
 
 	try{
 
-	Transitions<int> aux;
-
 	const vector<int> sensors1 = {1,2,3,4,5,6,7,8};
-	const vector<int> clusters1 = {0,0,0,0,0,0,0,0};
+	const vector<int> clusters1 = {0,0,1,1,0,0,1,1};
 	const vector<float> weights1 = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
 		
-	const vector<float> means1 = {10};
-	const vector<float> std1 = {10};
+	const vector<float> means1 = {10,20};
+	const vector<float> std1 = {10,20};
 
 	//mor.execute(sensors1, clusters1, weights1);
 	mor.execute(sensors1, clusters1, weights1, {means1, std1});

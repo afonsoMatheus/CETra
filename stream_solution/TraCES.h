@@ -32,7 +32,7 @@ class TraCES{
 
 	/* Nicknames for code simplification */
 	using clustering = unordered_map<C, vector<S> >;
-	using overlaping = unordered_map<C, vector<float> >;
+	using overlaping = unordered_map<C, vector<float>>;
 	using search_table = unordered_map<S, tuple<C, float>>;
 	using statistics = unordered_map<C, vector<float>>;
 
@@ -51,25 +51,17 @@ class TraCES{
 		clustering clusR;
 		unordered_map<C,float> refW;
 		statistics staR;
-		int starSize = 0;
 
 		/* Evolutionary Clustering variables */
-		//clustering clusE;
-		//unordered_map<C,float> evoW;
 		statistics staE;
 		set<C> evoLabels;
-
-		/* Tracking variables */
-		search_table evoTable;
-		overlaping matrix;
 
 		/* Fail/New sensors variables */
 		unordered_map<C, vector<S>> failS;
 		unordered_set<S> ns;
 		unordered_map<C, vector<S>> newS;
 
-		/* Transitions variables */
-		Transitions<C> TRANS;
+		/* Statistics queue */
 		deque<statistics> staQueue;
 
 		/**************************** SIGNATURES ****************************/
@@ -85,7 +77,7 @@ class TraCES{
 
 		//---------- Evo. Clustering Methods ----------//
 
-		void getEvoInformation(const vector<S>&, const vector<C>&, const vector<float>&);
+		search_table getEvoInformation(const vector<S>&, const vector<C>&, const vector<float>&);
 
 		template <class T>
 		void storeEvoStatistics(initializer_list<T>);
@@ -94,31 +86,31 @@ class TraCES{
 
 		//--------- Trans. Detection Methods ---------//
 
-		void trackTransitions();
+		Transitions<C> trackTransitions(search_table&);
 
-		void clusterOverlap();
+		overlaping clusterOverlap(search_table&);
 		
 		unordered_map<C,int> useLabels();
 
 		//------------- Ext. Transitions -------------//
 
-		void extTransitions();
+		void extTransitions(Transitions<C>&);
 
 		float sumSplits(const vector<float>&, const vector<C>&);
 
 		unordered_map<int,C> hashLabels();
 
-		void checkFailDeath(const C &);
+		void checkFailDeath(const C &, Transitions<C>&);
 
-		void checkNewBirth();
+		void checkNewBirth(Transitions<C>&);
 
 		//------------- Int. Transitions -------------//
 		
-		void intTransitions();
+		void intTransitions(Transitions<C>&);
 
-		void checkIntTrans();
+		void checkIntTrans(Transitions<C>&);
 
-		void checkNewStatistic(const C &, const C &);
+		void checkNewStatistic(const C &, const C &, Transitions<C>&);
 
 		//--------------- Visualization ---------------//
 
@@ -126,13 +118,13 @@ class TraCES{
 
 		void showStatistics();
 
-		void showIntersection();
+		void showIntersection(const overlaping&);
 
-		void showOverlaping();
+		void showOverlaping(const overlaping&);
 
 		void showTrackStatistics();
 
-		void showTransitions();
+		void showTransitions(Transitions<C>&);
 
 		void showIntQueue();
 
@@ -151,9 +143,7 @@ class TraCES{
 
 		void configSizeLimit(const float&);
 
-		void configStaNames(const vector<string>&);
-
-		void configStaLimits(const vector<float>&);
+		void configNewIntStatistic(const float&, const string&);
 
 		void configSurvLimit(const float&);
 
@@ -219,21 +209,18 @@ Transitions<C> TraCES<S, C>::execute(const vector<S> &sen, const vector<C> &clu,
 
 			/* Storing the clusters sizes and the total tracked internal statistics*/
 			for (const auto &x: clusR) staR[x.first].insert(staR[x.first].end(), x.second.size());
-			starSize = 1;
 
-			showRefClustering();
+			return Transitions<C>();
 
 		}else{
-
-			TRANS.clear();
 
 			cout << endl << "///// NEXT WINDOW /////" << endl << endl;
 
 			/* Getting all necessary evolutionary clustering variables, including the evolved clusters sizes */
-			getEvoInformation(sen, clu, wei);
+			search_table evoTable = getEvoInformation(sen, clu, wei);
 
-			/* Monitoring the transitions between the current referential clustering and the current evolutionary clustering */
-			trackTransitions();
+			/* Tracking the transitions between the current referential clustering and the current evolutionary clustering */
+			Transitions<C> TRANS = trackTransitions(evoTable);
 
 			/* Showing survived clusters, if any */
 			if(!TRANS.getSurvs().empty()) TRANS.showSurvs();
@@ -244,29 +231,21 @@ Transitions<C> TraCES<S, C>::execute(const vector<S> &sen, const vector<C> &clu,
 				cout << "=== TRANS DETECTED ===" << endl << endl;
 
 				/* Showing the detected internal or/and external transitions */
-				showTransitions();
+				TRANS.showTransitions();
 
-				cout << "### UPD REF CLUSTERING ###" << endl << endl;
-
-				/* Freeing the referential clustering variables */
-				freeRef();
+				cout << "### UPT REF CLUSTERING ###" << endl << endl;				
 
 				/* Updating the referential clustering variables with the current evolutionary clustering */
+				freeRef();
 				storeClustering(sen, clu, wei);
-
-				/*clusR = clusE;
-				refW = evoW;*/
 				staR = staE;
-
-				showRefClustering();
-
 			}
 
 			/* Freeing the evolutionary clustering variables */
 			freeEvo();
-		}
 
-		return TRANS;
+			return TRANS;
+		}
 
 	}catch(invalid_argument& e){
 
@@ -303,21 +282,6 @@ Transitions<C> TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, 
 			throw invalid_argument("ERROR: The sensors/clusters/weights arrays are not the same size!");
 		}
 
-		/* The method must not be executed if the internal statistics size changed since last execution! */
-		if(starSize > 0 && starSize != list.size()){
-			throw invalid_argument("ERROR: The internal statistics size changed since last execution!");
-		}
-
-		/* The method must not be executed if the inputted limits are more numerous than the inputted statistics */
-		if (list.size() + 1 < limits.size()){
-			throw invalid_argument("ERROR: The limits array size is greater than the input statistics list!");
-		}
-
-		/* The method must not be executed if the inputted statistics names are more numerous than the inputted statistics */
-		if(names.size() > list.size() + 1){
-			throw invalid_argument("ERROR: The amount of statistics names surpasses the statistics list!");
-		}
-
 		/* Inserting default limits for missing statistics limits in input */
 		if(limits.size() < list.size() + 1){
 			for(auto i = limits.size(); i < list.size() + 1; i++){
@@ -343,23 +307,20 @@ Transitions<C> TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, 
 			/* Storing the clusters sizes plus the internal statistics inputted */
 			storeRefStatistics(list);
 
-			showRefClustering();
+			return Transitions<C>();
 
 		}else{
-
-			TRANS.clear();
-			TRANS.insertInterN(names);
 
 			cout << endl << "/////////////// NEXT WINDOW ///////////////" << endl << endl;
 
 			/* Getting all necessary evolutionary clustering variables, including the evolved clusters sizes */
-			getEvoInformation(sen, clu, wei);
+			search_table evoTable = getEvoInformation(sen, clu, wei);
 
 			/* Storing the internal statistics inputted */
 			storeEvoStatistics(list);
 
 			/* Monitoring the transitions between the current referential clustering and the current evolutionary clustering */
-			trackTransitions();
+			Transitions<C> TRANS = trackTransitions(evoTable);
 
 			/* Showing survived clusters, if any */
 			if(!TRANS.getSurvs().empty()) TRANS.showSurvs();
@@ -370,25 +331,21 @@ Transitions<C> TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, 
 				cout << "=== TRANS DETECTED ===" << endl << endl;
 
 				/* Showing the detected internal or/and external transitions */
-				showTransitions();
+				TRANS.showTransitions();
 
-				cout << "### UPD REF CLUSTERING ###" << endl << endl;
-
-				/* Freeing the referential clustering variables */
-				freeRef();
+				cout << "### UPT REF CLUSTERING ###" << endl << endl;
 
 				/* Updating the referential clustering variables with the current evolutionary clustering */
+				freeRef();
 				storeClustering(sen, clu, wei);
-				//clusR = clusE;
-				//refW = evoW;
 				staR = staE;
-
-				showRefClustering();
 
 			}
 
 			/* Freeing the evolutionary clustering variables */
 			freeEvo();
+
+			return TRANS;
 		}
 
 	}catch(invalid_argument& e){
@@ -397,8 +354,6 @@ Transitions<C> TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, 
 
 		throw -1;
 	}
-
-	return TRANS;
 
 }
 
@@ -421,32 +376,20 @@ void TraCES<S,C>::configSizeLimit(const float& sl){
 
 /*
 *	Func: 		
-*		configStaNames(const vector<string>&)
+*		configNewIntStatistic(const string&, const float&)
 *	Args: 
-*		Array with the user defined statistics names. 
+*		Limit of the internal statistic,
+*		Name of the internal statistic. 
 *	Ret:
-*		None, updates the names in the internal statistics names array.  
+*		None, updates the names and limits arrays.  
 */
 template <typename S, typename C>
-void TraCES<S,C>::configStaNames(const vector<string>& nam){
-	for(const auto &x: nam) 
-		names.insert(names.end(), x);
-}
+void TraCES<S,C>::configNewIntStatistic(const float& lim, const string& nam){
 
-/*
-*	Func: 		
-*		configStaLimits(const vector<float>&)
-*	Args: 
-*		Array with the user defined statistics limits. 
-*	Ret:
-*		None, updates the limits in the internal statistics limits array.  
-*/
-template <typename S, typename C>
-void TraCES<S,C>::configStaLimits(const vector<float>& lims){
-	for(const auto &x: lims){
-		if(x < 0.0 || x > 1.0) throw invalid_argument("ERROR: The limits must be between 0.0 and 1.0"); 
-		limits.insert(limits.end(), x);
-	}
+	if(lim < 0.0 || lim > 1.0) throw invalid_argument("ERROR: The limits must be between 0.0 and 1.0"); 
+	limits.insert(limits.end(), lim);
+	names.insert(names.end(), nam);
+	
 }
 
 /*
@@ -465,7 +408,6 @@ void TraCES<S,C>::configSurvLimit(const float& ls){
 		throw invalid_argument("ERROR: The survival limit must be higher than the current split limit: "+ to_string(split_limit));
 	surv_limit = ls;
 }
-
 
 /*
 *	Func: 		
@@ -506,8 +448,9 @@ void TraCES<S, C>::storeClustering(const vector<S> &sen, const vector<C> &clu, c
 		clusR[clu[i]].insert(clusR[clu[i]].end(), sen[i]);
 		refW[clu[i]] += wei[i];
 	}
-}
 
+	showRefClustering();
+}
 
 /*
 *	Func: 		
@@ -522,7 +465,6 @@ template <class T>
 void TraCES<S,C>::storeRefStatistics(initializer_list<T> list){
 
 	/* The set structure helps to detect the clustering labels maintaining ordering */
-
 	set<C> ref_labels;
 
 	/* Storing referential clustering cluster's sizes */
@@ -544,10 +486,7 @@ void TraCES<S,C>::storeRefStatistics(initializer_list<T> list){
 			staR[*itr].insert(staR[*itr].end(), x);
 			itr++;
 		}		 
-	}
-
-	/* Storing internal statistics size for future verification */
-	starSize = list.size();		
+	}	
 
 }
 
@@ -579,16 +518,15 @@ void TraCES<S,C>::freeRef(){
 *		Array with the clustering clusters labels,
 *		Array with the clustering weights values,
 *	Ret:
-*		None, build all the necessary evolutionary information, such as the evolutionary labels,
+*		Search Table, build all the necessary evolutionary information, such as the evolutionary labels,
 *		the search table and the clusters size internal statistic. 
 */
 template <typename S, typename C>
-void TraCES<S,C>::getEvoInformation(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei){
+auto TraCES<S,C>::getEvoInformation(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei) -> search_table{
+
+	search_table evoTable;
 
 	for (int i = 0; i < sen.size(); ++i){
-
-		//clusE[clu[i]].insert(clusE[clu[i]].end(), sen[i]);
-		//evoW[clu[i]] += wei[i];
 
 		/* Getting evolutionary clustering cluster's labels */
 		if(evoLabels.find(clu[i]) == evoLabels.end()) 
@@ -606,8 +544,9 @@ void TraCES<S,C>::getEvoInformation(const vector<S> &sen, const vector<C> &clu, 
 		ns.insert(sen[i]);
 	}
 
-}
+	return evoTable;
 
+}
 
 /*
 *	Func: 		
@@ -648,13 +587,9 @@ void TraCES<S,C>::storeEvoStatistics(initializer_list<T> list){
 template <typename S, typename C>
 void TraCES<S,C>::freeEvo(){
 
-	//clusE.clear();
-	//evoW.clear();
 	staE.clear();
-	
+
 	evoLabels.clear();
-	evoTable.clear();
-	matrix.clear();
 
 	failS.clear();
 	ns.clear();
@@ -666,43 +601,49 @@ void TraCES<S,C>::freeEvo(){
 
 /*
 *	Func: 		
-*		trackTransitions()
+*		trackTransitions(search_table&)
 *	Args: 
-*		None. 
+*		The evolutionary clustering search table. 
 *	Ret:
-*		None, executes the detection mechanism between currents referential 
+*		Transitions object, executes the detection mechanism between currents referential 
 *		and evolutionary clustering. 
 */
 template <typename S, typename C>
-void TraCES<S, C>::trackTransitions(){
+Transitions<C> TraCES<S, C>::trackTransitions(search_table& evoTable){
 
-	/* Building overlap matrix between ref and evo clustering */
-	clusterOverlap();
+	/* Creating empty transitions object */
+	Transitions<C> TRANS;
 
-	//showTrackStatistics();
+	/* Inserting statistics names in transitions */
+	TRANS.insertInterN(names);
+
+	/* Building overlap matrix between ref and evo clustering and store it in transitions object */
+	TRANS.insertExtMatrix(clusterOverlap(evoTable));
 
 	/* Detecting external transitions */
-	extTransitions();
-
-	//showTrackStatistics();
+	extTransitions(TRANS);
 
 	/* Detecting internal transitions for surviving clusters */
 	if(!TRANS.getSurvs().empty())
-		intTransitions();
+		intTransitions(TRANS);
+
+	return TRANS;
 }
 
 /*
 *	Func: 		
-*		clusterOverlap()
+*		clusterOverlap(search_table&)
 *	Args: 
-*		None. 
+*		The evolutionary clustering search table.  
 *	Ret:
-*		None, builds the overlapping matrix between currents referential 
+*		Overlapping matrix, returns the overlapping matrix between currents referential 
 *		and evolutionary clustering, and builds fail/new sensors information. 
 */
 template <typename S, typename C>
-void TraCES<S, C>::clusterOverlap(){
+auto TraCES<S, C>::clusterOverlap(search_table& evoTable) -> overlaping{
 	
+	overlaping matrix;
+
 	unordered_map<C,int> lmap = useLabels();
 
 	for (auto &c : clusR){
@@ -733,7 +674,7 @@ void TraCES<S, C>::clusterOverlap(){
 		newS[get<0>(evoTable[x])].insert(newS[get<0>(evoTable[x])].end(), x);
 	}
 
-	//showIntersection();
+	//showIntersection(matrix);
 
 	/* Updating the matrix with the overlapping between the intersections and the ref clusters weights */
 	for (const auto &i : matrix){
@@ -742,7 +683,9 @@ void TraCES<S, C>::clusterOverlap(){
 		}
 	}
 
-	showOverlaping();
+	showOverlaping(matrix);
+
+	return matrix;
 }
 
 /*
@@ -771,15 +714,18 @@ unordered_map<C,int> TraCES<S, C>::useLabels(){
 
 /*
 *	Func: 		
-*		extTransitions()
+*		extTransitions(Transitions<C>&)
 *	Args: 
-*		None. 
+*		The overlapping matrix,
+*		The transitions object. 
 *	Ret:
 *		None, detects external transitions between the currents referential and evolutionary
 *		clustering.
 */
 template <typename S, typename C>
-void TraCES<S, C>::extTransitions(){
+void TraCES<S, C>::extTransitions(Transitions<C>& TRANS){
+
+	const overlaping &matrix = TRANS.getExtMatrix();
 
 	unordered_map<int,C> lmap = hashLabels();
 
@@ -792,7 +738,6 @@ void TraCES<S, C>::extTransitions(){
 
 		C split_union = (C) -2;
 		C surv_cand = (C) -2;
-		int lab_cand = -2;
 
 		for (int Y = 0; Y < X.second.size(); Y++){
 
@@ -802,18 +747,15 @@ void TraCES<S, C>::extTransitions(){
 				
 				if(surv_cand = (C) -2){
 					surv_cand = lmap[Y];
-					lab_cand = Y;
 				
 				}else if(mcell > X.second[surv_cand]){
 
 					surv_cand = lmap[Y];
-					lab_cand = Y;
 				
 				}else if(mcell == X.second[surv_cand]){
 
 					if(clusR[surv_cand].size() < clusR[lmap[Y]].size()){
 						surv_cand = lmap[Y];
-						lab_cand = Y;
 					}
 				}
 
@@ -828,13 +770,13 @@ void TraCES<S, C>::extTransitions(){
 
 			TRANS.insertDeath(X.first);
 
-			checkFailDeath(X.first);
+			checkFailDeath(X.first, TRANS);
 
 		}else if(split_cand.empty() == false){
 
 			float split_weis = sumSplits(X.second, split_cand);
 
-			if(split_weis >= surv_limit && split_weis > X.second[lab_cand]){
+			if(split_weis >= surv_limit){
 
 				for(const auto x: split_cand) {
 					
@@ -867,10 +809,9 @@ void TraCES<S, C>::extTransitions(){
 	set_difference(evoLabels.begin(), evoLabels.end(), tracks.begin(), tracks.end(),
         inserter(TRANS.allocBirths(), TRANS.allocBirths().begin()));
 
-	checkNewBirth();
+	checkNewBirth(TRANS);
 
 }
-
 
 /*
 *	Func: 		
@@ -915,17 +856,17 @@ float TraCES<S, C>::sumSplits(const vector<float> &overlaps, const vector<C> &sp
 	return sum;
 }
 
-
 /*
 *	Func: 		
-*		checkFailDeath(const C &)
+*		checkFailDeath(const C &, Transitions<C>&)
 *	Args: 
-*		A dying cluster. 
+*		A dying cluster,
+*		The transitions object. 
 *	Ret:
 *		None, identifies if a cluster is dead because of missing sensors.
 */
 template <typename S, typename C>
-void TraCES<S, C>::checkFailDeath(const C &clu){
+void TraCES<S, C>::checkFailDeath(const C &clu, Transitions<C>& TRANS){
 
 	if(failS.find(clu) != failS.end()){
 		if(failS[clu].size()/staR[clu][0] > surv_limit)
@@ -936,14 +877,14 @@ void TraCES<S, C>::checkFailDeath(const C &clu){
 
 /*
 *	Func: 		
-*		checkNewBirth();
+*		checkNewBirth(Transitions<C>&);
 *	Args: 
-*		None. 
+*		The transitions object. 
 *	Ret:
 *		None, identifies if a new cluster emerged because of new sensors.
 */
 template <typename S, typename C>
-void TraCES<S, C>::checkNewBirth(){
+void TraCES<S, C>::checkNewBirth(Transitions<C>& TRANS){
 
 	for(const auto &x: TRANS.getBirths()){
 		if(newS.find(x) != newS.end()){
@@ -957,23 +898,26 @@ void TraCES<S, C>::checkNewBirth(){
 
 /*
 *	Func: 		
-*		intTransitions()
+*		intTransitions(Transitions<C>&)
 *	Args: 
-*		None. 
+*		The transitions object. 
 *	Ret:
 *		None, compares the internal statistics of the survived referential clusters 
 *		with the corresponding evolutionary cluster and put it in a queue.		
 */
 template <typename S, typename C>
-void TraCES<S, C>::intTransitions(){
+void TraCES<S, C>::intTransitions(Transitions<C>& TRANS){
 
 	statistics inter;
 
 	for(const auto &x: TRANS.getSurvs()){
 		for(int i = 0; i < staR[x.first].size(); i++){
-			inter[x.first].insert(inter[x.first].end(), staE[x.second][i]/staR[x.first][i]);
+			if(i < staE[x.second].size())
+				inter[x.first].insert(inter[x.first].end(), staE[x.second][i]/staR[x.first][i]);
 		}
 	}
+
+	TRANS.insertIntMatrix(inter);
 
 	if(staQueue.size() < winSize){
 		staQueue.push_back(inter);
@@ -983,20 +927,20 @@ void TraCES<S, C>::intTransitions(){
 	}
 
 	if(staQueue.size() == winSize) 
-		checkIntTrans();
+		checkIntTrans(TRANS);
 }
 
 /*
 *	Func: 		
-*		checkIntTrans()
+*		checkIntTrans(Transitions<C>&)
 *	Args: 
-*		None. 
+*		The transitions object. 
 *	Ret:
 *		None, checks if the internal statistics changes matches the 
 *		entire window size to identify an internal transition.
 */
 template <typename S, typename C>
-void TraCES<S,C>::checkIntTrans(){
+void TraCES<S,C>::checkIntTrans(Transitions<C>& TRANS){
 
 	unordered_map<C, vector<int>> counts;
 
@@ -1019,7 +963,7 @@ void TraCES<S,C>::checkIntTrans(){
 		for(const auto &y: x.second){
 			if(y == staQueue.size()) {
 				TRANS.insertInterC(x.first, i);
-				checkNewStatistic(x.first, TRANS.getSurvs()[x.first]);
+				checkNewStatistic(x.first, TRANS.getSurvs()[x.first], TRANS);
 			}
 			i++;
 		}
@@ -1027,8 +971,18 @@ void TraCES<S,C>::checkIntTrans(){
 
 }
 
+/*
+*	Func: 		
+*		checkNewStatistic(const C &, const C &, Transitions<C>&)
+*	Args: 
+*		A referential cluster,
+*		An evolutionary cluster,
+*		The transitions object.
+*	Ret:
+*		None, inserts a size change by many new sensors. 
+*/
 template <typename S, typename C>
-void TraCES<S,C>::checkNewStatistic(const C &cr, const C &ce){
+void TraCES<S,C>::checkNewStatistic(const C &cr, const C &ce, Transitions<C>& TRANS){
 
 	if(newS[ce].size() > staR[cr][0] * limits[0]){
 		TRANS.insertNSurv(cr, ce);
@@ -1098,14 +1052,14 @@ void TraCES<S, C>::showStatistics(){
 
 /*
 *	Func: 		
-*		showIntersection()
+*		showIntersection(const overlaping&)
 *	Args: 
-*		None. 
+*		The overlapping matrix. 
 *	Ret:
 *		None, show intersections.
 */
 template <typename S, typename C>
-void TraCES<S,C>::showIntersection(){
+void TraCES<S,C>::showIntersection(const overlaping& matrix){
 
 	cout << "-----Intersection-----" << endl;
 	for (const auto &i : matrix){
@@ -1118,14 +1072,14 @@ void TraCES<S,C>::showIntersection(){
 
 /*
 *	Func: 		
-*		showOverlaping()
+*		showOverlaping(const overlaping&)
 *	Args: 
-*		None. 
+*		The overlapping matrix. 
 *	Ret:
 *		None, show overlapping.
 */
 template <typename S, typename C>
-void TraCES<S,C>::showOverlaping(){
+void TraCES<S,C>::showOverlaping(const overlaping& matrix){
 
 	cout << "-----Overlapping-----" << endl;
 	for (const auto &i : matrix){
@@ -1165,45 +1119,6 @@ void TraCES<S,C>::showTrackStatistics(){
 			for(const auto &y: x.second) cout << y << " ";
 			cout << endl;
 		}
-		cout << endl;
-	}
-}
-
-
-/*
-*	Func: 		
-*		showTransitions()
-*	Args: 
-*		None. 
-*	Ret:
-*		None, show external and internal transitions, if any.
-*/
-template <typename S, typename C>
-void TraCES<S, C>::showTransitions(){
-
-	if(TRANS.checkExtChange()){
-
-		cout << "+ EXT TRANSITIONS" << endl << endl; 
-
-		TRANS.showSplits();
-
-		TRANS.showUnions();
-		 
-		TRANS.showDeaths();
-		TRANS.showFDeaths();
-		
-		TRANS.showBirths();
-		TRANS.showNBirths();
-		
-	}
-
-	if(TRANS.checkIntChange()){
-
-		cout << "+ INT TRANSITIONS" << endl << endl;
-
-		TRANS.showInterC();
-		TRANS.showNStatistic();
-
 		cout << endl;
 	}
 }
