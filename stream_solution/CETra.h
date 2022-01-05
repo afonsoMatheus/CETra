@@ -8,8 +8,8 @@
 //                                                                            //
 //----------------------------------------------------------------------------//
 
-#ifndef TRACES_H
-#define TRACES_H
+#ifndef CETRA_H
+#define CETRA_H
 
 #include <unordered_map>
 #include <vector>
@@ -28,7 +28,7 @@ using namespace std;
 
 /* Sensors and clusters labels can be of must primary types, int is the default for both */
 template <typename S = int, typename C = int>
-class TraCES{
+class CETra{
 
 	/* Nicknames for code simplification */
 	using clustering = unordered_map<C, vector<S> >;
@@ -130,7 +130,7 @@ class TraCES{
 
 	public:
 
-		TraCES(const int = 3);
+		CETra(const int = 3);
 
 		//----------- Execution -----------//
 
@@ -156,16 +156,16 @@ class TraCES{
 /*
 *
 *	Func: 		
-*		TraCES(const int, const vector<float>) *Constructor
+*		CETra(const int, const vector<float>) *Constructor
 *	Args: 
 *		Size of statistics window, 
 *		Limits of the internal statistics.
 *	Ret:
-*		None, constructs a TraCES object. 
+*		None, constructs a CETra object. 
 *
 */
 template <typename S, typename C>
-TraCES<S, C>::TraCES(const int N){
+CETra<S, C>::CETra(const int N){
 
 	winSize = N;
 
@@ -192,7 +192,7 @@ TraCES<S, C>::TraCES(const int N){
 *
 */
 template <typename S, typename C>
-Transitions<C> TraCES<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei){
+Transitions<C> CETra<S, C>::execute(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei){
 	
 	try{
 
@@ -207,8 +207,9 @@ Transitions<C> TraCES<S, C>::execute(const vector<S> &sen, const vector<C> &clu,
 			/* Storing the current clustering and it's clusters weights */
 			storeClustering(sen, clu, wei);
 
-			/* Storing the clusters sizes and the total tracked internal statistics*/
-			for (const auto &x: clusR) staR[x.first].insert(staR[x.first].end(), x.second.size());
+			/* Storing the clusters sizes statistics*/
+			for (const auto &x: clusR) 
+				staR[x.first].insert(staR[x.first].end(), x.second.size());
 
 			return Transitions<C>();
 
@@ -273,7 +274,7 @@ Transitions<C> TraCES<S, C>::execute(const vector<S> &sen, const vector<C> &clu,
 */
 template <typename S, typename C>
 template <class T>
-Transitions<C> TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei, initializer_list<T> list){
+Transitions<C> CETra<S,C>::execute(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei, initializer_list<T> list){
 
 	try{
 
@@ -368,7 +369,7 @@ Transitions<C> TraCES<S,C>::execute(const vector<S> &sen, const vector<C> &clu, 
 *		None, updates the size limit in the internal limits array.  
 */
 template <typename S, typename C>
-void TraCES<S,C>::configSizeLimit(const float& sl){
+void CETra<S,C>::configSizeLimit(const float& sl){
 	if(sl < 0.0 || sl > 1.0) 
 		throw invalid_argument("ERROR: The size limit must be between 0.0 and 1.0");
 	limits[0] = sl;
@@ -384,7 +385,7 @@ void TraCES<S,C>::configSizeLimit(const float& sl){
 *		None, updates the names and limits arrays.  
 */
 template <typename S, typename C>
-void TraCES<S,C>::configNewIntStatistic(const float& lim, const string& nam){
+void CETra<S,C>::configNewIntStatistic(const float& lim, const string& nam){
 
 	if(lim < 0.0 || lim > 1.0) throw invalid_argument("ERROR: The limits must be between 0.0 and 1.0"); 
 	limits.insert(limits.end(), lim);
@@ -401,7 +402,7 @@ void TraCES<S,C>::configNewIntStatistic(const float& lim, const string& nam){
 *		None, updates the survival limit in the internal survival limit variable.  
 */
 template <typename S, typename C>
-void TraCES<S,C>::configSurvLimit(const float& ls){
+void CETra<S,C>::configSurvLimit(const float& ls){
 	if(ls < 0.0 || ls > 1.0) 
 		throw invalid_argument("ERROR: The survival limit must be between 0.0 and 1.0");
 	if(ls < split_limit)
@@ -418,7 +419,7 @@ void TraCES<S,C>::configSurvLimit(const float& ls){
 *		None, updates the split limit in the internal split limit variable.  
 */
 template <typename S, typename C>
-void TraCES<S,C>::configSplitLimit(const float& ls){
+void CETra<S,C>::configSplitLimit(const float& ls){
 	if(ls < 0.0 || ls > 1.0) 
 		throw invalid_argument("ERROR: The split limit must be between 0.0 and 1.0");
 	if(ls >= surv_limit){
@@ -441,7 +442,7 @@ void TraCES<S,C>::configSplitLimit(const float& ls){
 *		hash table each. 
 */
 template <typename S, typename C>
-void TraCES<S, C>::storeClustering(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei){
+void CETra<S, C>::storeClustering(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei){
 
 	/* Storing referencial clustering clusters and it's clusters weights */
 	for (int i = 0; i < sen.size(); ++i){
@@ -449,7 +450,7 @@ void TraCES<S, C>::storeClustering(const vector<S> &sen, const vector<C> &clu, c
 		refW[clu[i]] += wei[i];
 	}
 
-	showRefClustering();
+	//showRefClustering();
 }
 
 /*
@@ -462,7 +463,7 @@ void TraCES<S, C>::storeClustering(const vector<S> &sen, const vector<C> &clu, c
 */
 template <typename S, typename C>
 template <class T>
-void TraCES<S,C>::storeRefStatistics(initializer_list<T> list){
+void CETra<S,C>::storeRefStatistics(initializer_list<T> list){
 
 	/* The set structure helps to detect the clustering labels maintaining ordering */
 	set<C> ref_labels;
@@ -499,7 +500,7 @@ void TraCES<S,C>::storeRefStatistics(initializer_list<T> list){
 *		None, empty the referential clustering variables. 
 */
 template <typename S, typename C>
-void TraCES<S,C>::freeRef(){
+void CETra<S,C>::freeRef(){
 
 	clusR.clear();
 	refW.clear();
@@ -522,7 +523,7 @@ void TraCES<S,C>::freeRef(){
 *		the search table and the clusters size internal statistic. 
 */
 template <typename S, typename C>
-auto TraCES<S,C>::getEvoInformation(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei) -> search_table{
+auto CETra<S,C>::getEvoInformation(const vector<S> &sen, const vector<C> &clu, const vector<float> &wei) -> search_table{
 
 	search_table evoTable;
 
@@ -558,7 +559,7 @@ auto TraCES<S,C>::getEvoInformation(const vector<S> &sen, const vector<C> &clu, 
 */
 template <typename S, typename C>
 template <class T>
-void TraCES<S,C>::storeEvoStatistics(initializer_list<T> list){
+void CETra<S,C>::storeEvoStatistics(initializer_list<T> list){
 
 	/* Storing evolutionary clustering cluster's internal statistics */
 	for(const auto &s: list){
@@ -585,7 +586,7 @@ void TraCES<S,C>::storeEvoStatistics(initializer_list<T> list){
 *		None, empty the evolutionary clustering variables. 
 */
 template <typename S, typename C>
-void TraCES<S,C>::freeEvo(){
+void CETra<S,C>::freeEvo(){
 
 	staE.clear();
 
@@ -609,7 +610,7 @@ void TraCES<S,C>::freeEvo(){
 *		and evolutionary clustering. 
 */
 template <typename S, typename C>
-Transitions<C> TraCES<S, C>::trackTransitions(search_table& evoTable){
+Transitions<C> CETra<S, C>::trackTransitions(search_table& evoTable){
 
 	/* Creating empty transitions object */
 	Transitions<C> TRANS;
@@ -640,7 +641,7 @@ Transitions<C> TraCES<S, C>::trackTransitions(search_table& evoTable){
 *		and evolutionary clustering, and builds fail/new sensors information. 
 */
 template <typename S, typename C>
-auto TraCES<S, C>::clusterOverlap(search_table& evoTable) -> overlaping{
+auto CETra<S, C>::clusterOverlap(search_table& evoTable) -> overlaping{
 	
 	overlaping matrix;
 
@@ -683,7 +684,7 @@ auto TraCES<S, C>::clusterOverlap(search_table& evoTable) -> overlaping{
 		}
 	}
 
-	showOverlaping(matrix);
+	//showOverlaping(matrix);
 
 	return matrix;
 }
@@ -697,7 +698,7 @@ auto TraCES<S, C>::clusterOverlap(search_table& evoTable) -> overlaping{
 *		Hash Table, maps evolutionary cluster labels into matrix indexes.
 */
 template <typename S, typename C>
-unordered_map<C,int> TraCES<S, C>::useLabels(){
+unordered_map<C,int> CETra<S, C>::useLabels(){
 
 	unordered_map<C, int> lmap;
 
@@ -723,7 +724,7 @@ unordered_map<C,int> TraCES<S, C>::useLabels(){
 *		clustering.
 */
 template <typename S, typename C>
-void TraCES<S, C>::extTransitions(Transitions<C>& TRANS){
+void CETra<S, C>::extTransitions(Transitions<C>& TRANS){
 
 	const overlaping &matrix = TRANS.getExtMatrix();
 
@@ -822,7 +823,7 @@ void TraCES<S, C>::extTransitions(Transitions<C>& TRANS){
 *		Hash Table, maps matrix indexes to the evolutionary clusters labels.
 */
 template <typename S, typename C>
-unordered_map<int,C> TraCES<S, C>::hashLabels(){
+unordered_map<int,C> CETra<S, C>::hashLabels(){
 
 	unordered_map<int, C> umap;
 
@@ -845,7 +846,7 @@ unordered_map<int,C> TraCES<S, C>::hashLabels(){
 *		Float, the overlaps sum of a referential clustering split candidates.
 */
 template <typename S, typename C>
-float TraCES<S, C>::sumSplits(const vector<float> &overlaps, const vector<C> &split_cand){
+float CETra<S, C>::sumSplits(const vector<float> &overlaps, const vector<C> &split_cand){
 
 	float sum = 0.0;
 
@@ -866,12 +867,11 @@ float TraCES<S, C>::sumSplits(const vector<float> &overlaps, const vector<C> &sp
 *		None, identifies if a cluster is dead because of missing sensors.
 */
 template <typename S, typename C>
-void TraCES<S, C>::checkFailDeath(const C &clu, Transitions<C>& TRANS){
+void CETra<S, C>::checkFailDeath(const C &clu, Transitions<C>& TRANS){
 
 	if(failS.find(clu) != failS.end()){
 		if(failS[clu].size()/staR[clu][0] > surv_limit)
 			TRANS.insertFDeath(clu);
-		
 	}
 }
 
@@ -884,7 +884,7 @@ void TraCES<S, C>::checkFailDeath(const C &clu, Transitions<C>& TRANS){
 *		None, identifies if a new cluster emerged because of new sensors.
 */
 template <typename S, typename C>
-void TraCES<S, C>::checkNewBirth(Transitions<C>& TRANS){
+void CETra<S, C>::checkNewBirth(Transitions<C>& TRANS){
 
 	for(const auto &x: TRANS.getBirths()){
 		if(newS.find(x) != newS.end()){
@@ -906,7 +906,7 @@ void TraCES<S, C>::checkNewBirth(Transitions<C>& TRANS){
 *		with the corresponding evolutionary cluster and put it in a queue.		
 */
 template <typename S, typename C>
-void TraCES<S, C>::intTransitions(Transitions<C>& TRANS){
+void CETra<S, C>::intTransitions(Transitions<C>& TRANS){
 
 	statistics inter;
 
@@ -940,7 +940,7 @@ void TraCES<S, C>::intTransitions(Transitions<C>& TRANS){
 *		entire window size to identify an internal transition.
 */
 template <typename S, typename C>
-void TraCES<S,C>::checkIntTrans(Transitions<C>& TRANS){
+void CETra<S,C>::checkIntTrans(Transitions<C>& TRANS){
 
 	unordered_map<C, vector<int>> counts;
 
@@ -982,7 +982,7 @@ void TraCES<S,C>::checkIntTrans(Transitions<C>& TRANS){
 *		None, inserts a size change by many new sensors. 
 */
 template <typename S, typename C>
-void TraCES<S,C>::checkNewStatistic(const C &cr, const C &ce, Transitions<C>& TRANS){
+void CETra<S,C>::checkNewStatistic(const C &cr, const C &ce, Transitions<C>& TRANS){
 
 	if(newS[ce].size() > staR[cr][0] * limits[0]){
 		TRANS.insertNSurv(cr, ce);
@@ -1001,7 +1001,7 @@ void TraCES<S,C>::checkNewStatistic(const C &cr, const C &ce, Transitions<C>& TR
 *		None, show referential clustering and it's clusters weights.
 */
 template <typename S, typename C>
-void TraCES<S, C>::showRefClustering(){
+void CETra<S, C>::showRefClustering(){
 
 	cout << "------Clustering------" << endl;
 	for (const auto &i : clusR){
@@ -1024,7 +1024,7 @@ void TraCES<S, C>::showRefClustering(){
 *		None, show internal statistics.
 */
 template <typename S, typename C>
-void TraCES<S, C>::showStatistics(){
+void CETra<S, C>::showStatistics(){
 	
 	cout << "------Statistics-------" << endl;
 
@@ -1059,7 +1059,7 @@ void TraCES<S, C>::showStatistics(){
 *		None, show intersections.
 */
 template <typename S, typename C>
-void TraCES<S,C>::showIntersection(const overlaping& matrix){
+void CETra<S,C>::showIntersection(const overlaping& matrix){
 
 	cout << "-----Intersection-----" << endl;
 	for (const auto &i : matrix){
@@ -1079,7 +1079,7 @@ void TraCES<S,C>::showIntersection(const overlaping& matrix){
 *		None, show overlapping.
 */
 template <typename S, typename C>
-void TraCES<S,C>::showOverlaping(const overlaping& matrix){
+void CETra<S,C>::showOverlaping(const overlaping& matrix){
 
 	cout << "-----Overlapping-----" << endl;
 	for (const auto &i : matrix){
@@ -1099,7 +1099,7 @@ void TraCES<S,C>::showOverlaping(const overlaping& matrix){
 *		None, show failing and new sensors.
 */
 template <typename S, typename C>
-void TraCES<S,C>::showTrackStatistics(){
+void CETra<S,C>::showTrackStatistics(){
 
 	if(!failS.empty()){
 
@@ -1132,7 +1132,7 @@ void TraCES<S,C>::showTrackStatistics(){
 *		None, show statistics inside the queue.
 */
 template <typename S, typename C>
-void TraCES<S,C>::showIntQueue(){
+void CETra<S,C>::showIntQueue(){
 
 	for(const auto &x: staQueue){
 		cout << "----------" << endl;

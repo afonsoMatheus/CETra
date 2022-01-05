@@ -1,6 +1,6 @@
 /* Author: Afonso Matheus                                                     */
 /* Date: 2021                                                                 */
-//----------------------------------------------------------------------------//                                                                          
+//----------------------------------------------------------------------------//
 //                                                                            //
 // Script that contains the implementation of cluster's transiction detection // 
 // between two n-dimensional clusterings (MONIC)                              //
@@ -11,9 +11,9 @@
 
 /*Variables used between all modules*/
 
-int CLU = 3; // number of clusterings
-int MAX = 60000; // maximun sample size for vector alocation
-int FEA = 100; // number of features
+int CLU = 50; // number of clusterings
+int MAX = 300; // maximun sample size for vector alocation
+int FEA = 3; // number of features
 
 /*
 *

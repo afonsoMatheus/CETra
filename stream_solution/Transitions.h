@@ -18,6 +18,7 @@ using namespace std;
 #include <string>
 #include <unordered_map>
 #include <iostream>
+#include <fstream>
 
 template <typename T>
 class Transitions{
@@ -30,7 +31,7 @@ class Transitions{
 
 		/**************************** VARIABLES ****************************/
 
-		/* Overlapping matrix */
+		/* Matrices */
 		overlaping ext_matrix;
 		statistics int_matrix;
 
@@ -133,6 +134,125 @@ class Transitions{
 		void showInterC();
 
 		void showNStatistic();
+
+		void exportTrans(const string &path){
+
+			if(survs.empty() && !checkExtChange()) return;
+
+			unordered_map<T, int> hm_x;
+			unordered_map<T, int> hm_y;
+
+			vector<T> source;
+			vector<T> target;
+			vector<float> value;
+			vector<string> labels;
+
+			int l = 0;
+
+			if(!survs.empty()){
+				for(const auto &x : survs){
+
+					source.push_back(l++);
+					hm_x[get<0>(x)] = source.back();
+					labels.push_back("Cref" + to_string(get<0>(x)));
+
+					target.push_back(l++);
+					hm_y[get<1>(x)] = target.back();
+					labels.push_back("Cevo" + to_string(get<1>(x)));
+
+					value.push_back(1);
+
+				}
+			}
+
+			if(!splits.empty()){
+				for(const auto &x: splits){
+					for(const auto &y: x.second){
+						
+						if(hm_x.find(x.first) == hm_x.end()){
+							source.push_back(l++);
+							hm_x[x.first] = source.back();
+							labels.push_back("Cref" + to_string(x.first));
+						}else{
+							source.push_back(hm_x[x.first]);
+						}
+						
+						if(hm_y.find(y) == hm_y.end()){
+							target.push_back(l++);
+							hm_y[y] = target.back();
+							labels.push_back("Cevo" + to_string(y));
+						}else{
+							target.push_back(hm_y[y]);
+						}
+
+						value.push_back(1);	
+					}
+					
+				}
+			}
+
+			if(!unions.empty()){
+				for(const auto &x: unions){
+					for(const auto &y: x.second){ 
+						
+						if(hm_y.find(x.first) == hm_y.end()){
+							target.push_back(l++);
+							hm_y[x.first] = target.back();
+							labels.push_back("Cevo" + to_string(x.first));
+						}else{
+							target.push_back(hm_y[x.first]);
+						}
+						
+						if(hm_x.find(y) == hm_x.end()){
+							source.push_back(l++);
+							hm_x[y] = source.back();
+							labels.push_back("Cref" + to_string(y));
+						}else{
+							source.push_back(hm_x[y]);
+						}		
+
+						value.push_back(1);						
+					}
+					
+				}
+			}
+			 
+			//showDeaths();
+			
+			//showBirths();
+
+			ofstream output(path);
+
+			for(const auto &x: source){ 
+				output << x << " ";
+			}	
+			output << endl;
+
+			for(const auto &x: target){ 
+				output << x << " ";
+			}	
+			output << endl;
+
+			for(const auto &x: value){ 
+				output << x << " ";
+			}	
+			output << endl;
+
+			for(const auto &x: labels){ 
+				output << x << " ";
+			}
+
+			/*for(const auto &x: labels_x){ 
+				output << x << " ";
+			}
+			for(const auto &x: labels_y){ 
+				output << x << " ";
+			}	
+			output << endl;*/
+
+			output.close();
+
+		}
 
 };
 
