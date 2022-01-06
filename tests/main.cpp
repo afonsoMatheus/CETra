@@ -11,8 +11,8 @@ int main(int argc, char const *argv[]){
 	mor.configNewIntStatistic(0.5, "Mean");
 	mor.configNewIntStatistic(0.5, "Std");
 
-	Clustering C1 = inputClustering("/home/afonso/Documentos/Dissertação/Masters Degree/tests/basic_test/c1");
-	Clustering C2 = inputClustering("/home/afonso/Documentos/Dissertação/Masters Degree/tests/basic_test/c2");
+	Clustering C1 = inputClustering("/home/afonso/Documentos/Dissertação/Masters Degree/tests/basic_test/iFCDS3");
+	Clustering C2 = inputClustering("/home/afonso/Documentos/Dissertação/Masters Degree/tests/basic_test/iFCDS4");
 
 	try{
 
@@ -38,6 +38,8 @@ int main(int argc, char const *argv[]){
 	mor.execute(C1.sensors, C1.clusters, C1.weights);
 
 	Transitions<int> TRANS;
+
+	//cout << C2.sensors.size() << " " << C2.clusters.size()<< " " << C2.weights.size()<< " " << endl;
 
 	i = 0;
 	while(i < 1){

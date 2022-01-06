@@ -141,6 +141,7 @@ class Transitions{
 
 			unordered_map<T, int> hm_x;
 			unordered_map<T, int> hm_y;
+			unordered_map<string, int> dea;
 
 			vector<T> source;
 			vector<T> target;
@@ -151,14 +152,13 @@ class Transitions{
 
 			if(!survs.empty()){
 				for(const auto &x : survs){
-
 					source.push_back(l++);
 					hm_x[get<0>(x)] = source.back();
-					labels.push_back("Cref" + to_string(get<0>(x)));
+					labels.push_back("C" + to_string(get<0>(x)));
 
 					target.push_back(l++);
 					hm_y[get<1>(x)] = target.back();
-					labels.push_back("Cevo" + to_string(get<1>(x)));
+					labels.push_back("C" + to_string(get<1>(x)));
 
 					value.push_back(1);
 
@@ -172,7 +172,7 @@ class Transitions{
 						if(hm_x.find(x.first) == hm_x.end()){
 							source.push_back(l++);
 							hm_x[x.first] = source.back();
-							labels.push_back("Cref" + to_string(x.first));
+							labels.push_back("C" + to_string(x.first));
 						}else{
 							source.push_back(hm_x[x.first]);
 						}
@@ -180,7 +180,7 @@ class Transitions{
 						if(hm_y.find(y) == hm_y.end()){
 							target.push_back(l++);
 							hm_y[y] = target.back();
-							labels.push_back("Cevo" + to_string(y));
+							labels.push_back("C" + to_string(y));
 						}else{
 							target.push_back(hm_y[y]);
 						}
@@ -198,7 +198,7 @@ class Transitions{
 						if(hm_y.find(x.first) == hm_y.end()){
 							target.push_back(l++);
 							hm_y[x.first] = target.back();
-							labels.push_back("Cevo" + to_string(x.first));
+							labels.push_back("C" + to_string(x.first));
 						}else{
 							target.push_back(hm_y[x.first]);
 						}
@@ -206,7 +206,7 @@ class Transitions{
 						if(hm_x.find(y) == hm_x.end()){
 							source.push_back(l++);
 							hm_x[y] = source.back();
-							labels.push_back("Cref" + to_string(y));
+							labels.push_back("C" + to_string(y));
 						}else{
 							source.push_back(hm_x[y]);
 						}		
@@ -217,9 +217,51 @@ class Transitions{
 				}
 			}
 			 
-			//showDeaths();
-			
-			//showBirths();
+			if(!births.empty()){
+				for(const auto &x : births){
+					if(hm_y.find(x) == hm_y.end()){
+						target.push_back(l++);
+						hm_y[x] = target.back();
+						labels.push_back("C" + to_string(x));
+					}else{
+						target.push_back(hm_y[x]);
+					}
+
+					if(dea.find("BIRTH") == dea.end()){
+						source.push_back(l++);
+						dea["BIRTH"] = source.back();
+						labels.push_back("BIRTH");
+					}else{
+						source.push_back(dea["BIRTH"]);
+					}
+
+					value.push_back(1);	
+				}
+
+			}
+
+			if(!deaths.empty()){
+				for(const auto &x : deaths){
+					if(hm_x.find(x) == hm_x.end()){
+						source.push_back(l++);
+						hm_x[x] = source.back();
+						labels.push_back("C" + to_string(x));
+					}else{
+						source.push_back(hm_x[x]);
+					}
+
+					if(dea.find("DEATH") == dea.end()){
+						target.push_back(l++);
+						dea["DEATH"] = target.back();
+						labels.push_back("DEATH");
+					}else{
+						target.push_back(dea["DEATH"]);
+					}
+
+					value.push_back(1);	
+				}
+
+			}
 
 			ofstream output(path);
 
@@ -241,14 +283,6 @@ class Transitions{
 			for(const auto &x: labels){ 
 				output << x << " ";
 			}
-
-			/*for(const auto &x: labels_x){ 
-				output << x << " ";
-			}
-			for(const auto &x: labels_y){ 
-				output << x << " ";
-			}	
-			output << endl;*/
 
 			output.close();
 
