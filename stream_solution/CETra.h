@@ -215,7 +215,7 @@ Transitions<C> CETra<S, C>::execute(const vector<S> &sen, const vector<C> &clu, 
 
 		}else{
 
-			//cout << endl << "///// NEXT WINDOW /////" << endl << endl;
+			cout << endl << "///// NEXT WINDOW /////" << endl << endl;
 
 			/* Getting all necessary evolutionary clustering variables, including the evolved clusters sizes */
 			search_table evoTable = getEvoInformation(sen, clu, wei);
@@ -224,22 +224,30 @@ Transitions<C> CETra<S, C>::execute(const vector<S> &sen, const vector<C> &clu, 
 			Transitions<C> TRANS = trackTransitions(evoTable);
 
 			/* Showing survived clusters, if any */
-			//if(!TRANS.getSurvs().empty()) TRANS.showSurvs();
+			if(!TRANS.getSurvs().empty()) TRANS.showSurvs();
 
 			/* Verifying if there was any detected internal or external transitions */
-			if(TRANS.checkExtChange() || TRANS.checkIntChange()){
+			if(TRANS.checkExtChange()){
 
-				//cout << "=== TRANS DETECTED ===" << endl << endl;
+				cout << "=== TRANS DETECTED ===" << endl << endl;
 
 				/* Showing the detected internal or/and external transitions */
-				//TRANS.showTransitions();
+				TRANS.showTransitions();
 
-				//cout << "### UPT REF CLUSTERING ###" << endl << endl;				
+				cout << "### UPT REF CLUSTERING ###" << endl << endl;				
 
 				/* Updating the referential clustering variables with the current evolutionary clustering */
 				freeRef();
 				storeClustering(sen, clu, wei);
 				staR = staE;
+			
+			} else if(TRANS.checkIntChange()){
+
+				for(const auto &x: TRANS.getInterC()){
+					for(const auto &y: x.second){
+						staR[x.first][y] = staE[TRANS.getSurvs()[x.first]][y];
+					}
+				}
 			}
 
 			/* Freeing the evolutionary clustering variables */
@@ -327,12 +335,12 @@ Transitions<C> CETra<S,C>::execute(const vector<S> &sen, const vector<C> &clu, c
 			//if(!TRANS.getSurvs().empty()) TRANS.showSurvs();
 
 			/* Verifying if there was any detected internal or external transitions */
-			if(TRANS.checkExtChange() || TRANS.checkIntChange()){
+			if(TRANS.checkExtChange()){
 
 				//cout << "=== TRANS DETECTED ===" << endl << endl;
 
 				/* Showing the detected internal or/and external transitions */
-				//TRANS.showTransitions();
+				TRANS.showTransitions();
 
 				//cout << "### UPT REF CLUSTERING ###" << endl << endl;
 
@@ -341,6 +349,16 @@ Transitions<C> CETra<S,C>::execute(const vector<S> &sen, const vector<C> &clu, c
 				storeClustering(sen, clu, wei);
 				staR = staE;
 
+			}else if(TRANS.checkIntChange()){
+
+				TRANS.showSurvs();
+				TRANS.showInterC();
+
+				for(const auto &x: TRANS.getInterC()){
+					for(const auto &y: x.second){
+						staR[x.first][y] = staE[TRANS.getSurvs()[x.first]][y];
+					}
+				}
 			}
 
 			/* Freeing the evolutionary clustering variables */
@@ -961,7 +979,7 @@ void CETra<S,C>::checkIntTrans(Transitions<C>& TRANS){
 	for(const auto &x: counts){
 		int i = 0;
 		for(const auto &y: x.second){
-			if(y == staQueue.size()) {
+			if(y == staQueue.size()){
 				TRANS.insertInterC(x.first, i);
 				checkNewStatistic(x.first, TRANS.getSurvs()[x.first], TRANS);
 			}

@@ -750,7 +750,8 @@ void Transitions<T>::showNStatistic(){
 */
 template <typename T>
 void Transitions<T>::exportTrans(const string &path){
-	if(survs.empty() && !checkExtChange()) return;
+
+	if(survs.empty() == true && checkExtChange() == false) return;
 
 	unordered_map<T, int> hm_x;
 	unordered_map<T, int> hm_y;
