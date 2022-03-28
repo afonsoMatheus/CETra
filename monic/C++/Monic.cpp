@@ -1,7 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <map>
-#include <string>
 #include <unordered_map>
 #include "/home/afonso/Documentos/Dissertação/Masters Degree/tests/ReadFile.h"
 
@@ -118,7 +116,7 @@ Transitions<C> extTransitions(const unordered_map<C, vector<float>> &matrix, con
 
 			float split_weis = sumSplits(X.second, split_cand);
 
-			if(split_weis > 0.5){
+			if(split_weis >= 0.5){
 
 				for(const auto x: split_cand) {
 					
@@ -157,71 +155,15 @@ Transitions<C> extTransitions(const unordered_map<C, vector<float>> &matrix, con
 
 }
 
-template <typename C>
-void intTransitions(Transitions<C>& TRANS, unordered_map<int, vector<float>>& sta1, unordered_map<int, vector<float>>& sta2, vector<float>& limits){
-
-	unordered_map<int, vector<float>> inter;
-
-	for(const auto &x: TRANS.getSurvs()){
-		for(int i = 0; i < sta1[x.first].size(); i++){
-			if(i < sta2[x.second].size())
-				inter[x.first].insert(inter[x.first].end(), sta2[x.second][i]/sta1[x.first][i]);
-		}
-	}
-
-	checkIntTrans(TRANS, limits, inter);
-}
-
-template <typename C>
-void checkIntTrans(Transitions<C>& TRANS, vector<float>& limits, unordered_map<int, vector<float>> &inter){
-
-	for(const auto &clu: inter){
-		for(auto i = 0; i < clu.second.size(); i++){
-			if(fabs(clu.second[i]-1) > limits[i]){
-				TRANS.insertInterC(clu.first, i);
-			}
-		}
-	}	
-
-}
-
-Transitions<int> Monic(const Clustering &C1, const Clustering &C2, vector<float>& limits, vector<string>& names){
-
-	vector<int> aux_c1 = C1.clusters; 
-	sort( aux_c1.begin(), aux_c1.end());
-	aux_c1.erase( unique( aux_c1.begin(), aux_c1.end() ), aux_c1.end());
-
-	unordered_map<int, vector<float>> staC1;
-	for(const auto &x: C1.inter){
-		int i = 0;
-		for(const auto &y: aux_c1){
-			staC1[y].push_back(x.second[i]);
-			i++;
-		}
-	}
+void Monic(const Clustering &C1, const Clustering &C2){
 
 	vector<int> aux = C2.clusters; 
 	sort( aux.begin(), aux.end() );
 	aux.erase( unique( aux.begin(), aux.end() ), aux.end());
 
-	unordered_map<int, vector<float>> staC2;
-	for(const auto &x: C2.inter){
-		int i = 0;
-		for(const auto &y: aux){
-			staC2[y].push_back(x.second[i]);
-			i++;
-		}
-	}
-
 	unordered_map<int, vector<float>> mat = overlapMatrix(C1, C2, aux);
 
 	Transitions<int> TRANS = extTransitions<int>(mat, aux);
-
-	TRANS.insertInterN(names);
-
-	intTransitions(TRANS, staC1, staC2, limits);
-
-	return TRANS;
 
 	//TRANS.showSurvs();
 	//TRANS.showTransitions();

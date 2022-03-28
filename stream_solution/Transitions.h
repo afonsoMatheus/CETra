@@ -4,7 +4,7 @@
 //----------------------------------------------------------------------------//
 //                                                                            //                                                                          //
 // Script that contains the implementation of Transitions class used by the   // 
-// CETra algorithm.                                                           //
+// TraCES algorithm.                                                          //
 //                                                                            //
 //----------------------------------------------------------------------------//
 
@@ -135,17 +135,156 @@ class Transitions{
 
 		void showNStatistic();
 
-		void exportTrans(const string &);
+		void exportTrans(const string &path){
 
-		void showIntMatrix(){
+			if(survs.empty() && !checkExtChange()) return;
 
-			for (const auto &x: int_matrix){
-				cout << x.first << ": ";
-				for(const auto &y: x.second){
-					cout << y << " ";
-				} 
-				cout << endl;	
-			} 
+			unordered_map<T, int> hm_x;
+			unordered_map<T, int> hm_y;
+			unordered_map<string, int> dea;
+
+			vector<T> source;
+			vector<T> target;
+			vector<float> value;
+			vector<string> labels;
+
+			int l = 0;
+
+			if(!survs.empty()){
+				for(const auto &x : survs){
+					source.push_back(l++);
+					hm_x[get<0>(x)] = source.back();
+					labels.push_back("C" + to_string(get<0>(x)));
+
+					target.push_back(l++);
+					hm_y[get<1>(x)] = target.back();
+					labels.push_back("C" + to_string(get<1>(x)));
+
+					value.push_back(1);
+
+				}
+			}
+
+			if(!splits.empty()){
+				for(const auto &x: splits){
+					for(const auto &y: x.second){
+						
+						if(hm_x.find(x.first) == hm_x.end()){
+							source.push_back(l++);
+							hm_x[x.first] = source.back();
+							labels.push_back("C" + to_string(x.first));
+						}else{
+							source.push_back(hm_x[x.first]);
+						}
+						
+						if(hm_y.find(y) == hm_y.end()){
+							target.push_back(l++);
+							hm_y[y] = target.back();
+							labels.push_back("C" + to_string(y));
+						}else{
+							target.push_back(hm_y[y]);
+						}
+
+						value.push_back(1);	
+					}
+					
+				}
+			}
+
+			if(!unions.empty()){
+				for(const auto &x: unions){
+					for(const auto &y: x.second){ 
+						
+						if(hm_y.find(x.first) == hm_y.end()){
+							target.push_back(l++);
+							hm_y[x.first] = target.back();
+							labels.push_back("C" + to_string(x.first));
+						}else{
+							target.push_back(hm_y[x.first]);
+						}
+						
+						if(hm_x.find(y) == hm_x.end()){
+							source.push_back(l++);
+							hm_x[y] = source.back();
+							labels.push_back("C" + to_string(y));
+						}else{
+							source.push_back(hm_x[y]);
+						}		
+
+						value.push_back(1);						
+					}
+					
+				}
+			}
+			 
+			if(!births.empty()){
+				for(const auto &x : births){
+					if(hm_y.find(x) == hm_y.end()){
+						target.push_back(l++);
+						hm_y[x] = target.back();
+						labels.push_back("C" + to_string(x));
+					}else{
+						target.push_back(hm_y[x]);
+					}
+
+					if(dea.find("BIRTH") == dea.end()){
+						source.push_back(l++);
+						dea["BIRTH"] = source.back();
+						labels.push_back("BIRTH");
+					}else{
+						source.push_back(dea["BIRTH"]);
+					}
+
+					value.push_back(1);	
+				}
+
+			}
+
+			if(!deaths.empty()){
+				for(const auto &x : deaths){
+					if(hm_x.find(x) == hm_x.end()){
+						source.push_back(l++);
+						hm_x[x] = source.back();
+						labels.push_back("C" + to_string(x));
+					}else{
+						source.push_back(hm_x[x]);
+					}
+
+					if(dea.find("DEATH") == dea.end()){
+						target.push_back(l++);
+						dea["DEATH"] = target.back();
+						labels.push_back("DEATH");
+					}else{
+						target.push_back(dea["DEATH"]);
+					}
+
+					value.push_back(1);	
+				}
+
+			}
+
+			ofstream output(path);
+
+			for(const auto &x: source){ 
+				output << x << " ";
+			}	
+			output << endl;
+
+			for(const auto &x: target){ 
+				output << x << " ";
+			}	
+			output << endl;
+
+			for(const auto &x: value){ 
+				output << x << " ";
+			}	
+			output << endl;
+
+			for(const auto &x: labels){ 
+				output << x << " ";
+			}
+
+			output.close();
 
 		}
 
@@ -737,167 +876,6 @@ void Transitions<T>::showNStatistic(){
 	for(const auto &x : news){
 		cout << "Too much new sensors between ref cluster " << x.first << " and evo cluster " << x.second << endl; 
 	}
-
-}
-
-/*
-*	Func: 		
-*		exportTrans(const string &)
-*	Args: 
-*		String, the path to the output file. 
-*	Ret:
-*		None, export the transitions to a txt used by the sankey python script.
-*/
-template <typename T>
-void Transitions<T>::exportTrans(const string &path){
-	if(survs.empty() && !checkExtChange()) return;
-
-	unordered_map<T, int> hm_x;
-	unordered_map<T, int> hm_y;
-	unordered_map<string, int> dea;
-
-	vector<T> source;
-	vector<T> target;
-	vector<float> value;
-	vector<string> labels;
-
-	int l = 0;
-
-	if(!survs.empty()){
-		for(const auto &x : survs){
-			source.push_back(l++);
-			hm_x[get<0>(x)] = source.back();
-			labels.push_back("C" + to_string(get<0>(x)));
-
-			target.push_back(l++);
-			hm_y[get<1>(x)] = target.back();
-			labels.push_back("C" + to_string(get<1>(x)));
-
-			value.push_back(1);
-
-		}
-	}
-
-	if(!splits.empty()){
-		for(const auto &x: splits){
-			for(const auto &y: x.second){
-				
-				if(hm_x.find(x.first) == hm_x.end()){
-					source.push_back(l++);
-					hm_x[x.first] = source.back();
-					labels.push_back("C" + to_string(x.first));
-				}else{
-					source.push_back(hm_x[x.first]);
-				}
-				
-				if(hm_y.find(y) == hm_y.end()){
-					target.push_back(l++);
-					hm_y[y] = target.back();
-					labels.push_back("C" + to_string(y));
-				}else{
-					target.push_back(hm_y[y]);
-				}
-
-				value.push_back(1);	
-			}
-			
-		}
-	}
-
-	if(!unions.empty()){
-		for(const auto &x: unions){
-			for(const auto &y: x.second){ 
-				
-				if(hm_y.find(x.first) == hm_y.end()){
-					target.push_back(l++);
-					hm_y[x.first] = target.back();
-					labels.push_back("C" + to_string(x.first));
-				}else{
-					target.push_back(hm_y[x.first]);
-				}
-				
-				if(hm_x.find(y) == hm_x.end()){
-					source.push_back(l++);
-					hm_x[y] = source.back();
-					labels.push_back("C" + to_string(y));
-				}else{
-					source.push_back(hm_x[y]);
-				}		
-
-				value.push_back(1);						
-			}
-			
-		}
-	}
-	 
-	if(!births.empty()){
-		for(const auto &x : births){
-			if(hm_y.find(x) == hm_y.end()){
-				target.push_back(l++);
-				hm_y[x] = target.back();
-				labels.push_back("C" + to_string(x));
-			}else{
-				target.push_back(hm_y[x]);
-			}
-
-			if(dea.find("BIRTH") == dea.end()){
-				source.push_back(l++);
-				dea["BIRTH"] = source.back();
-				labels.push_back("BIRTH");
-			}else{
-				source.push_back(dea["BIRTH"]);
-			}
-
-			value.push_back(1);	
-		}
-
-	}
-
-	if(!deaths.empty()){
-		for(const auto &x : deaths){
-			if(hm_x.find(x) == hm_x.end()){
-				source.push_back(l++);
-				hm_x[x] = source.back();
-				labels.push_back("C" + to_string(x));
-			}else{
-				source.push_back(hm_x[x]);
-			}
-
-			if(dea.find("DEATH") == dea.end()){
-				target.push_back(l++);
-				dea["DEATH"] = target.back();
-				labels.push_back("DEATH");
-			}else{
-				target.push_back(dea["DEATH"]);
-			}
-
-			value.push_back(1);	
-		}
-
-	}
-
-	ofstream output(path);
-
-	for(const auto &x: source){ 
-		output << x << " ";
-	}	
-	output << endl;
-
-	for(const auto &x: target){ 
-		output << x << " ";
-	}	
-	output << endl;
-
-	for(const auto &x: value){ 
-		output << x << " ";
-	}	
-	output << endl;
-
-	for(const auto &x: labels){ 
-		output << x << " ";
-	}
-
-	output.close();
 
 }
 

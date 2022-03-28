@@ -1,6 +1,6 @@
 #include "/home/afonso/Documentos/Dissertação/Masters Degree/stream_solution/CETra.h"
 #include "/home/afonso/Documentos/Dissertação/Masters Degree/monic/C++/Monic.cpp"
-#include "/home/afonso/Documentos/Dissertação/Masters Degree/tests/ReadFile.h"
+#include "ReadFile.h"
 #include <chrono>
 using namespace std::chrono;
 
@@ -8,29 +8,28 @@ int main(int argc, char const *argv[]){
 
 	CETra<int, int> mor(1);
 	mor.configSizeLimit(0.5);
-	mor.configNewIntStatistic(0.5, "Sta1");
+	mor.configNewIntStatistic(0.5, "Mean");
+	mor.configNewIntStatistic(0.5, "Std");
 
-	string s1 = argv[1];
-	string s2 = argv[2];
-
-	Clustering C1 = inputClustering("/home/afonso/Documentos/Dissertação/Masters Degree/tests/" + s1);
-	Clustering C2 = inputClustering("/home/afonso/Documentos/Dissertação/Masters Degree/tests/" + s2);
+	Clustering C1 = inputClustering("/home/afonso/Documentos/Dissertação/Masters Degree/tests/basic_test/iFCDS3");
+	Clustering C2 = inputClustering("/home/afonso/Documentos/Dissertação/Masters Degree/tests/basic_test/iFCDS4");
 
 	try{
 
 	auto start = high_resolution_clock::now();
 
 	int i = 0;
-	while(i < 1){
+	/*while(i < 1000){
 
-		Monic(C1, C2, 0.5, "Sta1");
+		Monic(C1, C2);
 		i++;
-	}
+
+	}*/
 
 	auto stop = high_resolution_clock::now();
 
 	auto duration = duration_cast<microseconds>(stop - start);
-	cout << "Monic Time: " << duration.count() << endl;
+	cout << duration.count() << endl;
 
 	////////////////////////////////////////////////////////
 
@@ -38,16 +37,22 @@ int main(int argc, char const *argv[]){
 
 	mor.execute(C1.sensors, C1.clusters, C1.weights);
 
+	Transitions<int> TRANS;
+
+	//cout << C2.sensors.size() << " " << C2.clusters.size()<< " " << C2.weights.size()<< " " << endl;
+
 	i = 0;
 	while(i < 1){
-
-		mor.execute(C2.sensors, C2.clusters, C2.weights);
+		
+		TRANS = mor.execute(C2.sensors, C2.clusters, C2.weights);
 		i++;
 	}
 
+	TRANS.exportTrans("/home/afonso/Documentos/Dissertação/Masters Degree/tests/output/sankey.txt");
+
 	stop = high_resolution_clock::now();
 	duration = duration_cast<microseconds>(stop - start);
-	cout << "CETra Time: " << duration.count() << endl;
+	cout << "Time: " << duration.count() << endl;
 
 	}catch(int& i){
 		

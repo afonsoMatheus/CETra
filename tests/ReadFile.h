@@ -51,8 +51,8 @@ Clustering inputClustering(const string &path){
 
     /*for(const auto &x: C.weights)
 		cout << x << " ";
-	cout << endl << endl;*/
-
+	cout << endl << endl;
+*/
 	int i = 0;
 	while (getline (MyReadFile, line)) {
 		stringstream ss(line);
@@ -63,7 +63,7 @@ Clustering inputClustering(const string &path){
 	    i++;
 	}
 
-/*	for(const auto &x: C.inter){
+	/*for(const auto &x: C.inter){
 		for(const auto &y: x.second){
 			cout << y << " ";
 		}
