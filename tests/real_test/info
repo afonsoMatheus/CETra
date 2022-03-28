@@ -1,0 +1,513 @@
+1 Sul/Santa Catarina/Estacao_Agua Doce_2012-01-01_2016-12-31.csv
+2 Sul/Santa Catarina/Estacao_Agronomica_2012-01-01_2016-12-31.csv
+3 Sul/Santa Catarina/Estacao_Abdon Batista_2012-01-01_2016-12-31.csv
+4 Sul/Santa Catarina/Estacao_Vargeao_2012-01-01_2016-12-31.csv
+5 Sul/Santa Catarina/Estacao_Videira_2012-01-01_2016-12-31.csv
+6 Sul/Santa Catarina/Estacao_Witmarsum_2012-01-01_2016-12-31.csv
+7 Sul/Santa Catarina/Estacao_Xanxere_2012-01-01_2016-12-31.csv
+8 Sul/Santa Catarina/Estacao_Xaxim_2012-01-01_2016-12-31.csv
+9 Sul/Santa Catarina/Estacao_Zortea_2012-01-01_2016-12-31.csv
+10 Sul/Santa Catarina/Estacao_Agrolandia_2012-01-01_2016-12-31.csv
+11 Sul/Santa Catarina/Estacao_Aguas de Chapeco_2012-01-01_2016-12-31.csv
+12 Sul/Santa Catarina/Estacao_Vitor Meireles_2012-01-01_2016-12-31.csv
+13 Sul/Santa Catarina/Estacao_Urussanga_2012-01-01_2016-12-31.csv
+14 Sul/Santa Catarina/Estacao_Xavantina_2012-01-01_2016-12-31.csv
+15 Sul/Santa Catarina/Estacao_Abelardo Luz_2012-01-01_2016-12-31.csv
+16 Sul/Santa Catarina/Estacao_Aguas Frias_2012-01-01_2016-12-31.csv
+17 Sul/Santa Catarina/Estacao_Florianopolis_2012-01-01_2016-12-31.csv
+18 Sul/Santa Catarina/Estacao_Aguas Mornas_2012-01-01_2016-12-31.csv
+19 Sul/Santa Catarina/Estacao_Alfredo Wagner_2012-01-01_2016-12-31.csv
+20 Sul/Santa Catarina/Estacao_Vidal Ramos_2012-01-01_2016-12-31.csv
+21 Sul/Parana/Estacao_Urai_2012-01-01_2016-12-31.csv
+22 Sul/Parana/Estacao_Alto Paraiso_2012-01-01_2016-12-31.csv
+23 Sul/Parana/Estacao_Altonia_2012-01-01_2016-12-31.csv
+24 Sul/Parana/Estacao_Umuarama_2012-01-01_2016-12-31.csv
+25 Sul/Parana/Estacao_Vera Cruz do Oeste_2012-01-01_2016-12-31.csv
+26 Sul/Parana/Estacao_Agudos do Sul_2012-01-01_2016-12-31.csv
+27 Sul/Parana/Estacao_Curitiba_2012-01-01_2016-12-31.csv
+28 Sul/Parana/Estacao_Almirante Tamandare_2012-01-01_2016-12-31.csv
+29 Sul/Parana/Estacao_Adrianopolis_2012-01-01_2016-12-31.csv
+30 Sul/Parana/Estacao_Virmond_2012-01-01_2016-12-31.csv
+31 Sul/Parana/Estacao_Vere_2012-01-01_2016-12-31.csv
+32 Sul/Parana/Estacao_Alto Piquiri_2012-01-01_2016-12-31.csv
+33 Sul/Parana/Estacao_Alto Parana_2012-01-01_2016-12-31.csv
+34 Sul/Parana/Estacao_Altamira do Parana_2012-01-01_2016-12-31.csv
+35 Sul/Parana/Estacao_Uniflor_2012-01-01_2016-12-31.csv
+36 Sul/Parana/Estacao_Ventania_2012-01-01_2016-12-31.csv
+37 Sul/Parana/Estacao_Vitorino_2012-01-01_2016-12-31.csv
+38 Sul/Parana/Estacao_Uniao da Vitoria_2012-01-01_2016-12-31.csv
+39 Sul/Parana/Estacao_Xambre_2012-01-01_2016-12-31.csv
+40 Sul/Parana/Estacao_Alvorada do Sul_2012-01-01_2016-12-31.csv
+41 Sul/Rio Grande do Sul/Estacao_Vitoria das Missoes_2012-01-01_2016-12-31.csv
+42 Sul/Rio Grande do Sul/Estacao_Alegrete_2012-01-01_2016-12-31.csv
+43 Sul/Rio Grande do Sul/Estacao_Acegua_2012-01-01_2016-12-31.csv
+44 Sul/Rio Grande do Sul/Estacao_Vila Maria_2012-01-01_2016-12-31.csv
+45 Sul/Rio Grande do Sul/Estacao_Vista Alegre do Prata_2012-01-01_2016-12-31.csv
+46 Sul/Rio Grande do Sul/Estacao_Alpestre_2012-01-01_2016-12-31.csv
+47 Sul/Rio Grande do Sul/Estacao_Vila Flores_2012-01-01_2016-12-31.csv
+48 Sul/Rio Grande do Sul/Estacao_Agudo_2012-01-01_2016-12-31.csv
+49 Sul/Rio Grande do Sul/Estacao_Alegria_2012-01-01_2016-12-31.csv
+50 Sul/Rio Grande do Sul/Estacao_Agua Santa_2012-01-01_2016-12-31.csv
+51 Sul/Rio Grande do Sul/Estacao_Almirante Tamandare do Sul_2012-01-01_2016-12-31.csv
+52 Sul/Rio Grande do Sul/Estacao_Vista Gaucha_2012-01-01_2016-12-31.csv
+53 Sul/Rio Grande do Sul/Estacao_Vista Alegre_2012-01-01_2016-12-31.csv
+54 Sul/Rio Grande do Sul/Estacao_Porto Alegre_2012-01-01_2016-12-31.csv
+55 Sul/Rio Grande do Sul/Estacao_Vila Langaro_2012-01-01_2016-12-31.csv
+56 Sul/Rio Grande do Sul/Estacao_Westfalia_2012-01-01_2016-12-31.csv
+57 Sul/Rio Grande do Sul/Estacao_Vila Nova do Sul_2012-01-01_2016-12-31.csv
+58 Sul/Rio Grande do Sul/Estacao_Xangri-la_2012-01-01_2016-12-31.csv
+59 Sul/Rio Grande do Sul/Estacao_Ajuricaba_2012-01-01_2016-12-31.csv
+60 Sul/Rio Grande do Sul/Estacao_Alecrim_2012-01-01_2016-12-31.csv
+61 Sudeste/Rio de Janeiro/Estacao_Belford Roxo_2012-01-01_2016-12-31.csv
+62 Sudeste/Rio de Janeiro/Estacao_Seropedica_2012-01-01_2016-12-31.csv
+63 Sudeste/Rio de Janeiro/Estacao_Barra do Pirai_2012-01-01_2016-12-31.csv
+64 Sudeste/Rio de Janeiro/Estacao_Volta Redonda_2012-01-01_2016-12-31.csv
+65 Sudeste/Rio de Janeiro/Estacao_Tres Rios_2012-01-01_2016-12-31.csv
+66 Sudeste/Rio de Janeiro/Estacao_Varre-Sai_2012-01-01_2016-12-31.csv
+67 Sudeste/Rio de Janeiro/Estacao_Araruama_2012-01-01_2016-12-31.csv
+68 Sudeste/Rio de Janeiro/Estacao_Armacao dos Buzios_2012-01-01_2016-12-31.csv
+69 Sudeste/Rio de Janeiro/Estacao_Vassouras_2012-01-01_2016-12-31.csv
+70 Sudeste/Rio de Janeiro/Estacao_Aperibe_2012-01-01_2016-12-31.csv
+71 Sudeste/Rio de Janeiro/Estacao_Trajano de Moraes_2012-01-01_2016-12-31.csv
+72 Sudeste/Rio de Janeiro/Estacao_Silva Jardim_2012-01-01_2016-12-31.csv
+73 Sudeste/Rio de Janeiro/Estacao_Sumidouro_2012-01-01_2016-12-31.csv
+74 Sudeste/Rio de Janeiro/Estacao_Tangua_2012-01-01_2016-12-31.csv
+75 Sudeste/Rio de Janeiro/Estacao_Barra Mansa_2012-01-01_2016-12-31.csv
+76 Sudeste/Rio de Janeiro/Estacao_Rio de Janeiro_2012-01-01_2016-12-31.csv
+77 Sudeste/Rio de Janeiro/Estacao_Angra dos Reis_2012-01-01_2016-12-31.csv
+78 Sudeste/Rio de Janeiro/Estacao_Arraial do Cabo_2012-01-01_2016-12-31.csv
+79 Sudeste/Rio de Janeiro/Estacao_Teresopolis_2012-01-01_2016-12-31.csv
+80 Sudeste/Rio de Janeiro/Estacao_Areal_2012-01-01_2016-12-31.csv
+81 Sudeste/Espirito Santo/Estacao_Sooretama_2012-01-01_2016-12-31.csv
+82 Sudeste/Espirito Santo/Estacao_Alfredo Chaves_2012-01-01_2016-12-31.csv
+83 Sudeste/Espirito Santo/Estacao_Alto Rio Novo_2012-01-01_2016-12-31.csv
+84 Sudeste/Espirito Santo/Estacao_Atilio Vivacqua_2012-01-01_2016-12-31.csv
+85 Sudeste/Espirito Santo/Estacao_Vargem Alta_2012-01-01_2016-12-31.csv
+86 Sudeste/Espirito Santo/Estacao_Vila Valerio_2012-01-01_2016-12-31.csv
+87 Sudeste/Espirito Santo/Estacao_Aracruz_2012-01-01_2016-12-31.csv
+88 Sudeste/Espirito Santo/Estacao_Linhares_2012-01-01_2016-12-31.csv
+89 Sudeste/Espirito Santo/Estacao_Sao Roque do Canaa_2012-01-01_2016-12-31.csv
+90 Sudeste/Espirito Santo/Estacao_Vitoria_2012-01-01_2016-12-31.csv
+91 Sudeste/Espirito Santo/Estacao_Serra_2012-01-01_2016-12-31.csv
+92 Sudeste/Espirito Santo/Estacao_Apiaca_2012-01-01_2016-12-31.csv
+93 Sudeste/Espirito Santo/Estacao_Sao Mateus_2012-01-01_2016-12-31.csv
+94 Sudeste/Espirito Santo/Estacao_Vila Velha_2012-01-01_2016-12-31.csv
+95 Sudeste/Espirito Santo/Estacao_Aguia Branca_2012-01-01_2016-12-31.csv
+96 Sudeste/Espirito Santo/Estacao_Anchieta_2012-01-01_2016-12-31.csv
+97 Sudeste/Espirito Santo/Estacao_Venda Nova do Imigrante_2012-01-01_2016-12-31.csv
+98 Sudeste/Espirito Santo/Estacao_Alegre_2012-01-01_2016-12-31.csv
+99 Sudeste/Espirito Santo/Estacao_Vila Pavao_2012-01-01_2016-12-31.csv
+100 Sudeste/Espirito Santo/Estacao_Viana_2012-01-01_2016-12-31.csv
+101 Sudeste/Espirito Santo/Estacao_Afonso Claudio_2012-01-01_2016-12-31.csv
+102 Sudeste/Minas Gerais/Estacao_Vieiras_2012-01-01_2016-12-31.csv
+103 Sudeste/Minas Gerais/Estacao_Vespasiano_2012-01-01_2016-12-31.csv
+104 Sudeste/Minas Gerais/Estacao_Visconde do Rio Branco_2012-01-01_2016-12-31.csv
+105 Sudeste/Minas Gerais/Estacao_Virgolandia_2012-01-01_2016-12-31.csv
+106 Sudeste/Minas Gerais/Estacao_Vermelho Novo_2012-01-01_2016-12-31.csv
+107 Sudeste/Minas Gerais/Estacao_Abre Campo_2012-01-01_2016-12-31.csv
+108 Sudeste/Minas Gerais/Estacao_Acucena_2012-01-01_2016-12-31.csv
+109 Sudeste/Minas Gerais/Estacao_Virginia_2012-01-01_2016-12-31.csv
+110 Sudeste/Minas Gerais/Estacao_Aguanil_2012-01-01_2016-12-31.csv
+111 Sudeste/Minas Gerais/Estacao_Vicosa_2012-01-01_2016-12-31.csv
+112 Sudeste/Minas Gerais/Estacao_Aguas Vermelhas_2012-01-01_2016-12-31.csv
+113 Sudeste/Minas Gerais/Estacao_Volta Grande_2012-01-01_2016-12-31.csv
+114 Sudeste/Minas Gerais/Estacao_Aguas Formosas_2012-01-01_2016-12-31.csv
+115 Sudeste/Minas Gerais/Estacao_Abaete_2012-01-01_2016-12-31.csv
+116 Sudeste/Minas Gerais/Estacao_Belo Horizonte_2012-01-01_2016-12-31.csv
+117 Sudeste/Minas Gerais/Estacao_Wenceslau Braz_2012-01-01_2016-12-31.csv
+118 Sudeste/Minas Gerais/Estacao_Virginopolis_2012-01-01_2016-12-31.csv
+119 Sudeste/Minas Gerais/Estacao_Agua Comprida_2012-01-01_2016-12-31.csv
+120 Sudeste/Minas Gerais/Estacao_Virgem da Lapa_2012-01-01_2016-12-31.csv
+121 Sudeste/Minas Gerais/Estacao_Abadia dos Dourados_2012-01-01_2016-12-31.csv
+122 Sudeste/Minas Gerais/Estacao_Acaiaca_2012-01-01_2016-12-31.csv
+123 Sudeste/Sao Paulo/Estacao_Zacarias_2012-01-01_2016-12-31.csv
+124 Sudeste/Sao Paulo/Estacao_Aguas da Prata_2012-01-01_2016-12-31.csv
+125 Sudeste/Sao Paulo/Estacao_Sao Carlos_2012-01-01_2016-12-31.csv
+126 Sudeste/Sao Paulo/Estacao_Vista Alegre do Alto_2012-01-01_2016-12-31.csv
+127 Sudeste/Sao Paulo/Estacao_Vinhedo_2012-01-01_2016-12-31.csv
+128 Sudeste/Sao Paulo/Estacao_Viradouro_2012-01-01_2016-12-31.csv
+129 Sudeste/Sao Paulo/Estacao_Aguas de Lindoia_2012-01-01_2016-12-31.csv
+130 Sudeste/Sao Paulo/Estacao_Aguas de Santa Barbara_2012-01-01_2016-12-31.csv
+131 Sudeste/Sao Paulo/Estacao_Agudos_2012-01-01_2016-12-31.csv
+132 Sudeste/Sao Paulo/Estacao_Vargem Grande Paulista_2012-01-01_2016-12-31.csv
+133 Sudeste/Sao Paulo/Estacao_Votorantim_2012-01-01_2016-12-31.csv
+134 Sudeste/Sao Paulo/Estacao_Alambari_2012-01-01_2016-12-31.csv
+135 Sudeste/Sao Paulo/Estacao_Adamantina_2012-01-01_2016-12-31.csv
+136 Sudeste/Sao Paulo/Estacao_Varzea Paulista_2012-01-01_2016-12-31.csv
+137 Sudeste/Sao Paulo/Estacao_Vitoria Brasil_2012-01-01_2016-12-31.csv
+138 Sudeste/Sao Paulo/Estacao_Vargem Grande do Sul_2012-01-01_2016-12-31.csv
+139 Sudeste/Sao Paulo/Estacao_Aguas de Sao Pedro_2012-01-01_2016-12-31.csv
+140 Sudeste/Sao Paulo/Estacao_Sao Bernardo do Campo_2012-01-01_2016-12-31.csv
+141 Sudeste/Sao Paulo/Estacao_Votuporanga_2012-01-01_2016-12-31.csv
+142 Sudeste/Sao Paulo/Estacao_Sao Paulo_2012-01-01_2016-12-31.csv
+143 Nordeste/Ceara/Estacao_Uruoca_2012-01-01_2016-12-31.csv
+144 Nordeste/Ceara/Estacao_Limoeiro do Norte_2012-01-01_2016-12-31.csv
+145 Nordeste/Ceara/Estacao_Aiuaba_2012-01-01_2016-12-31.csv
+146 Nordeste/Ceara/Estacao_Alcantaras_2012-01-01_2016-12-31.csv
+147 Nordeste/Ceara/Estacao_Trairi_2012-01-01_2016-12-31.csv
+148 Nordeste/Ceara/Estacao_Tabuleiro do Norte_2012-01-01_2016-12-31.csv
+149 Nordeste/Ceara/Estacao_Altaneira_2012-01-01_2016-12-31.csv
+150 Nordeste/Ceara/Estacao_Acarau_2012-01-01_2016-12-31.csv
+151 Nordeste/Ceara/Estacao_Fortaleza_2012-01-01_2016-12-31.csv
+152 Nordeste/Ceara/Estacao_Acarape_2012-01-01_2016-12-31.csv
+153 Nordeste/Ceara/Estacao_Umirim_2012-01-01_2016-12-31.csv
+154 Nordeste/Ceara/Estacao_Varjota_2012-01-01_2016-12-31.csv
+155 Nordeste/Ceara/Estacao_Tururu_2012-01-01_2016-12-31.csv
+156 Nordeste/Ceara/Estacao_Varzea Alegre_2012-01-01_2016-12-31.csv
+157 Nordeste/Ceara/Estacao_Vicosa do Ceara_2012-01-01_2016-12-31.csv
+158 Nordeste/Ceara/Estacao_Ubajara_2012-01-01_2016-12-31.csv
+159 Nordeste/Ceara/Estacao_Uruburetama_2012-01-01_2016-12-31.csv
+160 Nordeste/Ceara/Estacao_Russas_2012-01-01_2016-12-31.csv
+161 Nordeste/Ceara/Estacao_Umari_2012-01-01_2016-12-31.csv
+162 Nordeste/Ceara/Estacao_Acopiara_2012-01-01_2016-12-31.csv
+163 Nordeste/Bahia/Estacao_Salvador_2012-01-01_2016-12-31.csv
+164 Nordeste/Bahia/Estacao_Acajutiba_2012-01-01_2016-12-31.csv
+165 Nordeste/Bahia/Estacao_Varzedo_2012-01-01_2016-12-31.csv
+166 Nordeste/Bahia/Estacao_Wenceslau Guimaraes_2012-01-01_2016-12-31.csv
+167 Nordeste/Bahia/Estacao_Alcobaca_2012-01-01_2016-12-31.csv
+168 Nordeste/Bahia/Estacao_Wanderley_2012-01-01_2016-12-31.csv
+169 Nordeste/Bahia/Estacao_Abaira_2012-01-01_2016-12-31.csv
+170 Nordeste/Bahia/Estacao_Aiquara_2012-01-01_2016-12-31.csv
+171 Nordeste/Bahia/Estacao_Vereda_2012-01-01_2016-12-31.csv
+172 Nordeste/Bahia/Estacao_Varzea do Poco_2012-01-01_2016-12-31.csv
+173 Nordeste/Bahia/Estacao_Agua Fria_2012-01-01_2016-12-31.csv
+174 Nordeste/Bahia/Estacao_Alagoinhas_2012-01-01_2016-12-31.csv
+175 Nordeste/Bahia/Estacao_Abare_2012-01-01_2016-12-31.csv
+176 Nordeste/Bahia/Estacao_Vera Cruz_2012-01-01_2016-12-31.csv
+177 Nordeste/Bahia/Estacao_Xique-Xique_2012-01-01_2016-12-31.csv
+178 Nordeste/Bahia/Estacao_Vitoria da Conquista_2012-01-01_2016-12-31.csv
+179 Nordeste/Bahia/Estacao_Almadina_2012-01-01_2016-12-31.csv
+180 Nordeste/Bahia/Estacao_Wagner_2012-01-01_2016-12-31.csv
+181 Nordeste/Bahia/Estacao_Adustina_2012-01-01_2016-12-31.csv
+182 Nordeste/Bahia/Estacao_Varzea Nova_2012-01-01_2016-12-31.csv
+183 Nordeste/Maranhao/Estacao_Altamira do Maranhao_2012-01-01_2016-12-31.csv
+184 Nordeste/Maranhao/Estacao_Aldeias Altas_2012-01-01_2016-12-31.csv
+185 Nordeste/Maranhao/Estacao_Bacuri_2012-01-01_2016-12-31.csv
+186 Nordeste/Maranhao/Estacao_Acailandia_2012-01-01_2016-12-31.csv
+187 Nordeste/Maranhao/Estacao_Tuntum_2012-01-01_2016-12-31.csv
+188 Nordeste/Maranhao/Estacao_Tutoia_2012-01-01_2016-12-31.csv
+189 Nordeste/Maranhao/Estacao_Sao Luis_2012-01-01_2016-12-31.csv
+190 Nordeste/Maranhao/Estacao_Vila Nova dos Martirios_2012-01-01_2016-12-31.csv
+191 Nordeste/Maranhao/Estacao_Vargem Grande_2012-01-01_2016-12-31.csv
+192 Nordeste/Maranhao/Estacao_Urbano Santos_2012-01-01_2016-12-31.csv
+193 Nordeste/Maranhao/Estacao_Ze Doca_2012-01-01_2016-12-31.csv
+194 Nordeste/Maranhao/Estacao_Vitorino Freire_2012-01-01_2016-12-31.csv
+195 Nordeste/Maranhao/Estacao_Alto Alegre do Maranhao_2012-01-01_2016-12-31.csv
+196 Nordeste/Maranhao/Estacao_Vitoria do Mearim_2012-01-01_2016-12-31.csv
+197 Nordeste/Maranhao/Estacao_Alto Alegre do Pindare_2012-01-01_2016-12-31.csv
+198 Nordeste/Maranhao/Estacao_Turilandia_2012-01-01_2016-12-31.csv
+199 Nordeste/Maranhao/Estacao_Alto Parnaiba_2012-01-01_2016-12-31.csv
+200 Nordeste/Maranhao/Estacao_Amapa do Maranhao_2012-01-01_2016-12-31.csv
+201 Nordeste/Maranhao/Estacao_Afonso Cunha_2012-01-01_2016-12-31.csv
+202 Nordeste/Maranhao/Estacao_Turiacu_2012-01-01_2016-12-31.csv
+203 Nordeste/Alagoas/Estacao_Branquinha_2012-01-01_2016-12-31.csv
+204 Nordeste/Alagoas/Estacao_Maceio_2012-01-01_2016-12-31.csv
+205 Nordeste/Alagoas/Estacao_Barra de Santo Antonio_2012-01-01_2016-12-31.csv
+206 Nordeste/Alagoas/Estacao_Taquarana_2012-01-01_2016-12-31.csv
+207 Nordeste/Alagoas/Estacao_Traipu_2012-01-01_2016-12-31.csv
+208 Nordeste/Alagoas/Estacao_Uniao dos Palmares_2012-01-01_2016-12-31.csv
+209 Nordeste/Alagoas/Estacao_Belo Monte_2012-01-01_2016-12-31.csv
+210 Nordeste/Alagoas/Estacao_Cajueiro_2012-01-01_2016-12-31.csv
+211 Nordeste/Alagoas/Estacao_Arapiraca_2012-01-01_2016-12-31.csv
+212 Nordeste/Alagoas/Estacao_Sao Miguel dos Campos_2012-01-01_2016-12-31.csv
+213 Nordeste/Alagoas/Estacao_Satuba_2012-01-01_2016-12-31.csv
+214 Nordeste/Alagoas/Estacao_Teotonio Vilela_2012-01-01_2016-12-31.csv
+215 Nordeste/Alagoas/Estacao_Boca da Mata_2012-01-01_2016-12-31.csv
+216 Nordeste/Alagoas/Estacao_Sao Jose da Tapera_2012-01-01_2016-12-31.csv
+217 Nordeste/Alagoas/Estacao_Senador Rui Palmeira_2012-01-01_2016-12-31.csv
+218 Nordeste/Alagoas/Estacao_Sao Luis do Quitunde_2012-01-01_2016-12-31.csv
+219 Nordeste/Alagoas/Estacao_Canapi_2012-01-01_2016-12-31.csv
+220 Nordeste/Alagoas/Estacao_Cacimbinhas_2012-01-01_2016-12-31.csv
+221 Nordeste/Alagoas/Estacao_Sao Miguel dos Milagres_2012-01-01_2016-12-31.csv
+222 Nordeste/Alagoas/Estacao_Anadia_2012-01-01_2016-12-31.csv
+223 Nordeste/Piaui/Estacao_Uniao_2012-01-01_2016-12-31.csv
+224 Nordeste/Piaui/Estacao_Acaua_2012-01-01_2016-12-31.csv
+225 Nordeste/Piaui/Estacao_Wall Ferraz_2012-01-01_2016-12-31.csv
+226 Nordeste/Piaui/Estacao_Valenca do Piaui_2012-01-01_2016-12-31.csv
+227 Nordeste/Piaui/Estacao_Varzea Branca_2012-01-01_2016-12-31.csv
+228 Nordeste/Piaui/Estacao_Urucui_2012-01-01_2016-12-31.csv
+229 Nordeste/Piaui/Estacao_Altos_2012-01-01_2016-12-31.csv
+230 Nordeste/Piaui/Estacao_Alagoinha do Piaui_2012-01-01_2016-12-31.csv
+231 Nordeste/Piaui/Estacao_Sussuapara_2012-01-01_2016-12-31.csv
+232 Nordeste/Piaui/Estacao_Alto Longa_2012-01-01_2016-12-31.csv
+233 Nordeste/Piaui/Estacao_Vera Mendes_2012-01-01_2016-12-31.csv
+234 Nordeste/Piaui/Estacao_Amarante_2012-01-01_2016-12-31.csv
+235 Nordeste/Piaui/Estacao_Tamboril do Piaui_2012-01-01_2016-12-31.csv
+236 Nordeste/Piaui/Estacao_Alvorada do Gurgueia_2012-01-01_2016-12-31.csv
+237 Nordeste/Piaui/Estacao_Agua Branca_2012-01-01_2016-12-31.csv
+238 Nordeste/Piaui/Estacao_Alegrete do Piaui_2012-01-01_2016-12-31.csv
+239 Nordeste/Piaui/Estacao_Agricolandia_2012-01-01_2016-12-31.csv
+240 Nordeste/Piaui/Estacao_Teresina_2012-01-01_2016-12-31.csv
+241 Nordeste/Piaui/Estacao_Vila Nova do Piaui_2012-01-01_2016-12-31.csv
+242 Nordeste/Piaui/Estacao_Tanque do Piaui_2012-01-01_2016-12-31.csv
+243 Nordeste/Pernambuco/Estacao_Recife_2012-01-01_2016-12-31.csv
+244 Nordeste/Pernambuco/Estacao_Vertente do Lerio_2012-01-01_2016-12-31.csv
+245 Nordeste/Pernambuco/Estacao_Afogados da Ingazeira_2012-01-01_2016-12-31.csv
+246 Nordeste/Pernambuco/Estacao_Vitoria de Santo Antao_2012-01-01_2016-12-31.csv
+247 Nordeste/Pernambuco/Estacao_Tupanatinga_2012-01-01_2016-12-31.csv
+248 Nordeste/Pernambuco/Estacao_Afranio_2012-01-01_2016-12-31.csv
+249 Nordeste/Pernambuco/Estacao_Tracunhaem_2012-01-01_2016-12-31.csv
+250 Nordeste/Pernambuco/Estacao_Aguas Belas_2012-01-01_2016-12-31.csv
+251 Nordeste/Pernambuco/Estacao_Abreu e Lima_2012-01-01_2016-12-31.csv
+252 Nordeste/Pernambuco/Estacao_Agua Preta_2012-01-01_2016-12-31.csv
+253 Nordeste/Pernambuco/Estacao_Verdejante_2012-01-01_2016-12-31.csv
+254 Nordeste/Pernambuco/Estacao_Xexeu_2012-01-01_2016-12-31.csv
+255 Nordeste/Pernambuco/Estacao_Alianca_2012-01-01_2016-12-31.csv
+256 Nordeste/Pernambuco/Estacao_Vertentes_2012-01-01_2016-12-31.csv
+257 Nordeste/Pernambuco/Estacao_Venturosa_2012-01-01_2016-12-31.csv
+258 Nordeste/Pernambuco/Estacao_Tuparetama_2012-01-01_2016-12-31.csv
+259 Nordeste/Pernambuco/Estacao_Altinho_2012-01-01_2016-12-31.csv
+260 Nordeste/Pernambuco/Estacao_Amaraji_2012-01-01_2016-12-31.csv
+261 Nordeste/Pernambuco/Estacao_Agrestina_2012-01-01_2016-12-31.csv
+262 Nordeste/Pernambuco/Estacao_Vicencia_2012-01-01_2016-12-31.csv
+263 Nordeste/Paraiba/Estacao_Teixeira_2012-01-01_2016-12-31.csv
+264 Nordeste/Paraiba/Estacao_Arara_2012-01-01_2016-12-31.csv
+265 Nordeste/Paraiba/Estacao_Joao Pessoa_2012-01-01_2016-12-31.csv
+266 Nordeste/Paraiba/Estacao_Algodao de Jandaira_2012-01-01_2016-12-31.csv
+267 Nordeste/Paraiba/Estacao_Alhandra_2012-01-01_2016-12-31.csv
+268 Nordeste/Paraiba/Estacao_Tenorio_2012-01-01_2016-12-31.csv
+269 Nordeste/Paraiba/Estacao_Aracagi_2012-01-01_2016-12-31.csv
+270 Nordeste/Paraiba/Estacao_Alagoa Grande_2012-01-01_2016-12-31.csv
+271 Nordeste/Paraiba/Estacao_Zabele_2012-01-01_2016-12-31.csv
+272 Nordeste/Paraiba/Estacao_Uirauna_2012-01-01_2016-12-31.csv
+273 Nordeste/Paraiba/Estacao_Umbuzeiro_2012-01-01_2016-12-31.csv
+274 Nordeste/Paraiba/Estacao_Sossego_2012-01-01_2016-12-31.csv
+275 Nordeste/Paraiba/Estacao_Vista Serrana_2012-01-01_2016-12-31.csv
+276 Nordeste/Paraiba/Estacao_Alagoinha_2012-01-01_2016-12-31.csv
+277 Nordeste/Paraiba/Estacao_Aguiar_2012-01-01_2016-12-31.csv
+278 Nordeste/Paraiba/Estacao_Sume_2012-01-01_2016-12-31.csv
+279 Nordeste/Paraiba/Estacao_Vieiropolis_2012-01-01_2016-12-31.csv
+280 Nordeste/Paraiba/Estacao_Sousa_2012-01-01_2016-12-31.csv
+281 Nordeste/Paraiba/Estacao_Alagoa Nova_2012-01-01_2016-12-31.csv
+282 Nordeste/Paraiba/Estacao_Alcantil_2012-01-01_2016-12-31.csv
+283 Nordeste/Rio Gande do Norte/Estacao_Antonio Martins_2012-01-01_2016-12-31.csv
+284 Nordeste/Rio Gande do Norte/Estacao_Vila Flor_2012-01-01_2016-12-31.csv
+285 Nordeste/Rio Gande do Norte/Estacao_Timbauba dos Batistas_2012-01-01_2016-12-31.csv
+286 Nordeste/Rio Gande do Norte/Estacao_Almino Afonso_2012-01-01_2016-12-31.csv
+287 Nordeste/Rio Gande do Norte/Estacao_Acu_2012-01-01_2016-12-31.csv
+288 Nordeste/Rio Gande do Norte/Estacao_Alexandria_2012-01-01_2016-12-31.csv
+289 Nordeste/Rio Gande do Norte/Estacao_Alto do Rodrigues_2012-01-01_2016-12-31.csv
+290 Nordeste/Rio Gande do Norte/Estacao_Natal_2012-01-01_2016-12-31.csv
+291 Nordeste/Rio Gande do Norte/Estacao_Upanema_2012-01-01_2016-12-31.csv
+292 Nordeste/Rio Gande do Norte/Estacao_Touros_2012-01-01_2016-12-31.csv
+293 Nordeste/Rio Gande do Norte/Estacao_Afonso Bezerra_2012-01-01_2016-12-31.csv
+294 Nordeste/Rio Gande do Norte/Estacao_Umarizal_2012-01-01_2016-12-31.csv
+295 Nordeste/Rio Gande do Norte/Estacao_Acari_2012-01-01_2016-12-31.csv
+296 Nordeste/Rio Gande do Norte/Estacao_Venha-Ver_2012-01-01_2016-12-31.csv
+297 Nordeste/Rio Gande do Norte/Estacao_Varzea_2012-01-01_2016-12-31.csv
+298 Nordeste/Rio Gande do Norte/Estacao_Agua Nova_2012-01-01_2016-12-31.csv
+299 Nordeste/Rio Gande do Norte/Estacao_Triunfo Potiguar_2012-01-01_2016-12-31.csv
+300 Nordeste/Rio Gande do Norte/Estacao_Angicos_2012-01-01_2016-12-31.csv
+301 Nordeste/Rio Gande do Norte/Estacao_Tibau do Sul_2012-01-01_2016-12-31.csv
+302 Nordeste/Rio Gande do Norte/Estacao_Tibau_2012-01-01_2016-12-31.csv
+303 Nordeste/Sergipe/Estacao_Areia Branca_2012-01-01_2016-12-31.csv
+304 Nordeste/Sergipe/Estacao_Tomar do Geru_2012-01-01_2016-12-31.csv
+305 Nordeste/Sergipe/Estacao_Boquim_2012-01-01_2016-12-31.csv
+306 Nordeste/Sergipe/Estacao_Siriri_2012-01-01_2016-12-31.csv
+307 Nordeste/Sergipe/Estacao_Canhoba_2012-01-01_2016-12-31.csv
+308 Nordeste/Sergipe/Estacao_Sao Francisco_2012-01-01_2016-12-31.csv
+309 Nordeste/Sergipe/Estacao_Aquidaba_2012-01-01_2016-12-31.csv
+310 Nordeste/Sergipe/Estacao_Telha_2012-01-01_2016-12-31.csv
+311 Nordeste/Sergipe/Estacao_Campo do Brito_2012-01-01_2016-12-31.csv
+312 Nordeste/Sergipe/Estacao_Araua_2012-01-01_2016-12-31.csv
+313 Nordeste/Sergipe/Estacao_Aracaju_2012-01-01_2016-12-31.csv
+314 Nordeste/Sergipe/Estacao_Barra dos Coqueiros_2012-01-01_2016-12-31.csv
+315 Nordeste/Sergipe/Estacao_Umbauba_2012-01-01_2016-12-31.csv
+316 Nordeste/Sergipe/Estacao_Brejo Grande_2012-01-01_2016-12-31.csv
+317 Nordeste/Sergipe/Estacao_Sao Domingos_2012-01-01_2016-12-31.csv
+318 Nordeste/Sergipe/Estacao_Sao Cristovao_2012-01-01_2016-12-31.csv
+319 Nordeste/Sergipe/Estacao_Simao Dias_2012-01-01_2016-12-31.csv
+320 Nordeste/Sergipe/Estacao_Tobias Barreto_2012-01-01_2016-12-31.csv
+321 Nordeste/Sergipe/Estacao_Sao Miguel do Aleixo_2012-01-01_2016-12-31.csv
+322 Nordeste/Sergipe/Estacao_Caninde de Sao Francisco_2012-01-01_2016-12-31.csv
+323 Norte/Amapa/Estacao_Porto Grande_2012-01-01_2016-12-31.csv
+324 Norte/Amapa/Estacao_Ferreira Gomes_2012-01-01_2016-12-31.csv
+325 Norte/Amapa/Estacao_Cutias_2012-01-01_2016-12-31.csv
+326 Norte/Amapa/Estacao_Vitoria do Jari_2012-01-01_2016-12-31.csv
+327 Norte/Amapa/Estacao_Macapa_2012-01-01_2016-12-31.csv
+328 Norte/Amapa/Estacao_Itaubal_2012-01-01_2016-12-31.csv
+329 Norte/Amapa/Estacao_Amapa_2012-01-01_2016-12-31.csv
+330 Norte/Amapa/Estacao_Tartarugalzinho_2012-01-01_2016-12-31.csv
+331 Norte/Amapa/Estacao_Calcoene_2012-01-01_2016-12-31.csv
+332 Norte/Amapa/Estacao_Mazagao_2012-01-01_2016-12-31.csv
+333 Norte/Amapa/Estacao_Oiapoque_2012-01-01_2016-12-31.csv
+334 Norte/Amapa/Estacao_Serra do Navio_2012-01-01_2016-12-31.csv
+335 Norte/Amapa/Estacao_Laranjal do Jari_2012-01-01_2016-12-31.csv
+336 Norte/Amapa/Estacao_Pracuuba_2012-01-01_2016-12-31.csv
+337 Norte/Amapa/Estacao_Pedra Branca do Amapari_2012-01-01_2016-12-31.csv
+338 Norte/Tocantins/Estacao_Taguatinga_2012-01-01_2016-12-31.csv
+339 Norte/Tocantins/Estacao_Aragominas_2012-01-01_2016-12-31.csv
+340 Norte/Tocantins/Estacao_Xambioa_2012-01-01_2016-12-31.csv
+341 Norte/Tocantins/Estacao_Tocantinia_2012-01-01_2016-12-31.csv
+342 Norte/Tocantins/Estacao_Angico_2012-01-01_2016-12-31.csv
+343 Norte/Tocantins/Estacao_Alianca do Tocantins_2012-01-01_2016-12-31.csv
+344 Norte/Tocantins/Estacao_Almas_2012-01-01_2016-12-31.csv
+345 Norte/Tocantins/Estacao_Aguiarnopolis_2012-01-01_2016-12-31.csv
+346 Norte/Tocantins/Estacao_Tupirama_2012-01-01_2016-12-31.csv
+347 Norte/Tocantins/Estacao_Sucupira_2012-01-01_2016-12-31.csv
+348 Norte/Tocantins/Estacao_Palmas_2012-01-01_2016-12-31.csv
+349 Norte/Tocantins/Estacao_Tupiratins_2012-01-01_2016-12-31.csv
+350 Norte/Tocantins/Estacao_Wanderlandia_2012-01-01_2016-12-31.csv
+351 Norte/Tocantins/Estacao_Ananas_2012-01-01_2016-12-31.csv
+352 Norte/Tocantins/Estacao_Abreulandia_2012-01-01_2016-12-31.csv
+353 Norte/Tocantins/Estacao_Talisma_2012-01-01_2016-12-31.csv
+354 Norte/Tocantins/Estacao_Tocantinopolis_2012-01-01_2016-12-31.csv
+355 Norte/Tocantins/Estacao_Aparecida do Rio Negro_2012-01-01_2016-12-31.csv
+356 Norte/Tocantins/Estacao_Alvorada_2012-01-01_2016-12-31.csv
+357 Norte/Tocantins/Estacao_Taipas do Tocantins_2012-01-01_2016-12-31.csv
+358 Norte/Roraima/Estacao_Sao Luiz_2012-01-01_2016-12-31.csv
+359 Norte/Roraima/Estacao_Sao Joao da Baliza_2012-01-01_2016-12-31.csv
+360 Norte/Roraima/Estacao_Uiramuta_2012-01-01_2016-12-31.csv
+361 Norte/Roraima/Estacao_Amajari_2012-01-01_2016-12-31.csv
+362 Norte/Roraima/Estacao_Mucajai_2012-01-01_2016-12-31.csv
+363 Norte/Roraima/Estacao_Pacaraima_2012-01-01_2016-12-31.csv
+364 Norte/Roraima/Estacao_Rorainopolis_2012-01-01_2016-12-31.csv
+365 Norte/Roraima/Estacao_Normandia_2012-01-01_2016-12-31.csv
+366 Norte/Roraima/Estacao_Rorainopolis_2012-01-01_2016-12-31 (1).csv
+367 Norte/Roraima/Estacao_Caroebe_2012-01-01_2016-12-31.csv
+368 Norte/Roraima/Estacao_Caracarai_2012-01-01_2016-12-31.csv
+369 Norte/Roraima/Estacao_Canta_2012-01-01_2016-12-31.csv
+370 Norte/Acre/Estacao_Xapuri_2012-01-01_2016-12-31.csv
+371 Norte/Acre/Estacao_Porto Acre_2012-01-01_2016-12-31.csv
+372 Norte/Acre/Estacao_Senador Guiomard_2012-01-01_2016-12-31.csv
+373 Norte/Acre/Estacao_Bujari_2012-01-01_2016-12-31.csv
+374 Norte/Acre/Estacao_Feijo_2012-01-01_2016-12-31.csv
+375 Norte/Acre/Estacao_Brasileia_2012-01-01_2016-12-31.csv
+376 Norte/Acre/Estacao_Marechal Thaumaturgo_2012-01-01_2016-12-31.csv
+377 Norte/Acre/Estacao_Assis Brasil_2012-01-01_2016-12-31.csv
+378 Norte/Acre/Estacao_Santa Rosa do Purus_2012-01-01_2016-12-31.csv
+379 Norte/Acre/Estacao_Manoel Urbano_2012-01-01_2016-12-31.csv
+380 Norte/Acre/Estacao_Tarauaca_2012-01-01_2016-12-31.csv
+381 Norte/Acre/Estacao_Capixaba_2012-01-01_2016-12-31.csv
+382 Norte/Acre/Estacao_Rio Branco_2012-01-01_2016-12-31.csv
+383 Norte/Acre/Estacao_Epitaciolandia_2012-01-01_2016-12-31.csv
+384 Norte/Acre/Estacao_Sena Madureira_2012-01-01_2016-12-31.csv
+385 Norte/Acre/Estacao_Mancio Lima_2012-01-01_2016-12-31.csv
+386 Norte/Acre/Estacao_Placido de Castro_2012-01-01_2016-12-31.csv
+387 Norte/Acre/Estacao_Acrelandia_2012-01-01_2016-12-31.csv
+388 Norte/Acre/Estacao_Porto Walter_2012-01-01_2016-12-31.csv
+389 Norte/Acre/Estacao_Rodrigues Alves_2012-01-01_2016-12-31.csv
+390 Norte/Acre/Estacao_Jordao_2012-01-01_2016-12-31.csv
+391 Norte/Rondonia/Estacao_Sao Francisco do Guapore_2012-01-01_2016-12-31.csv
+392 Norte/Rondonia/Estacao_Castanheiras_2012-01-01_2016-12-31.csv
+393 Norte/Rondonia/Estacao_Campo Novo de Rondonia_2012-01-01_2016-12-31.csv
+394 Norte/Rondonia/Estacao_Seringueiras_2012-01-01_2016-12-31.csv
+395 Norte/Rondonia/Estacao_Candeias do Jamari_2012-01-01_2016-12-31.csv
+396 Norte/Rondonia/Estacao_Theobroma_2012-01-01_2016-12-31.csv
+397 Norte/Rondonia/Estacao_Vale do Anari_2012-01-01_2016-12-31.csv
+398 Norte/Rondonia/Estacao_Sao Miguel do Guapore_2012-01-01_2016-12-31.csv
+399 Norte/Rondonia/Estacao_Cacoal_2012-01-01_2016-12-31.csv
+400 Norte/Rondonia/Estacao_Rolim de Moura_2012-01-01_2016-12-31.csv
+401 Norte/Rondonia/Estacao_Vale do Paraiso_2012-01-01_2016-12-31.csv
+402 Norte/Rondonia/Estacao_Cacaulandia_2012-01-01_2016-12-31.csv
+403 Norte/Rondonia/Estacao_Ariquemes_2012-01-01_2016-12-31.csv
+404 Norte/Rondonia/Estacao_Rio Crespo_2012-01-01_2016-12-31.csv
+405 Norte/Rondonia/Estacao_Teixeiropolis_2012-01-01_2016-12-31.csv
+406 Norte/Rondonia/Estacao_Urupa_2012-01-01_2016-12-31.csv
+407 Norte/Rondonia/Estacao_Alto Alegre dos Parecis_2012-01-01_2016-12-31.csv
+408 Norte/Rondonia/Estacao_Vilhena_2012-01-01_2016-12-31.csv
+409 Norte/Rondonia/Estacao_Buritis_2012-01-01_2016-12-31.csv
+410 Norte/Rondonia/Estacao_Cabixi_2012-01-01_2016-12-31.csv
+411 Norte/Rondonia/Estacao_Porto Velho_2012-01-01_2016-12-31.csv
+412 Norte/Para/Estacao_Alenquer_2012-01-01_2016-12-31.csv
+413 Norte/Para/Estacao_Afua_2012-01-01_2016-12-31.csv
+414 Norte/Para/Estacao_Belem_2012-01-01_2016-12-31.csv
+415 Norte/Para/Estacao_Almeirim_2012-01-01_2016-12-31.csv
+416 Norte/Para/Estacao_Tracuateua_2012-01-01_2016-12-31.csv
+417 Norte/Para/Estacao_Acara_2012-01-01_2016-12-31.csv
+418 Norte/Para/Estacao_Tome-Acu_2012-01-01_2016-12-31.csv
+419 Norte/Para/Estacao_Vigia_2012-01-01_2016-12-31.csv
+420 Norte/Para/Estacao_Tucurui_2012-01-01_2016-12-31.csv
+421 Norte/Para/Estacao_Tucuma_2012-01-01_2016-12-31.csv
+422 Norte/Para/Estacao_Altamira_2012-01-01_2016-12-31.csv
+423 Norte/Para/Estacao_Abaetetuba_2012-01-01_2016-12-31.csv
+424 Norte/Para/Estacao_Abel Figueiredo_2012-01-01_2016-12-31.csv
+425 Norte/Para/Estacao_Ulianopolis_2012-01-01_2016-12-31.csv
+426 Norte/Para/Estacao_Agua Azul do Norte_2012-01-01_2016-12-31.csv
+427 Norte/Para/Estacao_Uruara_2012-01-01_2016-12-31.csv
+428 Norte/Para/Estacao_Viseu_2012-01-01_2016-12-31.csv
+429 Norte/Para/Estacao_Anajas_2012-01-01_2016-12-31.csv
+430 Norte/Para/Estacao_Trairao_2012-01-01_2016-12-31.csv
+431 Norte/Para/Estacao_Xinguara_2012-01-01_2016-12-31.csv
+432 Norte/Para/Estacao_Vitoria do Xingu_2012-01-01_2016-12-31.csv
+433 Norte/Amazonas/Estacao_Barreirinha_2012-01-01_2016-12-31.csv
+434 Norte/Amazonas/Estacao_Atalaia do Norte_2012-01-01_2016-12-31.csv
+435 Norte/Amazonas/Estacao_Tonantins_2012-01-01_2016-12-31.csv
+436 Norte/Amazonas/Estacao_Anama_2012-01-01_2016-12-31.csv
+437 Norte/Amazonas/Estacao_Urucurituba_2012-01-01_2016-12-31.csv
+438 Norte/Amazonas/Estacao_Sao Sebastiao do Uatuma_2012-01-01_2016-12-31.csv
+439 Norte/Amazonas/Estacao_Urucara_2012-01-01_2016-12-31.csv
+440 Norte/Amazonas/Estacao_Anori_2012-01-01_2016-12-31.csv
+441 Norte/Amazonas/Estacao_Autazes_2012-01-01_2016-12-31.csv
+442 Norte/Amazonas/Estacao_Manaus_2012-01-01_2016-12-31.csv
+443 Norte/Amazonas/Estacao_Sao Paulo de Olivenca_2012-01-01_2016-12-31.csv
+444 Norte/Amazonas/Estacao_Tapaua_2012-01-01_2016-12-31.csv
+445 Norte/Amazonas/Estacao_Apui_2012-01-01_2016-12-31.csv
+446 Norte/Amazonas/Estacao_Amatura_2012-01-01_2016-12-31.csv
+447 Norte/Amazonas/Estacao_Tefe_2012-01-01_2016-12-31.csv
+448 Norte/Amazonas/Estacao_Barcelos_2012-01-01_2016-12-31.csv
+449 Norte/Amazonas/Estacao_Sao Gabriel da Cachoeira_2012-01-01_2016-12-31.csv
+450 Norte/Amazonas/Estacao_Uarini_2012-01-01_2016-12-31.csv
+451 Norte/Amazonas/Estacao_Silves_2012-01-01_2016-12-31.csv
+452 Norte/Amazonas/Estacao_Alvaraes_2012-01-01_2016-12-31.csv
+453 Centro-Oeste/DF/Estacao_Brasilia_2012-01-01_2016-12-31.csv
+454 Centro-Oeste/Mato Grosso do Sul/Estacao_Sete Quedas_2012-01-01_2016-12-31.csv
+455 Centro-Oeste/Mato Grosso do Sul/Estacao_Anastacio_2012-01-01_2016-12-31.csv
+456 Centro-Oeste/Mato Grosso do Sul/Estacao_Tacuru_2012-01-01_2016-12-31.csv
+457 Centro-Oeste/Mato Grosso do Sul/Estacao_Terenos_2012-01-01_2016-12-31.csv
+458 Centro-Oeste/Mato Grosso do Sul/Estacao_Agua Clara_2012-01-01_2016-12-31.csv
+459 Centro-Oeste/Mato Grosso do Sul/Estacao_Sonora_2012-01-01_2016-12-31.csv
+460 Centro-Oeste/Mato Grosso do Sul/Estacao_Antonio Joao_2012-01-01_2016-12-31.csv
+461 Centro-Oeste/Mato Grosso do Sul/Estacao_Sidrolandia_2012-01-01_2016-12-31.csv
+462 Centro-Oeste/Mato Grosso do Sul/Estacao_Campo Grande_2012-01-01_2016-12-31.csv
+463 Centro-Oeste/Mato Grosso do Sul/Estacao_Sao Gabriel do Oeste_2012-01-01_2016-12-31.csv
+464 Centro-Oeste/Mato Grosso do Sul/Estacao_Alcinopolis_2012-01-01_2016-12-31.csv
+465 Centro-Oeste/Mato Grosso do Sul/Estacao_Tres Lagoas_2012-01-01_2016-12-31.csv
+466 Centro-Oeste/Mato Grosso do Sul/Estacao_Anaurilandia_2012-01-01_2016-12-31.csv
+467 Centro-Oeste/Mato Grosso do Sul/Estacao_Aparecida do Taboado_2012-01-01_2016-12-31.csv
+468 Centro-Oeste/Mato Grosso do Sul/Estacao_Aquidauana_2012-01-01_2016-12-31.csv
+469 Centro-Oeste/Mato Grosso do Sul/Estacao_Amambai_2012-01-01_2016-12-31.csv
+470 Centro-Oeste/Mato Grosso do Sul/Estacao_Angelica_2012-01-01_2016-12-31.csv
+471 Centro-Oeste/Mato Grosso do Sul/Estacao_Selviria_2012-01-01_2016-12-31.csv
+472 Centro-Oeste/Mato Grosso do Sul/Estacao_Taquarussu_2012-01-01_2016-12-31.csv
+473 Centro-Oeste/Mato Grosso do Sul/Estacao_Vicentina_2012-01-01_2016-12-31.csv
+474 Centro-Oeste/Goias/Estacao_Varjao_2012-01-01_2016-12-31.csv
+475 Centro-Oeste/Goias/Estacao_Aguas Lindas de Goias_2012-01-01_2016-12-31.csv
+476 Centro-Oeste/Goias/Estacao_Urutai_2012-01-01_2016-12-31.csv
+477 Centro-Oeste/Goias/Estacao_Aloandia_2012-01-01_2016-12-31.csv
+478 Centro-Oeste/Goias/Estacao_Vila Propicio_2012-01-01_2016-12-31.csv
+479 Centro-Oeste/Goias/Estacao_Goiania_2012-01-01_2016-12-31.csv
+480 Centro-Oeste/Goias/Estacao_Alexania_2012-01-01_2016-12-31.csv
+481 Centro-Oeste/Goias/Estacao_Vicentinopolis_2012-01-01_2016-12-31.csv
+482 Centro-Oeste/Goias/Estacao_Acreuna_2012-01-01_2016-12-31.csv
+483 Centro-Oeste/Goias/Estacao_Abadiania_2012-01-01_2016-12-31.csv
+484 Centro-Oeste/Goias/Estacao_Vianopolis_2012-01-01_2016-12-31.csv
+485 Centro-Oeste/Goias/Estacao_Uruacu_2012-01-01_2016-12-31.csv
+486 Centro-Oeste/Goias/Estacao_Vila Boa_2012-01-01_2016-12-31.csv
+487 Centro-Oeste/Goias/Estacao_Valparaiso de Goias_2012-01-01_2016-12-31.csv
+488 Centro-Oeste/Goias/Estacao_Abadia de Goias_2012-01-01_2016-12-31.csv
+489 Centro-Oeste/Goias/Estacao_Uruana_2012-01-01_2016-12-31.csv
+490 Centro-Oeste/Goias/Estacao_Adelandia_2012-01-01_2016-12-31.csv
+491 Centro-Oeste/Goias/Estacao_Agua Limpa_2012-01-01_2016-12-31.csv
+492 Centro-Oeste/Goias/Estacao_Agua Fria de Goias_2012-01-01_2016-12-31.csv
+493 Centro-Oeste/Goias/Estacao_Uirapuru_2012-01-01_2016-12-31.csv
+494 Centro-Oeste/Mato Grosso/Estacao_Alto Araguaia_2012-01-01_2016-12-31.csv
+495 Centro-Oeste/Mato Grosso/Estacao_Terra Nova do Norte_2012-01-01_2016-12-31.csv
+496 Centro-Oeste/Mato Grosso/Estacao_Varzea Grande_2012-01-01_2016-12-31.csv
+497 Centro-Oeste/Mato Grosso/Estacao_Torixoreu_2012-01-01_2016-12-31.csv
+498 Centro-Oeste/Mato Grosso/Estacao_Alto Boa Vista_2012-01-01_2016-12-31.csv
+499 Centro-Oeste/Mato Grosso/Estacao_Agua Boa_2012-01-01_2016-12-31.csv
+500 Centro-Oeste/Mato Grosso/Estacao_Vila Rica_2012-01-01_2016-12-31.csv
+501 Centro-Oeste/Mato Grosso/Estacao_Alto Taquari_2012-01-01_2016-12-31.csv
+502 Centro-Oeste/Mato Grosso/Estacao_Acorizal_2012-01-01_2016-12-31.csv
+503 Centro-Oeste/Mato Grosso/Estacao_Vera_2012-01-01_2016-12-31.csv
+504 Centro-Oeste/Mato Grosso/Estacao_Alto Paraguai_2012-01-01_2016-12-31.csv
+505 Centro-Oeste/Mato Grosso/Estacao_Uniao do Sul_2012-01-01_2016-12-31.csv
+506 Centro-Oeste/Mato Grosso/Estacao_Apiacas_2012-01-01_2016-12-31.csv
+507 Centro-Oeste/Mato Grosso/Estacao_Vale de Sao Domingos_2012-01-01_2016-12-31.csv
+508 Centro-Oeste/Mato Grosso/Estacao_Tesouro_2012-01-01_2016-12-31.csv
+509 Centro-Oeste/Mato Grosso/Estacao_Tapurah_2012-01-01_2016-12-31.csv
+510 Centro-Oeste/Mato Grosso/Estacao_Vila Bela da Santissima Trindade_2012-01-01_2016-12-31.csv
+511 Centro-Oeste/Mato Grosso/Estacao_Cuiaba_2012-01-01_2016-12-31.csv
+512 Centro-Oeste/Mato Grosso/Estacao_Alto Garcas_2012-01-01_2016-12-31.csv
+513 Centro-Oeste/Mato Grosso/Estacao_Alta Floresta_2012-01-01_2016-12-31.csv
