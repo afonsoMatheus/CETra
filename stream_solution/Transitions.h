@@ -579,7 +579,7 @@ void Transitions<T>::showSurvs(){
 	
 	if(survs.empty()) return;
 
-	cout << "- Sobreviventes" << endl;
+	cout << "+ SOBREVIVENTES" << endl;
 	for(const auto &x : survs)cout << get<0>(x) << " -> " << get<1>(x)<< endl;
 	cout << endl;
 }
@@ -641,7 +641,10 @@ void Transitions<T>::showDeaths(){
 	if(deaths.empty()) return;
 
 	cout << "- Mortes" << endl;
-	for(const auto &x : deaths) cout << x << " -> DEATH " << endl;
+	for(const auto &x : deaths){
+		cout << x << " -> DEATH " << endl;
+	} 
+
 	cout << endl;
 }
 

@@ -51,6 +51,7 @@ class CETra{
 		clustering clusR;
 		unordered_map<C,float> refW;
 		statistics staR;
+		unsigned int refRate;
 
 		/* Evolutionary Clustering variables */
 		statistics staE;
@@ -127,6 +128,10 @@ class CETra{
 		void showTransitions(Transitions<C>&);
 
 		void showIntQueue();
+
+		void showRefRate(){
+			cout << "Survival Rate: " << refRate << endl;
+		}
 
 	public:
 
@@ -210,6 +215,8 @@ Transitions<C> CETra<S, C>::execute(const vector<S> &sen, const vector<C> &clu, 
 			/* Storing the clusters sizes statistics*/
 			for (const auto &x: clusR) 
 				staR[x.first].insert(staR[x.first].end(), x.second.size());
+
+			refRate = 1;
 
 			return Transitions<C>();
 
@@ -308,6 +315,8 @@ Transitions<C> CETra<S,C>::execute(const vector<S> &sen, const vector<C> &clu, c
 			/* Storing the clusters sizes plus the internal statistics inputted */
 			storeRefStatistics(list);
 
+			refRate = 1;
+
 			return Transitions<C>();
 
 		}else{
@@ -324,7 +333,7 @@ Transitions<C> CETra<S,C>::execute(const vector<S> &sen, const vector<C> &clu, c
 			Transitions<C> TRANS = trackTransitions(evoTable);
 
 			/* Showing survived clusters, if any */
-			//if(!TRANS.getSurvs().empty()) TRANS.showSurvs();
+			if(!TRANS.getSurvs().empty()) TRANS.showSurvs();
 
 			/* Verifying if there was any detected internal or external transitions */
 			if(TRANS.checkExtChange() || TRANS.checkIntChange()){
@@ -332,7 +341,7 @@ Transitions<C> CETra<S,C>::execute(const vector<S> &sen, const vector<C> &clu, c
 				//cout << "=== TRANS DETECTED ===" << endl << endl;
 
 				/* Showing the detected internal or/and external transitions */
-				//TRANS.showTransitions();
+				TRANS.showTransitions();
 
 				//cout << "### UPT REF CLUSTERING ###" << endl << endl;
 
@@ -341,10 +350,16 @@ Transitions<C> CETra<S,C>::execute(const vector<S> &sen, const vector<C> &clu, c
 				storeClustering(sen, clu, wei);
 				staR = staE;
 
+				refRate = 0;
+
 			}
 
 			/* Freeing the evolutionary clustering variables */
 			freeEvo();
+
+			refRate++;
+
+			showRefRate();
 
 			return TRANS;
 		}
@@ -744,7 +759,7 @@ void CETra<S, C>::extTransitions(Transitions<C>& TRANS){
 
 			float mcell = X.second[Y];
 
-			if (mcell > surv_limit){
+			if (mcell >= surv_limit){
 				
 				if(surv_cand = (C) -2){
 					surv_cand = lmap[Y];

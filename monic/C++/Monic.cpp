@@ -3,19 +3,19 @@
 #include <map>
 #include <string>
 #include <unordered_map>
-#include "/home/afonso/Documentos/Dissertação/Masters Degree/tests/ReadFile.h"
+//#include "/home/afonso/Documentos/Dissertação/Masters Degree/tests/ReadFile.h"
 
 using namespace std;
 
-unordered_map<int, vector<float>> overlapMatrix(const Clustering &C1, const Clustering &C2, const vector<int> &aux){
+unordered_map<unsigned int, vector<float>> overlapMatrix(const Clustering &C1, const Clustering &C2, const vector<unsigned int> &aux){
 
-	unordered_map<int, vector<float>> om;
+	unordered_map<unsigned int, vector<float>> om;
 
-	unordered_map<int,float> wei;
+	unordered_map<unsigned int,float> wei;
 
-	unordered_map<int,int> lmap;
+	unordered_map<unsigned int,int> lmap;
 
-	int a = 0;
+	unsigned int a = 0;
 	for(const auto &x: aux){
 		lmap[x] = a;
 		a++;
@@ -25,7 +25,7 @@ unordered_map<int, vector<float>> overlapMatrix(const Clustering &C1, const Clus
 
 		if(om.find(C1.clusters[i]) == om.end())
 			om[C1.clusters[i]] = vector<float>(aux.size());
-		wei[C1.clusters[i]] = wei[C1.clusters[i]] + C2.weights[i];
+		wei[C1.clusters[i]] = wei[C1.clusters[i]] + C1.weights[i];
 
 		for(auto j = 0; j < C2.sensors.size(); j++){
 
@@ -85,7 +85,7 @@ Transitions<C> extTransitions(const unordered_map<C, vector<float>> &matrix, con
 
 			float mcell = X.second[Y];
 
-			if (mcell > 0.5){
+			if (mcell >= 0.5){
 				
 				if(surv_cand = (C) -2){
 					surv_cand = lmap[Y];
@@ -118,7 +118,7 @@ Transitions<C> extTransitions(const unordered_map<C, vector<float>> &matrix, con
 
 			float split_weis = sumSplits(X.second, split_cand);
 
-			if(split_weis > 0.5){
+			if(split_weis >= 0.5){
 
 				for(const auto x: split_cand) {
 					
@@ -158,9 +158,9 @@ Transitions<C> extTransitions(const unordered_map<C, vector<float>> &matrix, con
 }
 
 template <typename C>
-void intTransitions(Transitions<C>& TRANS, unordered_map<int, vector<float>>& sta1, unordered_map<int, vector<float>>& sta2, vector<float>& limits){
+void intTransitions(Transitions<C>& TRANS, unordered_map<unsigned int, vector<float>>& sta1, unordered_map<unsigned int, vector<float>>& sta2, vector<float>& limits){
 
-	unordered_map<int, vector<float>> inter;
+	unordered_map<unsigned int, vector<float>> inter;
 
 	for(const auto &x: TRANS.getSurvs()){
 		for(int i = 0; i < sta1[x.first].size(); i++){
@@ -173,7 +173,7 @@ void intTransitions(Transitions<C>& TRANS, unordered_map<int, vector<float>>& st
 }
 
 template <typename C>
-void checkIntTrans(Transitions<C>& TRANS, vector<float>& limits, unordered_map<int, vector<float>> &inter){
+void checkIntTrans(Transitions<C>& TRANS, vector<float>& limits, unordered_map<unsigned int, vector<float>> &inter){
 
 	for(const auto &clu: inter){
 		for(auto i = 0; i < clu.second.size(); i++){
@@ -185,13 +185,13 @@ void checkIntTrans(Transitions<C>& TRANS, vector<float>& limits, unordered_map<i
 
 }
 
-Transitions<int> Monic(const Clustering &C1, const Clustering &C2, vector<float>& limits, vector<string>& names){
+Transitions<unsigned int> Monic(const Clustering &C1, const Clustering &C2, vector<float>& limits, vector<string>& names){
 
-	vector<int> aux_c1 = C1.clusters; 
+	vector<unsigned int> aux_c1 = C1.clusters; 
 	sort( aux_c1.begin(), aux_c1.end());
 	aux_c1.erase( unique( aux_c1.begin(), aux_c1.end() ), aux_c1.end());
 
-	unordered_map<int, vector<float>> staC1;
+	unordered_map<unsigned int, vector<float>> staC1;
 	for(const auto &x: C1.inter){
 		int i = 0;
 		for(const auto &y: aux_c1){
@@ -200,11 +200,11 @@ Transitions<int> Monic(const Clustering &C1, const Clustering &C2, vector<float>
 		}
 	}
 
-	vector<int> aux = C2.clusters; 
+	vector<unsigned int> aux = C2.clusters; 
 	sort( aux.begin(), aux.end() );
 	aux.erase( unique( aux.begin(), aux.end() ), aux.end());
 
-	unordered_map<int, vector<float>> staC2;
+	unordered_map<unsigned int, vector<float>> staC2;
 	for(const auto &x: C2.inter){
 		int i = 0;
 		for(const auto &y: aux){
@@ -213,17 +213,21 @@ Transitions<int> Monic(const Clustering &C1, const Clustering &C2, vector<float>
 		}
 	}
 
-	unordered_map<int, vector<float>> mat = overlapMatrix(C1, C2, aux);
+	unordered_map<unsigned int, vector<float>> mat = overlapMatrix(C1, C2, aux);
 
-	Transitions<int> TRANS = extTransitions<int>(mat, aux);
+	Transitions<unsigned int> TRANS = extTransitions<unsigned int>(mat, aux);
+
+	TRANS.insertExtMatrix(mat);
 
 	TRANS.insertInterN(names);
 
 	intTransitions(TRANS, staC1, staC2, limits);
 
+	TRANS.showSurvs();
+	TRANS.showTransitions();
+
 	return TRANS;
 
-	//TRANS.showSurvs();
-	//TRANS.showTransitions();
+	
 
 }
